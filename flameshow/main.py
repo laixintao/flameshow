@@ -10,6 +10,7 @@ from flameshow.parser import ProfileParser
 from flameshow.render import FlameGraphApp
 from flameshow.pprof_parser import parse_golang_profile
 from flameshow.const import MAX_RENDER_DEPTH, MIN_RENDER_DEPTH
+from flameshow import __version__
 
 
 logger = logging.getLogger(__name__)
@@ -75,6 +76,13 @@ def run_app(verbose, log_to, format, profile, _debug_exit_after_rednder):
         raise UsageError("Unsupported format = {}".format(format))
 
 
+def print_version(ctx, param, value):
+    if not value or ctx.resilient_parsing:
+        return
+    click.echo(__version__)
+    ctx.exit()
+
+
 @click.command()
 @click.option("-v", "--verbose", count=True, default=2)
 @click.option("-l", "--log-to", type=click.Path(), default=None)
@@ -83,6 +91,9 @@ def run_app(verbose, log_to, format, profile, _debug_exit_after_rednder):
     "--format",
     type=click.Choice(["flamegraph", "json"], case_sensitive=False),
     default="flamegraph",
+)
+@click.option(
+    "--version", is_flag=True, callback=print_version, expose_value=False, is_eager=True
 )
 @click.argument("profile", type=click.File("rb"))
 def main(verbose, log_to, format, profile):
