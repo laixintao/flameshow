@@ -16,7 +16,7 @@ class SpanContainer(Widget):
     }
     """
 
-    def __init__(self, root_stack, my_width, level, i, *args, **kwargs):
+    def __init__(self, root_stack, my_width, level, i, sample_unit, *args, **kwargs):
         """
         Args:
             level: recursive render level limit
@@ -26,6 +26,7 @@ class SpanContainer(Widget):
         self.my_width = my_width
         self.level = level
         self.i = i
+        self.sample_unit = sample_unit
 
     def compose(self) -> ComposeResult:
         # render current all the way down, until one got multi children
@@ -38,7 +39,11 @@ class SpanContainer(Widget):
             is_deepest_level = self.level == 0 and len(current_stack.children) > 1
 
             yield Span(
-                current_stack, is_deepest_level, sample_index=self.i, my_width=width
+                current_stack,
+                is_deepest_level,
+                sample_index=self.i,
+                sample_unit=self.sample_unit,
+                my_width=width,
             )
 
             if is_deepest_level or not current_stack.children:
@@ -84,6 +89,10 @@ class SpanContainer(Widget):
                 level = self.level - 1
             else:
                 level = 0
-            widgets.append(SpanContainer(child, style_w, level=level, i=self.i))
+            widgets.append(
+                SpanContainer(
+                    child, style_w, level=level, i=self.i, sample_unit=self.sample_unit
+                )
+            )
 
         return Horizontal(*widgets)

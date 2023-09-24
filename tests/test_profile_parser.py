@@ -65,5 +65,5 @@ def test_render_detail_when_parent_zero():
     s1 = Stack("s1", 1, values=[0], parent=root, root=root)
     s1.line.function_name = "asdf"
 
-    detail = s1.render_detail(0)
+    detail = s1.render_detail(0, "bytes")
     assert "(0.0% of parent, 0.0% of root)" in detail
