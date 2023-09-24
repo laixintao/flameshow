@@ -172,6 +172,7 @@ class FlameGraphApp(App):
             "100%",
             level=self._max_level,
             i=self.sample_index,
+            sample_unit=self.sample_unit,
         )
 
         widgets = [*parents, children]
@@ -201,6 +202,7 @@ class FlameGraphApp(App):
                     s,
                     is_deepest_level=False,
                     sample_index=self.sample_index,
+                    sample_unit=self.sample_unit,
                     classes="parent-of-focus",
                 )
             )
@@ -421,7 +423,11 @@ class FlameGraphApp(App):
     def set_stack_detail(self, stack):
         span_detail = self.query_one("#span-detail")
         span_detail.border_subtitle = stack.render_title()
-        span_detail.update(stack.render_detail(self.sample_index))
+        span_detail.update(stack.render_detail(self.sample_index, self.sample_unit))
+
+    @property
+    def sample_unit(self):
+        return self.profile.sample_types[self.sample_index].sample_unit
 
     def is_span_exist(self, span_id):
         _id = f"#{fgid(span_id)}"

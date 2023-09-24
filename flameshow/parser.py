@@ -8,6 +8,7 @@ from typing import Dict, Tuple, List
 from typing_extensions import Self
 
 from textual.color import Color
+from flameshow.utils import sizeof
 
 
 logger = logging.getLogger(__name__)
@@ -104,7 +105,6 @@ class Stack:
         else:
             self.values = values
 
-
         parts = self.name.split("/")
         if len(parts) > 1:
             self.golang_package = "/".join(parts[:-1])
@@ -145,13 +145,20 @@ class Stack:
             return self._id == other._id
         return False
 
-    def render_detail(self, sample_index: int):
+    def humanize(self, sample_unit, value):
+        display_value = value
+        if sample_unit == "bytes":
+            display_value = sizeof(value)
+
+        return display_value
+
+    def render_detail(self, sample_index: int, sample_unit: str):
         """
         render 2 lines of detail information
         """
         if self._id == 0:  # root
             total = sum([c.values[sample_index] for c in self.children])
-            line1 = f"Total: {total}"
+            line1 = f"Total: {self.humanize(sample_unit, total)}"
             line2 = ""
             if self.children:
                 line2 = f"Binary: {self.children[0].mapping_file}"
@@ -177,8 +184,9 @@ class Stack:
                         self.values[sample_index] / self.root.values[sample_index] * 100
                     )
 
+                value = self.humanize(sample_unit, self.values[sample_index])
                 line2 = (
-                    f"{self.line.function_name}: [b red]{self.values[sample_index]}[/b"
+                    f"{self.line.function_name}: [b red]{value}[/b"
                     f" red] ({p_parent:.1f}% of parent, {p_root:.1f}% of root)"
                 )
         return line1 + os.linesep + line2
@@ -214,7 +222,6 @@ class ProfileParser:
         self.root = Stack("root", _id=self.idgenerator())
         self.total_sample = 0
         self.id_store = {self.root._id: self.root}
-
 
     def idgenerator(self):
         i = self.next_id

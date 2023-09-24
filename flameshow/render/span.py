@@ -32,20 +32,32 @@ class Span(Widget):
     """
 
     def __init__(
-        self, s_stack, is_deepest_level, sample_index, *args, my_width=1, **kwargs
+        self,
+        s_stack,
+        is_deepest_level,
+        sample_index,
+        sample_unit,
+        *args,
+        my_width=1,
+        **kwargs,
     ):
         super().__init__(id=fgid(s_stack._id), *args, **kwargs)
         self.s_stack = s_stack
         self.s_deepest = is_deepest_level
         self.my_width = my_width
         self.i = sample_index
+        self.sample_unit = sample_unit
 
     def on_mount(self) -> None:
         self.styles.background = self.s_stack.display_color
         self.styles.width = f"{self.my_width * 100:.2f}%"
 
         stack = self.s_stack
-        self.tooltip = stack.render_title() + os.linesep + stack.render_detail(self.i)
+        self.tooltip = (
+            stack.render_title()
+            + os.linesep
+            + stack.render_detail(self.i, self.sample_unit)
+        )
 
     def render(self) -> RenderableType:
         # actuall, just display self.s_text will still work
