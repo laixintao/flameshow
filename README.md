@@ -27,11 +27,5 @@ $ curl http://localhost:9100/debug/pprof/goroutine -o goroutine.out
 $ flameshow goroutine.out
 ```
 
-Or using pipe:
-
-```shell
-curl http://localhost:9100/debug/pprof/goroutine | flameshow -
-```
-
 Once you open flameshow, you should be able to use it, the UI is very easy to
 use.
