@@ -1,5 +1,7 @@
 # Flameshow
 
+<a href="https://badge.fury.io/py/flameshow"><img src="https://badge.fury.io/py/flameshow.svg" alt="PyPI version"></a>
+
 Flameshow is a terminal Flamegraph viewer.
 
 ![](./docs/flameshow.gif)
