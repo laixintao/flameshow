@@ -1,0 +1,358 @@
+{
+  "SampleType": [
+    {
+      "Type": "goroutine",
+      "Unit": "count"
+    }
+  ],
+  "Sample": [
+    {
+      "Label": null,
+      "Location": [
+        {
+          "Address": 4582655,
+          "ID": 1,
+          "IsFolded": false,
+          "Line": [
+            {
+              "Function": {
+                "Filename": "/usr/local/go/src/runtime/traceback.go",
+                "ID": 1,
+                "Name": "runtime.gentraceback",
+                "StartLine": 0,
+                "SystemName": "runtime.gentraceback"
+              },
+              "Line": 177
+            }
+          ],
+          "Mapping": {
+            "BuildID": "",
+            "File": "/usr/bin/node-exporter",
+            "HasFilenames": false,
+            "HasFunctions": true,
+            "HasInlineFrames": false,
+            "HasLineNumbers": false,
+            "ID": 1,
+            "KernelRelocationSymbol": "",
+            "Limit": 11280384,
+            "Offset": 0,
+            "Start": 4194304
+          }
+        },
+        {
+          "Address": 4532272,
+          "ID": 2,
+          "IsFolded": false,
+          "Line": [
+            {
+              "Function": {
+                "Filename": "/usr/local/go/src/runtime/stack.go",
+                "ID": 2,
+                "Name": "runtime.copystack",
+                "StartLine": 0,
+                "SystemName": "runtime.copystack"
+              },
+              "Line": 908
+            }
+          ],
+          "Mapping": {
+            "BuildID": "",
+            "File": "/usr/bin/node-exporter",
+            "HasFilenames": false,
+            "HasFunctions": true,
+            "HasInlineFrames": false,
+            "HasLineNumbers": false,
+            "ID": 1,
+            "KernelRelocationSymbol": "",
+            "Limit": 11280384,
+            "Offset": 0,
+            "Start": 4194304
+          }
+        },
+        {
+          "Address": 4533174,
+          "ID": 3,
+          "IsFolded": false,
+          "Line": [
+            {
+              "Function": {
+                "Filename": "/usr/local/go/src/runtime/stack.go",
+                "ID": 3,
+                "Name": "runtime.newstack",
+                "StartLine": 0,
+                "SystemName": "runtime.newstack"
+              },
+              "Line": 1078
+            }
+          ],
+          "Mapping": {
+            "BuildID": "",
+            "File": "/usr/bin/node-exporter",
+            "HasFilenames": false,
+            "HasFunctions": true,
+            "HasInlineFrames": false,
+            "HasLineNumbers": false,
+            "ID": 1,
+            "KernelRelocationSymbol": "",
+            "Limit": 11280384,
+            "Offset": 0,
+            "Start": 4194304
+          }
+        },
+        {
+          "Address": 4523594,
+          "ID": 4,
+          "IsFolded": false,
+          "Line": [
+            {
+              "Function": {
+                "Filename": "/usr/local/go/src/runtime/slice.go",
+                "ID": 4,
+                "Name": "runtime.makeslice",
+                "StartLine": 0,
+                "SystemName": "runtime.makeslice"
+              },
+              "Line": 83
+            }
+          ],
+          "Mapping": {
+            "BuildID": "",
+            "File": "/usr/bin/node-exporter",
+            "HasFilenames": false,
+            "HasFunctions": true,
+            "HasInlineFrames": false,
+            "HasLineNumbers": false,
+            "ID": 1,
+            "KernelRelocationSymbol": "",
+            "Limit": 11280384,
+            "Offset": 0,
+            "Start": 4194304
+          }
+        },
+        {
+          "Address": 5331654,
+          "ID": 5,
+          "IsFolded": false,
+          "Line": [
+            {
+              "Function": {
+                "Filename": "/usr/local/go/src/strings/builder.go",
+                "ID": 5,
+                "Name": "strings.(*Builder).grow",
+                "StartLine": 0,
+                "SystemName": "strings.(*Builder).grow"
+              },
+              "Line": 68
+            },
+            {
+              "Function": {
+                "Filename": "/usr/local/go/src/strings/builder.go",
+                "ID": 6,
+                "Name": "strings.(*Builder).Grow",
+                "StartLine": 0,
+                "SystemName": "strings.(*Builder).Grow"
+              },
+              "Line": 82
+            },
+            {
+              "Function": {
+                "Filename": "/usr/local/go/src/strings/strings.go",
+                "ID": 7,
+                "Name": "strings.Join",
+                "StartLine": 0,
+                "SystemName": "strings.Join"
+              },
+              "Line": 434
+            }
+          ],
+          "Mapping": {
+            "BuildID": "",
+            "File": "/usr/bin/node-exporter",
+            "HasFilenames": false,
+            "HasFunctions": true,
+            "HasInlineFrames": false,
+            "HasLineNumbers": false,
+            "ID": 1,
+            "KernelRelocationSymbol": "",
+            "Limit": 11280384,
+            "Offset": 0,
+            "Start": 4194304
+          }
+        },
+        {
+          "Address": 5810086,
+          "ID": 6,
+          "IsFolded": false,
+          "Line": [
+            {
+              "Function": {
+                "Filename": "/usr/local/go/src/path/filepath/path_unix.go",
+                "ID": 8,
+                "Name": "path/filepath.join",
+                "StartLine": 0,
+                "SystemName": "path/filepath.join"
+              },
+              "Line": 45
+            }
+          ],
+          "Mapping": {
+            "BuildID": "",
+            "File": "/usr/bin/node-exporter",
+            "HasFilenames": false,
+            "HasFunctions": true,
+            "HasInlineFrames": false,
+            "HasLineNumbers": false,
+            "ID": 1,
+            "KernelRelocationSymbol": "",
+            "Limit": 11280384,
+            "Offset": 0,
+            "Start": 4194304
+          }
+        },
+        {
+          "Address": 10874332,
+          "ID": 7,
+          "IsFolded": false,
+          "Line": [
+            {
+              "Function": {
+                "Filename": "/usr/local/go/src/path/filepath/path.go",
+                "ID": 9,
+                "Name": "path/filepath.Join",
+                "StartLine": 0,
+                "SystemName": "path/filepath.Join"
+              },
+              "Line": 213
+            },
+            {
+              "Function": {
+                "Filename": "/go/src/node_exporter/collector/paths.go",
+                "ID": 10,
+                "Name": "github.com/prometheus/node_exporter/collector.procFilePath",
+                "StartLine": 0,
+                "SystemName": "github.com/prometheus/node_exporter/collector.procFilePath"
+              },
+              "Line": 32
+            },
+            {
+              "Function": {
+                "Filename": "/go/src/node_exporter/collector/meminfo_linux.go",
+                "ID": 11,
+                "Name": "github.com/prometheus/node_exporter/collector.(*meminfoCollector).getMemInfo",
+                "StartLine": 0,
+                "SystemName": "github.com/prometheus/node_exporter/collector.(*meminfoCollector).getMemInfo"
+              },
+              "Line": 34
+            }
+          ],
+          "Mapping": {
+            "BuildID": "",
+            "File": "/usr/bin/node-exporter",
+            "HasFilenames": false,
+            "HasFunctions": true,
+            "HasInlineFrames": false,
+            "HasLineNumbers": false,
+            "ID": 1,
+            "KernelRelocationSymbol": "",
+            "Limit": 11280384,
+            "Offset": 0,
+            "Start": 4194304
+          }
+        },
+        {
+          "Address": 10872900,
+          "ID": 8,
+          "IsFolded": false,
+          "Line": [
+            {
+              "Function": {
+                "Filename": "/go/src/node_exporter/collector/meminfo.go",
+                "ID": 12,
+                "Name": "github.com/prometheus/node_exporter/collector.(*meminfoCollector).Update",
+                "StartLine": 0,
+                "SystemName": "github.com/prometheus/node_exporter/collector.(*meminfoCollector).Update"
+              },
+              "Line": 50
+            }
+          ],
+          "Mapping": {
+            "BuildID": "",
+            "File": "/usr/bin/node-exporter",
+            "HasFilenames": false,
+            "HasFunctions": true,
+            "HasInlineFrames": false,
+            "HasLineNumbers": false,
+            "ID": 1,
+            "KernelRelocationSymbol": "",
+            "Limit": 11280384,
+            "Offset": 0,
+            "Start": 4194304
+          }
+        },
+        {
+          "Address": 10682787,
+          "ID": 9,
+          "IsFolded": false,
+          "Line": [
+            {
+              "Function": {
+                "Filename": "/go/src/node_exporter/collector/collector.go",
+                "ID": 13,
+                "Name": "github.com/prometheus/node_exporter/collector.execute",
+                "StartLine": 0,
+                "SystemName": "github.com/prometheus/node_exporter/collector.execute"
+              },
+              "Line": 161
+            }
+          ],
+          "Mapping": {
+            "BuildID": "",
+            "File": "/usr/bin/node-exporter",
+            "HasFilenames": false,
+            "HasFunctions": true,
+            "HasInlineFrames": false,
+            "HasLineNumbers": false,
+            "ID": 1,
+            "KernelRelocationSymbol": "",
+            "Limit": 11280384,
+            "Offset": 0,
+            "Start": 4194304
+          }
+        },
+        {
+          "Address": 11206640,
+          "ID": 10,
+          "IsFolded": false,
+          "Line": [
+            {
+              "Function": {
+                "Filename": "/go/src/node_exporter/collector/collector.go",
+                "ID": 14,
+                "Name": "github.com/prometheus/node_exporter/collector.NodeCollector.Collect.func1",
+                "StartLine": 0,
+                "SystemName": "github.com/prometheus/node_exporter/collector.NodeCollector.Collect.func1"
+              },
+              "Line": 152
+            }
+          ],
+          "Mapping": {
+            "BuildID": "",
+            "File": "/usr/bin/node-exporter",
+            "HasFilenames": false,
+            "HasFunctions": true,
+            "HasInlineFrames": false,
+            "HasLineNumbers": false,
+            "ID": 1,
+            "KernelRelocationSymbol": "",
+            "Limit": 11280384,
+            "Offset": 0,
+            "Start": 4194304
+          }
+        }
+      ],
+      "NumLabel": null,
+      "NumUnit": null,
+      "Value": [1, 10000000]
+    }
+  ]
+}
