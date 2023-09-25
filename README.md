@@ -11,7 +11,7 @@ Flameshow is a terminal Flamegraph viewer.
 - Renders Flamegraphs in your terminal
 - Supports zooming in and displaying percentages
 - Keyboard input is prioritized
-- However, all operations in Flameshow can also be performed using the mouse
+- All operations can also be performed using the mouse.
 - Can switch to different sample types
 
 ## Install
@@ -22,7 +22,7 @@ pip install flameshow
 
 Requirements: needs `go` command available for building `.so` file for Golang.
 
-(`.whl`s are on the way!)
+(Python wheels are on the way!)
 
 ## Usage
 
@@ -33,8 +33,24 @@ $ curl http://localhost:9100/debug/pprof/goroutine -o goroutine.out
 $ flameshow goroutine.out
 ```
 
-Once you open flameshow, you should be able to use it, the UI is very easy to
-use.
+use. Once you open Flameshow, the user-friendly UI should make it easy to
+navigate.
 
 Currently it only supports Golang's pprof dump, I am working on supporting more
 formats
+
+## Development
+
+If you want to dive into the code and make some changes, start with:
+
+```shell
+git clone git@github.com:laixintao/flameshow.git
+cd flameshow
+pip install poetry
+poetry install
+```
+
+---
+
+This project is proudly powered by
+[textual](https://github.com/Textualize/textual).
