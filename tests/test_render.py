@@ -1,5 +1,5 @@
 import pytest
-from flameshow.parser import ProfileParser
+from flameshow.parser import Profile, ProfileParser, SampleType
 from flameshow.render import FlameGraphApp
 from flameshow.pprof_parser import parse_golang_profile
 
@@ -27,3 +27,33 @@ async def test_render_goroutine_child_not_100percent_of_parent(data_dir):
         for i in range(369, 379):
             child = app.query_one(f"#fg-{i}")
             assert child.styles.width.value == 66.67
+
+
+def test_default_sample_types_heap():
+    p = Profile()
+    app = FlameGraphApp(
+        Profile(),
+        15,
+        False,
+    )
+    p.sample_types = [
+        SampleType("alloc_objects", "count"),
+        SampleType("alloc_space", "bytes"),
+        SampleType("inuse_objects", "count"),
+        SampleType("inuse_space", "bytes"),
+    ]
+    assert app._choose_default_index(p.sample_types) == 3
+
+
+def test_default_sample_types_profile():
+    p = Profile()
+    app = FlameGraphApp(
+        Profile(),
+        15,
+        False,
+    )
+    p.sample_types = [
+        SampleType("samples", "count"),
+        SampleType("cpu", "nanoseconds"),
+    ]
+    assert app._choose_default_index(p.sample_types) == 0
