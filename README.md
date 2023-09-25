@@ -20,6 +20,10 @@ Flameshow is a terminal Flamegraph viewer.
 pip install flameshow
 ```
 
+Requirements: needs `go` command available for building `.so` file for Golang.
+
+(`.whl`s are on the way!)
+
 ## Usage
 
 View golang's goroutine dump:
