@@ -74,14 +74,14 @@ class FlameGraphApp(App):
     """
 
     focused_stack_id = reactive(0)
-    sample_index = reactive(0, init=False)
+    sample_index = reactive(None, init=False)
 
     def __init__(
         self,
         profile,
         max_level,
         _debug_exit_after_rednder=False,
-        default_sample_index=0,
+        default_sample_index=None,
         *args,
         **kwargs,
     ):
@@ -102,7 +102,17 @@ class FlameGraphApp(App):
 
         self.filename = self.profile.filename
 
-        self.sample_index = default_sample_index
+        if default_sample_index is not None:
+            self.sample_index = default_sample_index
+
+        self.sample_index = self._choose_default_index(self.profile.sample_types)
+
+    def _choose_default_index(self, sample_types):
+        for index, sample_type in enumerate(sample_types):
+            if sample_type.sample_type == "inuse_space":
+                return index
+
+        return 0
 
     def on_mount(self):
         logger.info("mounted")
@@ -121,7 +131,6 @@ class FlameGraphApp(App):
             RadioButton(f"{s.sample_type}, {s.sample_unit}")
             for s in self.profile.sample_types
         ]
-        # TODO for heap default to inuse bytes
         options[self.sample_index].value = True
         radioset = RadioSet(*options, id="sample-type-radio")
         detail_row = Horizontal(
@@ -221,7 +230,11 @@ class FlameGraphApp(App):
         logger.info("sample index changed to %d", sample_index)
 
         center_text = self._center_header_text(self.sample_index)
-        header = self.query_one("FlameshowHeader")
+        try:
+            header = self.query_one("FlameshowHeader")
+        except NoMatches:
+            logger.warning("FlameshowHeader not found, might be not composed yet.")
+            return
         header.center_text = center_text
 
         stack = self.profile.id_store[self.focused_stack_id]
