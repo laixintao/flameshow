@@ -35,3 +35,6 @@ $ flameshow goroutine.out
 
 Once you open flameshow, you should be able to use it, the UI is very easy to
 use.
+
+Currently it only supports Golang's pprof dump, I am working on supporting more
+formats
