@@ -55,19 +55,20 @@ class FlameGraphApp(App):
 
     DEFAULT_CSS = """
     #span-detail-container {
-        height: 6;
     }
 
     #span-detail {
         width: 1fr;
+        height: 1fr;
         padding: 0 1;
         border: round $secondary;
         border-subtitle-align: left;
-        background:   $boost;
+        content-align-vertical: middle;
     }
 
     #sample-type-radio {
         width: 20%;
+        height: 1fr;
     }
 
     """
@@ -123,13 +124,18 @@ class FlameGraphApp(App):
         # TODO for heap default to inuse bytes
         options[self.sample_index].value = True
         radioset = RadioSet(*options, id="sample-type-radio")
-        yield Horizontal(
+        detail_row = Horizontal(
             Static(
                 id="span-detail",
             ),
             radioset,
             id="span-detail-container",
         )
+
+        # set min height, 2 lines of detail + 2 lines border
+        detail_row.styles.height = max(4, len(options) + 2)
+
+        yield detail_row
 
         yield FlameGraphScroll(
             Vertical(id="flamegraph-container"),
