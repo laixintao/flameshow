@@ -84,8 +84,20 @@ def print_version(ctx, param, value):
 
 
 @click.command()
-@click.option("-v", "--verbose", count=True, default=2)
-@click.option("-l", "--log-to", type=click.Path(), default=None)
+@click.option(
+    "-v",
+    "--verbose",
+    count=True,
+    default=2,
+    help="Add log verbose level, using -v, -vv, -vvv for printing more logs.",
+)
+@click.option(
+    "-l",
+    "--log-to",
+    type=click.Path(),
+    default=None,
+    help="Printing logs to a file, for debugging, default is no logs.",
+)
 @click.option(
     "-f",
     "--format",
