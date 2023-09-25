@@ -23,7 +23,8 @@ class GoExtBuilder(build_ext):
         try:
             build_ext.run(self)
         except (DistutilsPlatformError, FileNotFoundError):
-            print("Could not compile C extension.")
+            print("Could not compile Go extension.")
+            raise
 
     def build_extension(self, ext):
         ext_path = self.get_ext_fullpath(ext.name)
@@ -39,6 +40,7 @@ def build(setup_kwargs):
     """
     This function is mandatory in order to build the extensions.
     """
+    print("start to build golang extension...")
     setup_kwargs.update(
         {"ext_modules": ext_modules, "cmdclass": {"build_ext": GoExtBuilder}}
     )

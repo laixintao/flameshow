@@ -3,7 +3,10 @@ name = "flameshow"
 version = "0.1.3"
 description = ""
 authors = ["laixintao <laixintaoo@gmail.com>"]
+maintainers = ["laixintao <laixintaoo@gmail.com>"]
 readme = "README.md"
+homepage = "https://github.com/laixintao/flameshow"
+keywords = ["terminal", "golang", "pprof", "flamegraph"]
 packages = [{include = "flameshow"}]
 include = [
     { path = "go", format = "sdist" }
@@ -28,5 +31,6 @@ pytest = "^7.4.2"
 pytest-asyncio = "^0.21.1"
 
 [build-system]
-requires = ["poetry>=0.12", "setuptools"]
-build-backend = "poetry.masonry.api"
+# TODO should add this to deps?
+requires = ["poetry-core>=1.6.1", "setuptools"]
+build-backend = "poetry.core.masonry.api"

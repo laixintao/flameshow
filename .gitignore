@@ -165,3 +165,4 @@ flameshow/pprof_parser/_libpprofparser.cpython-310-darwin.h
 *.svg
 *.out
 flameshow/pprof_parser/_libpprofparser*
+*.tar.gz
