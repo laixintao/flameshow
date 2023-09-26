@@ -23,7 +23,10 @@ class GoExtBuilder(build_ext):
         try:
             build_ext.run(self)
         except (DistutilsPlatformError, FileNotFoundError):
-            print("Could not compile Go extension.")
+            print(
+                "Could not compile Go extension. Please make sure the `go` command is"
+                " available."
+            )
             raise
 
     def build_extension(self, ext):
