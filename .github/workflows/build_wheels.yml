@@ -22,8 +22,8 @@ jobs:
           CIBW_BEFORE_ALL_LINUX: >
             arch && 
             uname -m && 
-            apt update &&
-            apt install go &&
+            apt-get update &&
+            apt-get install go &&
             go version
         with:
           package-dir: .
