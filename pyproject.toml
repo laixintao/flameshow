@@ -33,10 +33,3 @@ pytest-asyncio = "^0.21.1"
 [build-system]
 requires = ["poetry-core", "setuptools"]
 build-backend = "poetry.core.masonry.api"
-
-# Install system library
-[tool.cibuildwheel.linux]
-before-all = [
-  "bash script/prepare_golang.sh",
-  "go version",
-]
