@@ -19,9 +19,10 @@ jobs:
             CIBW_TEST_REQUIRES: pytest
             CIBW_TEST_COMMAND: "pytest {project}/tests"  with:
             CIBW_SKIP: cp36-*
-          package-dir: .
-          output-dir: wheelhouse
-          config-file: "./pyproject.toml"
+          with:
+            package-dir: .
+            output-dir: wheelhouse
+            config-file: "./pyproject.toml"
 
       - uses: actions/upload-artifact@v3
         with:
