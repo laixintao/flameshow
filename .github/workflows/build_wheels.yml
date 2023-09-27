@@ -32,9 +32,6 @@ jobs:
           output-dir: wheelhouse
           config-file: "./pyproject.toml"
 
-      - name: Setup upterm session
-        uses: lhotari/action-upterm@v1
-
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
