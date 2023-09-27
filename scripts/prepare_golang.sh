@@ -4,7 +4,7 @@ set -ex
 
 GO_VERSION=1.21.1
 ARCH=$(uname -m)
-OS=Linux
+OS=linux
 
 if [ $ARCH == "x86_64" ]; then
   go_arch=amd64
