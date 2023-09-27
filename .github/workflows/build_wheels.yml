@@ -17,8 +17,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.16.1
         env:
           CIBW_TEST_REQUIRES: pytest
-          CIBW_TEST_COMMAND: "pytest {project}/tests"  with:
-          CIBW_SKIP: cp36-*
+          CIBW_TEST_COMMAND: "pytest"
         with:
           package-dir: .
           output-dir: wheelhouse
