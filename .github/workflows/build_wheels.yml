@@ -16,15 +16,17 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.16.1
         env:
-          CIBW_TEST_REQUIRES: pytest pytest_asyncio
-          CIBW_TEST_COMMAND: "pytest {project}/tests"
-
-          CIBW_PROJECT_REQUIRES_PYTHON: ">=3.10, <3.12"
-          CIBW_BEFORE_ALL_LINUX: "bash {project}/scripts/prepare_golang.sh"
-          CIBW_BEFORE_BUILD: "rm -rfv {project}/build"
           # TODO build for more
           CIBW_ARCHS_LINUX: "x86_64"
+          CIBW_PROJECT_REQUIRES_PYTHON: ">=3.10, <3.12"
+          CIBW_SKIP: "*musllinux*"
+
+          CIBW_BEFORE_ALL_LINUX: "bash {project}/scripts/prepare_golang.sh"
+          CIBW_BEFORE_BUILD: "rm -rfv {project}/build"
           CIBW_ENVIRONMENT: PATH=$PATH:/usr/local/go/bin
+
+          CIBW_TEST_REQUIRES: pytest pytest_asyncio
+          CIBW_TEST_COMMAND: "pytest {project}/tests"
         with:
           package-dir: .
           output-dir: wheelhouse
