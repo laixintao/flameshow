@@ -33,7 +33,3 @@ pytest-asyncio = "^0.21.1"
 [build-system]
 requires = ["poetry-core", "setuptools"]
 build-backend = "poetry.core.masonry.api"
-
-# compatiable with cbuildwheel
-[project]
-requires-python = ">=3.10"
