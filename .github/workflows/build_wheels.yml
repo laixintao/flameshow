@@ -17,7 +17,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.16.1
         env:
           CIBW_TEST_REQUIRES: pytest
-          CIBW_TEST_COMMAND: "pytest"
+          CIBW_TEST_COMMAND: "pytest {project}/tests"
           CIBW_PROJECT_REQUIRES_PYTHON: ">=3.10"
         with:
           package-dir: .
