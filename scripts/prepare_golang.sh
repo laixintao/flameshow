@@ -15,11 +15,10 @@ else
   exit 1
 fi
 
-DOWNLOAD="https://go.dev/dl/go1.21.1.darwin-${go_arch}.pkg"
 
-echo $DOWNLOAD
+FILENAME=go${GO_VERSION}.${OS}-${go_arch}.tar.gz
+echo $FILENAME
 
-FILENAME=go${GO_VERSION}.${OS}-${ARCH}.tar.gz
 curl -sS -LO https://go.dev/dl/${FILENAME}
 tar -C /usr/local -xzf $FILENAME
 export PATH=$PATH:/usr/local/go/bin
