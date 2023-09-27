@@ -37,9 +37,6 @@ build-backend = "poetry.core.masonry.api"
 # Install system library
 [tool.cibuildwheel.linux]
 before-all = [
-  "printenv",
-  "arch",
-  "uname -a",
-  "yum install -y go",
+  "bash script/prepare_golang.sh",
   "go version",
 ]
