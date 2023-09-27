@@ -8,7 +8,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, windows-2019, macos-11]
+        os: [ubuntu-20.04]
 
     steps:
       - uses: actions/checkout@v4
@@ -19,8 +19,8 @@ jobs:
           CIBW_TEST_REQUIRES: pytest
           CIBW_TEST_COMMAND: "pytest"
           CIBW_PROJECT_REQUIRES_PYTHON: ">=3.10"
-          CIBW_BEFORE_ALL: >
-            curl -LO https://go.dev/dl/go1.21.1.linux-amd64.tar.gza && \
+          CIBW_BEFORE_ALL_LINUX: >
+            curl -LO https://go.dev/dl/go1.21.1.linux-amd64.tar.gz && \
             tar -C /usr/local -xzf go1.21.1.linux-amd64.tar.gz && \
             export PATH=$PATH:/usr/local/go/bin && \
             go version
