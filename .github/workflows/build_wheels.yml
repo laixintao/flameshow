@@ -15,7 +15,10 @@ jobs:
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.16.1
-        with:
+          env:
+            CIBW_TEST_REQUIRES: pytest
+            CIBW_TEST_COMMAND: "pytest {project}/tests"  with:
+            CIBW_SKIP: cp36-*
           package-dir: .
           output-dir: wheelhouse
           config-file: "./pyproject.toml"
