@@ -23,3 +23,5 @@ curl -sS -LO https://go.dev/dl/${FILENAME}
 tar -C /usr/local -xzf $FILENAME
 export PATH=$PATH:/usr/local/go/bin
 go version
+
+yum install -y libffi-devel

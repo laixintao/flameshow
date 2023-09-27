@@ -18,6 +18,7 @@ jobs:
         env:
           CIBW_TEST_REQUIRES: pytest pytest_asyncio
           CIBW_TEST_COMMAND: "pytest {project}/tests"
+
           CIBW_PROJECT_REQUIRES_PYTHON: ">=3.10"
           CIBW_BEFORE_ALL_LINUX: "bash {project}/scripts/prepare_golang.sh"
           CIBW_BEFORE_BUILD: "rm -rfv {project}/build"
