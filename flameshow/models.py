@@ -84,15 +84,17 @@ class SampleType:
 @dataclass
 class Profile:
     filename: str = ""
-    root_stack: Frame | None = None
-    highest_lines: int = 0
-    total_sample: int = 0
+
     created_at: datetime.datetime | None = None
     id_store: Dict[int, Frame] = field(default_factory=dict)
 
     sample_types: List[SampleType] = field(default_factory=list)
-
     default_sample_type_index: int = -1
 
     period_type: SampleType | None = None
     period: int = 0
+
+    # TODO parse using protobuf
+    root_stack: Frame | None = None
+    highest_lines: int = 0
+    total_sample: int = 0
