@@ -6,8 +6,8 @@ import time
 from typing import Dict, Tuple, List
 from typing_extensions import Self
 
-from textual.color import Color
 from flameshow.utils import sizeof
+from .runtime import r
 
 
 logger = logging.getLogger(__name__)
@@ -35,11 +35,11 @@ class Frame:
         else:
             self.golang_package = "buildin"
 
-        self.golang_module_function = parts[-1]
-        self.golang_module = self.golang_module_function.split(".")[0]
+        golang_module_function = parts[-1]
+        golang_module = golang_module_function.split(".")[0]
 
-        self.display_name = self.golang_module_function
-        self.display_color = color_platte.get_color(self.golang_module)
+        self.display_name = golang_module_function
+        self.color_key = golang_module
 
         self.mapping_file = ""
         self.root = root
@@ -72,6 +72,10 @@ class Frame:
 
     def render_title(self) -> str:
         raise NotImplementedError
+
+    @property
+    def display_color(self):
+        return r.get_color(self.color_key)
 
 
 @dataclass
