@@ -31,7 +31,9 @@ class GoExtBuilder(build_ext):
 
     def build_extension(self, ext):
         ext_path = self.get_ext_fullpath(ext.name)
+        print(f"{ext_path=}")
         cmd = ["go", "build", "-buildmode=c-shared", "-o", ext_path]
+        print(f"{cmd=}")
         cmd += ext.sources
         out = call(cmd, cwd="./go")
 
