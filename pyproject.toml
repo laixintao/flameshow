@@ -22,9 +22,11 @@ typing-extensions = "^4.7.1"
 textual = "^0.37.1"
 click = "^8.1.7"
 cffi = "^1.15.1"
+protobuf = "^3.20"
 
 [tool.poetry.scripts]
 flameshow = 'flameshow.main:main'
+debug-flameshow = "flameshow.pprof_parser.pb_parse::main"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.2"

@@ -1,5 +1,6 @@
 import json
 from flameshow.parser import ProfileParser, Stack
+from flameshow.pprof_parser import parse_golang_profile
 
 
 def test_parse_sample_location_with_multiple_lines(data_dir):
@@ -67,3 +68,15 @@ def test_render_detail_when_parent_zero():
 
     detail = s1.render_detail(0, "bytes")
     assert "(0.0% of parent, 0.0% of root)" in detail
+
+
+def test_parse_to_json(data_dir):
+    with open(data_dir / "profile-10seconds.out", "rb") as f:
+        content = f.read()
+
+    loaded_json = parse_golang_profile(content)
+
+    with open(data_dir / "profile10s_node_exporter.json") as f:
+        expected_json = json.load(f)
+
+    assert loaded_json == expected_json
