@@ -1,7 +1,9 @@
 import gzip
 import logging
 
+from dataclasses import dataclass
 from . import profile_pb2
+from typing_extensions import List
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +23,16 @@ def parse_pprof_file(content) -> profile_pb2.Profile:
 
     return profile
 
+@dataclass
+class SampleType:
+    stype: str
+    unit: str
+    
+@dataclass
+class PprofProfile:
+    sample_type: List[SampleType]
+
+
 
 if __name__ == "__main__":
     with open("tests/pprof_data/profile-10seconds.out", "rb") as f:
@@ -29,3 +41,7 @@ if __name__ == "__main__":
     data = parse_pprof_file(content)
     print(dir(data))
     print(data.sample)
+    print(data.sample_type)
+    print(data.string_table)
+
+    pprof_profile = PprofProfile()

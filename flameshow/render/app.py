@@ -13,7 +13,7 @@ from textual.reactive import reactive
 from textual.widgets import Footer, Static, RadioSet, RadioButton
 from textual.events import Click
 
-from flameshow.parser import Stack
+from flameshow.models import Stack
 from flameshow.render.header import FlameshowHeader
 from flameshow.utils import fgid
 from flameshow import __version__
