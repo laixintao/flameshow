@@ -52,6 +52,7 @@ class ProfileParser:
 
         pprof_profile = Profile()
         pprof_profile.sample_types = self.parse_sample_types(pbdata.sample_type)
+        return pprof_profile
 
     def parse_sample_types(self, sample_types):
         result = []
