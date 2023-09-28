@@ -22,7 +22,7 @@ typing-extensions = "^4.7.1"
 textual = "^0.37.1"
 click = "^8.1.7"
 cffi = "^1.15.1"
-protobuf = "^3.20"
+protobuf = "^4.24"
 
 [tool.poetry.scripts]
 flameshow = 'flameshow.main:main'
