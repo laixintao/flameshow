@@ -58,8 +58,12 @@ class ProfileParser:
         pprof_profile.period = pbdata.period
         pprof_profile.period_type = self.to_smaple_type(pbdata.period_type)
 
-        print(pprof_profile.period)
-        print(pprof_profile.period_type)
+        if pbdata.default_sample_type:
+            pprof_profile.default_sample_type_index = pbdata.default_sample_type
+
+        print(type(pbdata.default_sample_type))
+        print(pbdata.default_sample_type)
+        print(pprof_profile.default_sample_type_index)
         return pprof_profile
 
     def parse_created_at(self, time_nanos):

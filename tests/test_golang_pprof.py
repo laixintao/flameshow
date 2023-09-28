@@ -22,6 +22,7 @@ def test_golang_goroutine_parse_using_protobuf(goroutine_pprof):
     assert profile.period_type.sample_type  == 'goroutine'
     assert profile.period_type.sample_unit  == 'count'
     assert profile.period == 1
+    assert profile.default_sample_type_index == -1
 
 def test_golang_profile10s_parse_using_protobuf(profile10s):
     profile = parse_profile(profile10s, "profile10s.json")
@@ -40,3 +41,4 @@ def test_golang_profile10s_parse_using_protobuf(profile10s):
     assert profile.period_type.sample_unit  == 'nanoseconds'
     assert profile.period == 10000000
 
+    assert profile.default_sample_type_index == -1

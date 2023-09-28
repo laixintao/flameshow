@@ -1,16 +1,12 @@
+from dataclasses import dataclass
 import datetime
 import logging
 import os
-import random
 import time
-from typing import Dict, List, Tuple
-from typing_extensions import Self
-from dataclasses import dataclass
+from typing import Tuple
 
-from textual.color import Color
-
-from flameshow.utils import sizeof
 from flameshow.models import Frame, Profile, SampleType
+from flameshow.utils import sizeof
 
 
 logger = logging.getLogger(__name__)
