@@ -67,7 +67,7 @@ end_color = Color.parse("#FFE637")
 color_platte = FlameGraphRandomColorPlatte()
 
 
-class Stack:
+class Frame:
     def __init__(
         self, name, _id, children=None, parent=None, values=None, root=None
     ) -> None:
@@ -117,7 +117,7 @@ class Stack:
         self.children.append(childstack)
 
     def __eq__(self, other):
-        if isinstance(other, Stack):
+        if isinstance(other, Frame):
             return self._id == other._id
         return False
 
@@ -137,9 +137,9 @@ class SampleType:
 @dataclass
 class Profile:
     filename: str = ""
-    root_stack: Stack | None = None
+    root_stack: Frame | None = None
     highest_lines: int = 0
     total_sample: int = 0
     created_at: datetime.datetime | None = None
-    id_store: Dict[int, Stack] = field(default_factory=dict)
+    id_store: Dict[int, Frame] = field(default_factory=dict)
     sample_types: List[SampleType] = field(default_factory=list)

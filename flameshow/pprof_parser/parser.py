@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from textual.color import Color
 
 from flameshow.utils import sizeof
-from flameshow.models import Stack, Profile, SampleType
+from flameshow.models import Frame, Profile, SampleType
 
 
 logger = logging.getLogger(__name__)
@@ -39,7 +39,7 @@ class Line:
 
 
 # TODO should be rename to Frame?
-class PprofStack(Stack):
+class PprofFrame(Frame):
     def __init__(
         self, name, _id, children=None, parent=None, values=None, root=None
     ) -> None:
@@ -104,7 +104,7 @@ class ProfileParser:
         self.next_id = 0
         # root must be created first, with id = 0
         # when render, focused ip will be set to 0 by default
-        self.root = PprofStack("root", _id=self.idgenerator())
+        self.root = PprofFrame("root", _id=self.idgenerator())
         self.total_sample = 0
         self.id_store = {self.root._id: self.root}
 
@@ -143,7 +143,7 @@ class ProfileParser:
 
         return head
 
-    def parse_single_location(self, location, values, parent) -> Tuple[Stack, Stack]:
+    def parse_single_location(self, location, values, parent) -> Tuple[Frame, Frame]:
         """
         Lines might be multiple, for every line, render to a stack
         returns the first stack, and the last stack (to continue the recurssion)
@@ -154,7 +154,7 @@ class ProfileParser:
         for line in reversed(location["Line"]):
             name = line["Function"]["Name"]
 
-            stack = PprofStack(name, self.idgenerator())
+            stack = PprofFrame(name, self.idgenerator())
             self.id_store[stack._id] = stack
             stack.values = values
             stack.parent = my_parent
@@ -174,7 +174,7 @@ class ProfileParser:
 
         return head, tail
 
-    def debug_root(self, root: Stack, indent=0):
+    def debug_root(self, root: Frame, indent=0):
         num = str(indent)
         space = num + " " * (indent - len(num))
         logger.debug(f"{space}{root.name=} ({root.values})")

@@ -13,7 +13,7 @@ from textual.reactive import reactive
 from textual.widgets import Footer, Static, RadioSet, RadioButton
 from textual.events import Click
 
-from flameshow.models import Stack
+from flameshow.models import Frame
 from flameshow.render.header import FlameshowHeader
 from flameshow.utils import fgid
 from flameshow import __version__
@@ -291,7 +291,7 @@ class FlameGraphApp(App):
         logger.info("event: %s", e)
         self.sample_index = e.index
 
-    def _set_new_viewinfostack(self, new_view_info_stack: Stack):
+    def _set_new_viewinfostack(self, new_view_info_stack: Frame):
         old_view_info_stack = self.view_info_stack
 
         # delete old first
