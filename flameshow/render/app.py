@@ -81,7 +81,6 @@ class FlameGraphApp(App):
         profile,
         max_level,
         _debug_exit_after_rednder=False,
-        default_sample_index=None,
         *args,
         **kwargs,
     ):
@@ -102,17 +101,12 @@ class FlameGraphApp(App):
 
         self.filename = self.profile.filename
 
-        if default_sample_index is not None:
-            self.sample_index = default_sample_index
-
-        self.sample_index = self._choose_default_index(self.profile.sample_types)
-
-    def _choose_default_index(self, sample_types):
-        for index, sample_type in enumerate(sample_types):
-            if sample_type.sample_type == "inuse_space":
-                return index
-
-        return 0
+        if profile.default_sample_type_index < 0:
+            self.sample_index = (
+                len(profile.sample_types) + profile.default_sample_type_index
+            )
+        else:
+            self.sample_index = profile.default_sample_type_index
 
     def on_mount(self):
         logger.info("mounted")

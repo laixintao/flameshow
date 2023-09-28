@@ -6,7 +6,6 @@ import click
 from click.exceptions import UsageError
 
 
-from flameshow.pprof_parser.parser import ProfileParser
 from flameshow.pprof_parser.parser import parse_profile
 from flameshow.render import FlameGraphApp
 from flameshow.pprof_parser import parse_golang_profile

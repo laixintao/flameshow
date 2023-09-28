@@ -19,10 +19,11 @@ def test_golang_goroutine_parse_using_protobuf(goroutine_pprof):
 
     assert profile.created_at == datetime.datetime(2023, 9, 9, 15, 8, 29, 664363)
 
-    assert profile.period_type.sample_type  == 'goroutine'
-    assert profile.period_type.sample_unit  == 'count'
+    assert profile.period_type.sample_type == "goroutine"
+    assert profile.period_type.sample_unit == "count"
     assert profile.period == 1
     assert profile.default_sample_type_index == -1
+
 
 def test_golang_profile10s_parse_using_protobuf(profile10s):
     profile = parse_profile(profile10s, "profile10s.json")
@@ -37,8 +38,8 @@ def test_golang_profile10s_parse_using_protobuf(profile10s):
 
     assert profile.created_at == datetime.datetime(2023, 9, 9, 15, 8, 29, 866118)
 
-    assert profile.period_type.sample_type  == 'cpu'
-    assert profile.period_type.sample_unit  == 'nanoseconds'
+    assert profile.period_type.sample_type == "cpu"
+    assert profile.period_type.sample_unit == "nanoseconds"
     assert profile.period == 10000000
 
     assert profile.default_sample_type_index == -1
