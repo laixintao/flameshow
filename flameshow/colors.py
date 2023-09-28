@@ -1,6 +1,9 @@
 import random
+import logging
 
 from textual.color import Color
+
+logger = logging.getLogger(__name__)
 
 
 class ColorPlatteBase:
@@ -33,6 +36,7 @@ class LinaerColorPlatte(ColorPlatteBase):
         if self.index == len(self.platte):
             self.index = 0
 
+        logger.debug("assign color=%s", color)
         return color
 
     def generate_platte(self):
