@@ -33,5 +33,5 @@ pytest = "^7.4.2"
 pytest-asyncio = "^0.21.1"
 
 [build-system]
-requires = ["poetry-core", "setuptools"]
+requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
