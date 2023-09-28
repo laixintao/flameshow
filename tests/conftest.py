@@ -14,3 +14,11 @@ def data_dir():
 def goroutine_pprof():
     with open(pathlib.Path(__file__).parent / "pprof_data/goroutine.out", "rb") as f:
         return f.read()
+
+
+@pytest.fixture(scope="session")
+def profile10s():
+    with open(
+        pathlib.Path(__file__).parent / "pprof_data/profile-10seconds.out", "rb"
+    ) as f:
+        return f.read()

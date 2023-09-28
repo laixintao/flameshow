@@ -166,3 +166,4 @@ flameshow/pprof_parser/_libpprofparser.cpython-310-darwin.h
 *.out
 flameshow/pprof_parser/_libpprofparser*
 *.tar.gz
+a.json

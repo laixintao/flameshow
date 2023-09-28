@@ -90,3 +90,6 @@ class Profile:
     created_at: datetime.datetime | None = None
     id_store: Dict[int, Frame] = field(default_factory=dict)
     sample_types: List[SampleType] = field(default_factory=list)
+
+    period_type: SampleType | None = None
+    period: int = 0

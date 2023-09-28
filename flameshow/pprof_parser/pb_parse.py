@@ -6,6 +6,7 @@ https://github.com/google/pprof/tree/main/proto
 """
 import gzip
 import logging
+import datetime
 
 from dataclasses import dataclass
 from . import profile_pb2
@@ -51,16 +52,29 @@ class ProfileParser:
         print(dir(pbdata))
 
         pprof_profile = Profile()
+        pprof_profile.filename = self.filename
         pprof_profile.sample_types = self.parse_sample_types(pbdata.sample_type)
+        pprof_profile.created_at = self.parse_created_at(pbdata.time_nanos)
+        pprof_profile.period = pbdata.period
+        pprof_profile.period_type = self.to_smaple_type(pbdata.period_type)
+
+        print(pprof_profile.period)
+        print(pprof_profile.period_type)
         return pprof_profile
+
+    def parse_created_at(self, time_nanos):
+        date = datetime.datetime.fromtimestamp(time_nanos / 1e9)
+        return date
 
     def parse_sample_types(self, sample_types):
         result = []
         for st in sample_types:
-            result.append(SampleType(self.s(st.type), self.s(st.unit)))
+            result.append(self.to_smaple_type(st))
 
-        print("parse sample type done, result=", result)
         return result
+
+    def to_smaple_type(self, st):
+        return SampleType(self.s(st.type), self.s(st.unit))
 
 
 def parse_profile(binary_data, filename):
