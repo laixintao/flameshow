@@ -38,7 +38,6 @@ class Line:
         )
 
 
-# TODO should be rename to Frame?
 class PprofFrame(Frame):
     def __init__(
         self, name, _id, children=None, parent=None, values=None, root=None
