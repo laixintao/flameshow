@@ -6,7 +6,6 @@ https://github.com/google/pprof/tree/main/proto
 """
 from dataclasses import dataclass, field
 import datetime
-import datetime
 import gzip
 import logging
 import logging
@@ -137,7 +136,6 @@ def unmarshal(content) -> profile_pb2.Profile:
     is_gzip = content[0] == 31 and content[1] == 139
 
     if is_gzip:
-        print("the pprof file is gzip.")
         content = gzip.decompress(content)
 
     profile = profile_pb2.Profile()
@@ -299,7 +297,9 @@ class ProfileParser:
         return functions
 
     def parse_created_at(self, time_nanos):
-        date = datetime.datetime.fromtimestamp(time_nanos / 1e9)
+        date = datetime.datetime.fromtimestamp(
+            time_nanos / 1e9, tz=datetime.timezone.utc
+        )
         return date
 
     def parse_sample_types(self, sample_types):

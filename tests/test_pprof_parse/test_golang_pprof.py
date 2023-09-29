@@ -35,7 +35,9 @@ def test_golang_goroutine_parse_using_protobuf(goroutine_pprof):
     assert st.sample_type == "goroutine"
     assert st.sample_unit == "count"
 
-    assert profile.created_at == datetime.datetime(2023, 9, 9, 15, 8, 29, 664363)
+    assert profile.created_at == datetime.datetime(
+        2023, 9, 9, 7, 8, 29, 664363, tzinfo=datetime.timezone.utc
+    )
 
     assert profile.period_type.sample_type == "goroutine"
     assert profile.period_type.sample_unit == "count"
@@ -54,7 +56,9 @@ def test_golang_profile10s_parse_using_protobuf(profile10s):
     assert st.sample_type == "cpu"
     assert st.sample_unit == "nanoseconds"
 
-    assert profile.created_at == datetime.datetime(2023, 9, 9, 15, 8, 29, 866118)
+    assert profile.created_at == datetime.datetime(
+        2023, 9, 9, 7, 8, 29, 866118, tzinfo=datetime.timezone.utc
+    )
 
     assert profile.period_type.sample_type == "cpu"
     assert profile.period_type.sample_unit == "nanoseconds"

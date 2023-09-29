@@ -18,7 +18,7 @@ def setup_log(enabled, level, loglocation):
         logging.basicConfig(
             filename=os.path.expanduser(loglocation),
             filemode="a",
-            format="%(asctime)s %(levelname)5s (%(module)s) %(message)s",
+            format="%(asctime)s %(levelname)5s (%(module)sL%(lineno)d) %(message)s",
             level=level,
         )
     else:
@@ -37,11 +37,11 @@ def run_app(verbose, log_to, format, profile_f, _debug_exit_after_rednder):
 
     t0 = time.time()
     profile_data = profile_f.read()
-    t01 = time.time()
 
     profile = parse_profile(profile_data, profile_f.name)
 
-    logger.info("Parse profile, took %.1fs", t01 - t0)
+    t01 = time.time()
+    logger.info("Parse profile, took %.3fs", t01 - t0)
     render_depth = MAX_RENDER_DEPTH - int(profile.total_sample / 100)
     # limit to 3 - 10
     render_depth = max(MIN_RENDER_DEPTH, render_depth)

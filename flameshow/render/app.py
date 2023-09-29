@@ -160,7 +160,7 @@ class FlameGraphApp(App):
         if not created_at:
             return Static("")
 
-        datetime_str = created_at.strftime("Dumped at %Y %b %d(%A) %H:%M:%S")
+        datetime_str = created_at.astimezone().strftime("Dumped at %Y %b %d(%A) %H:%M:%S %Z")
         return Static(datetime_str)
 
     def post_display_hook(self):

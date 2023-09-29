@@ -44,7 +44,6 @@ class Span(Widget):
         **kwargs,
     ):
         super().__init__(id=fgid(s_stack._id), *args, **kwargs)
-        logger.debug(f"new span, {my_width=} {s_stack.name=}")
         self.s_stack = s_stack
         self.s_deepest = is_deepest_level
         self.my_width = my_width
@@ -89,7 +88,6 @@ class Span(Widget):
             ),
         )
 
-        logger.debug('render t %s' ,t)
         return t
 
     class SpanSelected(Message):
