@@ -64,11 +64,20 @@ class Location:
 
 class PprofFrame(Frame):
     def __init__(
-        self, name, _id, children=None, parent=None, values=None, root=None
+        self,
+        name,
+        _id,
+        children=None,
+        parent=None,
+        values=None,
+        root=None,
+        line=None,
+        mapping=None,
     ) -> None:
         super().__init__(name, _id, children, parent, values, root)
 
-        self.line = Line()
+        self.line = line
+        self.mapping = mapping
 
     def humanize(self, sample_unit, value):
         display_value = value
@@ -86,9 +95,9 @@ class PprofFrame(Frame):
             line1 = f"Total: {self.humanize(sample_unit, total)}"
             line2 = ""
             if self.children:
-                line2 = f"Binary: {self.children[0].mapping_file}"
+                line2 = f"Binary: {self.children[0].mapping.filename}"
         else:
-            line1 = f"{self.line.function_filename}, [b]line {self.line.line_no}[/b]"
+            line1 = f"{self.line.function.filename}, [b]line {self.line.line_no}[/b]"
             if not self.parent or not self.root:
                 logger.warning("self.parent or self.root is None!")
                 line2 = "<error>"
@@ -111,7 +120,7 @@ class PprofFrame(Frame):
 
                 value = self.humanize(sample_unit, self.values[sample_index])
                 line2 = (
-                    f"{self.line.function_name}: [b red]{value}[/b"
+                    f"{self.line.function.name}: [b red]{value}[/b"
                     f" red] ({p_parent:.1f}% of parent, {p_root:.1f}% of root)"
                 )
         return line1 + os.linesep + line2
@@ -150,6 +159,9 @@ class ProfileParser:
         # parse cached locations, profile do not need this, so only store
         # them on the parser
         self.locations = []
+        self.highest = 0
+
+        self.id_store = {}
 
     def idgenerator(self):
         i = self.next_id
@@ -184,16 +196,52 @@ class ProfileParser:
 
         # WIP
         root = self.root
+        root.values = [0] * len(pprof_profile.sample_types)
         for pbsample in pbdata.sample:
-            child_frame = self.parse_sample(pbsample, parent=root)
+            child_frame = self.parse_sample(pbsample)
+            if not child_frame:
+                continue
             root.values = list(map(sum, zip(root.values, child_frame.values)))
             root.pile_up(child_frame)
 
         pprof_profile.root_stack = root
-        print(type(pbdata.sample))
-        print(pbdata.sample)
 
         return pprof_profile
+
+    def parse_sample(self, sample) -> PprofFrame | None:
+        values = sample.value
+        locations = list(reversed([self.locations[i] for i in sample.location_id]))
+
+        my_depth = sum(len(l.lines) for l in locations)
+        self.highest = max(my_depth, self.highest)
+
+        current_parent = None
+        head = None
+        for location in locations:
+            for line in location.lines:
+                frame = self.line2frame(location, line, values)
+
+                if current_parent:
+                    frame.parent = current_parent
+                    current_parent.children = [frame]
+                if not head:
+                    head = frame
+
+                current_parent = frame
+
+        return head
+
+    def line2frame(self, location: Location, line: Line, values) -> PprofFrame:
+        frame = PprofFrame(
+            name=line.function.name,
+            _id=self.idgenerator(),
+            values=values,
+            root=self.root,
+            mapping=location.mapping,
+        )
+        frame.line = line
+        self.id_store[frame._id] = frame
+        return frame
 
     def parse_location(self, pblocations):
         parsed_locations = {}
@@ -229,7 +277,7 @@ class ProfileParser:
 
     def parse_line(self, pblines) -> List[Line]:
         lines = []
-        for pl in pblines:
+        for pl in reversed(pblines):
             line = Line(
                 line_no=pl.line,
                 function=self.functions[pl.function_id],
@@ -249,10 +297,6 @@ class ProfileParser:
             )
         return functions
 
-    def parse_sample(self, sample, parent) -> PprofFrame:
-        print("parse sample: ", sample)
-        pass
-
     def parse_created_at(self, time_nanos):
         date = datetime.datetime.fromtimestamp(time_nanos / 1e9)
         return date
@@ -267,16 +311,26 @@ class ProfileParser:
     def to_smaple_type(self, st):
         return SampleType(self.s(st.type), self.s(st.unit))
 
+def get_frame_tree(root_frame):
+    """
+    only for testing and debugging
+    """
+
+    def _get_child(frame):
+        return {c.name: _get_child(c) for c in frame.children}
+
+    return {"root": _get_child(root_frame)}
 
 def parse_profile(binary_data, filename):
     parser = ProfileParser(filename)
     profile = parser.parse(binary_data)
 
+
     return profile
 
 
 if __name__ == "__main__":
-    with open("tests/pprof_data/profile-10seconds.out", "rb") as f:
+    with open("tests/pprof_data/goroutine.out", "rb") as f:
         content = f.read()
 
     parse_profile(content, "abc")

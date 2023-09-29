@@ -26,6 +26,7 @@ def test_golang_goroutine_parse(goroutine_pprof):
 def test_golang_goroutine_check_frame_tree(goroutine_pprof, data_dir):
     bdata = parse_golang_profile(goroutine_pprof)
     result = golang_parse_profile(bdata, "goroutine.out")
+
     frame_tree = get_frame_tree(result.root_stack)
 
     with open(data_dir / "goroutine_frametree.json") as f:
@@ -33,6 +34,14 @@ def test_golang_goroutine_check_frame_tree(goroutine_pprof, data_dir):
 
     assert frame_tree == expected
 
+def test_python_protobuf_goroutine_check_frame_tree(goroutine_pprof, data_dir):
+    profile = parse_profile(goroutine_pprof, "profile10s.out")
+    frame_tree = get_frame_tree(profile.root_stack)
+
+    with open(data_dir / "goroutine_frametree.json") as f:
+        expected = json.load(f)
+
+    assert frame_tree == expected
 
 def test_golang_goroutine_parse_using_protobuf(goroutine_pprof):
     profile = parse_profile(goroutine_pprof, "goroutine.out")
@@ -51,7 +60,7 @@ def test_golang_goroutine_parse_using_protobuf(goroutine_pprof):
 
 
 def test_golang_profile10s_parse_using_protobuf(profile10s):
-    profile = parse_profile(profile10s, "profile10s.json")
+    profile = parse_profile(profile10s, "profile10s.out")
     assert len(profile.sample_types) == 2
 
     st = profile.sample_types[0]

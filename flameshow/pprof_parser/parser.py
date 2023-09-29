@@ -216,7 +216,7 @@ def get_frame_tree(root_frame):
     """
 
     def _get_child(frame):
-        return {c.name: get_frame_tree(c) for c in frame.children}
+        return {c.name: _get_child(c) for c in frame.children}
 
     return {"root": _get_child(root_frame)}
 
@@ -228,5 +228,6 @@ def parse_profile(profile_dict, filename):
     logger.info("Max depth: %s", parser_obj.highest)
     t2 = time.time()
     logger.info("parse json files cost %s s", t2 - t1)
+
 
     return profile
