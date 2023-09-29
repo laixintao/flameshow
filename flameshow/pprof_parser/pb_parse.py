@@ -161,7 +161,7 @@ class ProfileParser:
         self.locations = []
         self.highest = 0
 
-        self.id_store = {}
+        self.id_store = {self.root._id: self.root}
 
     def idgenerator(self):
         i = self.next_id
@@ -181,8 +181,6 @@ class ProfileParser:
     def parse(self, binary_data):
         pbdata = unmarshal(binary_data)
         self.parse_internal_data(pbdata)
-
-        print(dir(pbdata))
 
         pprof_profile = Profile()
         pprof_profile.filename = self.filename
@@ -205,6 +203,9 @@ class ProfileParser:
             root.pile_up(child_frame)
 
         pprof_profile.root_stack = root
+        pprof_profile.id_store = self.id_store
+        pprof_profile.total_sample = len(pbdata.sample)
+        pprof_profile.highest_lines =  self.highest
 
         return pprof_profile
 
@@ -311,6 +312,7 @@ class ProfileParser:
     def to_smaple_type(self, st):
         return SampleType(self.s(st.type), self.s(st.unit))
 
+
 def get_frame_tree(root_frame):
     """
     only for testing and debugging
@@ -321,11 +323,12 @@ def get_frame_tree(root_frame):
 
     return {"root": _get_child(root_frame)}
 
+
 def parse_profile(binary_data, filename):
     parser = ProfileParser(filename)
     profile = parser.parse(binary_data)
 
-
+    # import ipdb; ipdb.set_trace()
     return profile
 
 

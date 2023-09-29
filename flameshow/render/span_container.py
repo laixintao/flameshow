@@ -38,6 +38,7 @@ class SpanContainer(Widget):
         while 1:
             is_deepest_level = self.level == 0 and len(current_stack.children) > 1
 
+            logger.debug(f"root span: {current_stack.name=} {self.level=} {len(current_stack.children)=}")
             yield Span(
                 current_stack,
                 is_deepest_level,
@@ -89,6 +90,8 @@ class SpanContainer(Widget):
                 level = self.level - 1
             else:
                 level = 0
+
+            logger.debug("render child: %s, style_w=%s", child.name,  style_w)
             widgets.append(
                 SpanContainer(
                     child, style_w, level=level, i=self.i, sample_unit=self.sample_unit

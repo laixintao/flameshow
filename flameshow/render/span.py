@@ -42,11 +42,13 @@ class Span(Widget):
         **kwargs,
     ):
         super().__init__(id=fgid(s_stack._id), *args, **kwargs)
+        logger.debug(f"new span, {my_width=} {s_stack.name=}")
         self.s_stack = s_stack
         self.s_deepest = is_deepest_level
         self.my_width = my_width
         self.i = sample_index
         self.sample_unit = sample_unit
+
 
     def on_mount(self) -> None:
         self.styles.background = self.s_stack.display_color
@@ -62,9 +64,12 @@ class Span(Widget):
     def render(self) -> RenderableType:
         # actuall, just display self.s_text will still work
         display_text = self.s_stack.display_name
+
         if self.s_deepest:
             display_text = "+more"
+
         display_color = self.s_stack.display_color
+
         t = Text.assemble(
             (
                 "▏",
@@ -82,6 +87,7 @@ class Span(Widget):
             ),
         )
 
+        logger.debug('render t %s' ,t)
         return t
 
     class SpanSelected(Message):

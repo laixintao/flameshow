@@ -1,16 +1,13 @@
-import json
 import logging
 import os
 import time
+
 import click
-from click.exceptions import UsageError
 
-
-from flameshow.pprof_parser.parser import parse_profile
-from flameshow.render import FlameGraphApp
-from flameshow.pprof_parser import parse_golang_profile
-from flameshow.const import MAX_RENDER_DEPTH, MIN_RENDER_DEPTH
 from flameshow import __version__
+from flameshow.const import MAX_RENDER_DEPTH, MIN_RENDER_DEPTH
+from flameshow.pprof_parser.pb_parse import parse_profile
+from flameshow.render import FlameGraphApp
 
 
 logger = logging.getLogger(__name__)
@@ -40,35 +37,28 @@ def run_app(verbose, log_to, format, profile_f, _debug_exit_after_rednder):
 
     t0 = time.time()
     profile_data = profile_f.read()
-    profile_dict = parse_golang_profile(profile_data)
     t01 = time.time()
-    logger.info("Read golang profile_f, took %.1fs", t01 - t0)
 
-    if format == "json":
-        click.echo(json.dumps(profile_dict, indent=2, sort_keys=True))
-    elif format == "flamegraph":
-        profile = parse_profile(profile_dict, profile_f.name)
+    profile = parse_profile(profile_data, profile_f.name)
 
-        render_depth = MAX_RENDER_DEPTH - int(profile.total_sample / 100)
-        # limit to 3 - 10
-        render_depth = max(MIN_RENDER_DEPTH, render_depth)
-        render_depth = min(MAX_RENDER_DEPTH, render_depth)
+    logger.info("Parse profile, took %.1fs", t01 - t0)
+    render_depth = MAX_RENDER_DEPTH - int(profile.total_sample / 100)
+    # limit to 3 - 10
+    render_depth = max(MIN_RENDER_DEPTH, render_depth)
+    render_depth = min(MAX_RENDER_DEPTH, render_depth)
 
-        logger.info(
-            "Start to render app, total samples=%d, render_depth=%d",
-            profile.total_sample,
-            render_depth,
-        )
+    logger.info(
+        "Start to render app, total samples=%d, render_depth=%d",
+        profile.total_sample,
+        render_depth,
+    )
 
-        app = FlameGraphApp(
-            profile,
-            render_depth,
-            _debug_exit_after_rednder,
-        )
-        app.run()
-
-    else:
-        raise UsageError("Unsupported format = {}".format(format))
+    app = FlameGraphApp(
+        profile,
+        render_depth,
+        _debug_exit_after_rednder,
+    )
+    app.run()
 
 
 def print_version(ctx, param, value):
