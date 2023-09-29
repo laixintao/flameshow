@@ -1,6 +1,6 @@
 """
 Holds the run time configs.
-Can be changed dynamicly.
+Can be changed dynamically.
 """
 
 from dataclasses import dataclass

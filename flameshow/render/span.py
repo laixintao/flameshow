@@ -63,7 +63,7 @@ class Span(Widget):
         )
 
     def render(self) -> RenderableType:
-        # actuall, just display self.s_text will still work
+        # actually, just display self.s_text will still work
         display_text = self.s_stack.display_name
 
         if self.s_deepest:

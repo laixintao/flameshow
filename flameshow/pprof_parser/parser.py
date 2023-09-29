@@ -131,7 +131,7 @@ class PprofFrame(Frame):
 def unmarshal(content) -> profile_pb2.Profile:
     if len(content) < 2:
         raise Exception(
-            "Profile content lengh is too short: {} bytes".format(len(content))
+            "Profile content length is too short: {} bytes".format(len(content))
         )
     is_gzip = content[0] == 31 and content[1] == 139
 

@@ -53,7 +53,7 @@ class SpanContainer(Widget):
                 break
 
             current_stack_value = current_stack.values[self.i]
-            if not current_stack_value:  # devide by zero
+            if not current_stack_value:  # divide by zero
                 return
             c0 = current_stack.children[0]
             # sometimes, child is not 100% of parent
