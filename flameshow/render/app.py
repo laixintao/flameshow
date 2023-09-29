@@ -13,7 +13,7 @@ from textual.reactive import reactive
 from textual.widgets import Footer, Static, RadioSet, RadioButton
 from textual.events import Click
 
-from flameshow.parser import Stack
+from flameshow.models import Frame
 from flameshow.render.header import FlameshowHeader
 from flameshow.utils import fgid
 from flameshow import __version__
@@ -27,7 +27,9 @@ logger = logging.getLogger(__name__)
 class FlameGraphScroll(VerticalScroll, inherit_bindings=False):
     BINDINGS: ClassVar[list[BindingType]] = [
         Binding("b", "scroll_up", "Scroll Up", show=True, key_display="B"),
-        Binding("f,space", "scroll_down", "Scroll Down", show=True, key_display="F"),
+        Binding(
+            "f,space", "scroll_down", "Scroll Down", show=True, key_display="F"
+        ),
         Binding("home", "scroll_home", "Scroll Home", show=False),
         Binding("end", "scroll_end", "Scroll End", show=False),
         Binding("pageup", "page_up", "Page Up", show=False),
@@ -81,7 +83,6 @@ class FlameGraphApp(App):
         profile,
         max_level,
         _debug_exit_after_rednder=False,
-        default_sample_index=None,
         *args,
         **kwargs,
     ):
@@ -102,17 +103,12 @@ class FlameGraphApp(App):
 
         self.filename = self.profile.filename
 
-        if default_sample_index is not None:
-            self.sample_index = default_sample_index
-
-        self.sample_index = self._choose_default_index(self.profile.sample_types)
-
-    def _choose_default_index(self, sample_types):
-        for index, sample_type in enumerate(sample_types):
-            if sample_type.sample_type == "inuse_space":
-                return index
-
-        return 0
+        if profile.default_sample_type_index < 0:
+            self.sample_index = (
+                len(profile.sample_types) + profile.default_sample_type_index
+            )
+        else:
+            self.sample_index = profile.default_sample_type_index
 
     def on_mount(self):
         logger.info("mounted")
@@ -166,7 +162,9 @@ class FlameGraphApp(App):
         if not created_at:
             return Static("")
 
-        datetime_str = created_at.strftime("Dumped at %Y %b %d(%A) %H:%M:%S")
+        datetime_str = created_at.astimezone().strftime(
+            "Dumped at %Y %b %d(%A) %H:%M:%S %Z"
+        )
         return Static(datetime_str)
 
     def post_display_hook(self):
@@ -233,7 +231,9 @@ class FlameGraphApp(App):
         try:
             header = self.query_one("FlameshowHeader")
         except NoMatches:
-            logger.warning("FlameshowHeader not found, might be not composed yet.")
+            logger.warning(
+                "FlameshowHeader not found, might be not composed yet."
+            )
             return
         header.center_text = center_text
 
@@ -256,7 +256,9 @@ class FlameGraphApp(App):
         try:
             old_container = self.query_one("#flamegraph-container")
         except NoMatches:
-            logger.warning("Can not find the old_container of #flamegraph-container")
+            logger.warning(
+                "Can not find the old_container of #flamegraph-container"
+            )
         else:
             old_container.remove()
 
@@ -291,7 +293,7 @@ class FlameGraphApp(App):
         logger.info("event: %s", e)
         self.sample_index = e.index
 
-    def _set_new_viewinfostack(self, new_view_info_stack: Stack):
+    def _set_new_viewinfostack(self, new_view_info_stack: Frame):
         old_view_info_stack = self.view_info_stack
 
         # delete old first
@@ -310,8 +312,8 @@ class FlameGraphApp(App):
             new_view = self.query_one(_add_id)
         except NoMatches:
             logger.critical(
-                "Not found when try to add class view-info-span to a Span, id={}"
-                .format(_add_id)
+                "Not found when try to add class view-info-span to a Span,"
+                " id={}".format(_add_id)
             )
             return
         else:
@@ -395,7 +397,7 @@ class FlameGraphApp(App):
     def _find_left_sibling(self, me):
         """
         Find left.
-        Even not currently dislayed, still can be viewed on detail.
+        Even not currently displayed, still can be viewed on detail.
         No need to check if the fgid is currently rendered.
         """
         my_parent = me.parent
@@ -442,7 +444,9 @@ class FlameGraphApp(App):
     def set_stack_detail(self, stack):
         span_detail = self.query_one("#span-detail")
         span_detail.border_subtitle = stack.render_title()
-        span_detail.update(stack.render_detail(self.sample_index, self.sample_unit))
+        span_detail.update(
+            stack.render_detail(self.sample_index, self.sample_unit)
+        )
 
     @property
     def sample_unit(self):

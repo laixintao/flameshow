@@ -1,16 +1,13 @@
-import json
 import logging
 import os
 import time
+
 import click
-from click.exceptions import UsageError
 
-
-from flameshow.parser import ProfileParser
-from flameshow.render import FlameGraphApp
-from flameshow.pprof_parser import parse_golang_profile
-from flameshow.const import MAX_RENDER_DEPTH, MIN_RENDER_DEPTH
 from flameshow import __version__
+from flameshow.const import MAX_RENDER_DEPTH, MIN_RENDER_DEPTH
+from flameshow.pprof_parser import parse_profile
+from flameshow.render import FlameGraphApp
 
 
 logger = logging.getLogger(__name__)
@@ -21,7 +18,10 @@ def setup_log(enabled, level, loglocation):
         logging.basicConfig(
             filename=os.path.expanduser(loglocation),
             filemode="a",
-            format="%(asctime)s %(levelname)5s (%(module)s) %(message)s",
+            format=(
+                "%(asctime)s %(levelname)5s (%(module)sL%(lineno)d)"
+                " %(message)s"
+            ),
             level=level,
         )
     else:
@@ -29,51 +29,44 @@ def setup_log(enabled, level, loglocation):
     logger.info("------ flameshow ------")
 
 
-LOG_LEVEL = {0: logging.CRITICAL, 1: logging.WARNING, 2: logging.INFO, 3: logging.DEBUG}
+LOG_LEVEL = {
+    0: logging.CRITICAL,
+    1: logging.WARNING,
+    2: logging.INFO,
+    3: logging.DEBUG,
+}
 
 
-def run_app(verbose, log_to, format, profile, _debug_exit_after_rednder):
+def run_app(verbose, log_to, format, profile_f, _debug_exit_after_rednder):
     log_level = LOG_LEVEL[verbose]
     setup_log(log_to is not None, log_level, log_to)
 
     logger.info(f"run app, {format=}")
 
     t0 = time.time()
-    profile_data = profile.read()
-    profile_dict = parse_golang_profile(profile_data)
+    profile_data = profile_f.read()
+
+    profile = parse_profile(profile_data, profile_f.name)
+
     t01 = time.time()
-    logger.info("Read golang profile, took %.2fs", t01 - t0)
+    logger.info("Parse profile, took %.3fs", t01 - t0)
+    render_depth = MAX_RENDER_DEPTH - int(profile.total_sample / 100)
+    # limit to 3 - 10
+    render_depth = max(MIN_RENDER_DEPTH, render_depth)
+    render_depth = min(MAX_RENDER_DEPTH, render_depth)
 
-    if format == "json":
-        click.echo(json.dumps(profile_dict, indent=2, sort_keys=True))
-    elif format == "flamegraph":
-        parser_obj = ProfileParser(filename=profile.name)
-        t1 = time.time()
-        profile = parser_obj.parse(profile_dict)
-        logger.info("Max depth: %s", parser_obj.highest)
-        t2 = time.time()
-        logger.info("parse json files cost %s s", t2 - t1)
+    logger.info(
+        "Start to render app, total samples=%d, render_depth=%d",
+        profile.total_sample,
+        render_depth,
+    )
 
-        render_depth = MAX_RENDER_DEPTH - int(parser_obj.total_sample / 100)
-        # limit to 3 - 10
-        render_depth = max(MIN_RENDER_DEPTH, render_depth)
-        render_depth = min(MAX_RENDER_DEPTH, render_depth)
-
-        logger.info(
-            "Start to render app, total samples=%d, render_depth=%d",
-            parser_obj.total_sample,
-            render_depth,
-        )
-
-        app = FlameGraphApp(
-            profile,
-            render_depth,
-            _debug_exit_after_rednder,
-        )
-        app.run()
-
-    else:
-        raise UsageError("Unsupported format = {}".format(format))
+    app = FlameGraphApp(
+        profile,
+        render_depth,
+        _debug_exit_after_rednder,
+    )
+    app.run()
 
 
 def print_version(ctx, param, value):
@@ -105,7 +98,11 @@ def print_version(ctx, param, value):
     default="flamegraph",
 )
 @click.option(
-    "--version", is_flag=True, callback=print_version, expose_value=False, is_eager=True
+    "--version",
+    is_flag=True,
+    callback=print_version,
+    expose_value=False,
+    is_eager=True,
 )
 @click.argument("profile", type=click.File("rb"))
 def main(verbose, log_to, format, profile):

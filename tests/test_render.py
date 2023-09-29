@@ -1,7 +1,8 @@
 import pytest
-from flameshow.parser import Profile, ProfileParser, SampleType
+
+from flameshow.pprof_parser import parse_profile
+from flameshow.pprof_parser.parser import Line, Profile, SampleType, PprofFrame
 from flameshow.render import FlameGraphApp
-from flameshow.pprof_parser import parse_golang_profile
 
 
 @pytest.mark.asyncio
@@ -11,9 +12,7 @@ async def test_render_goroutine_child_not_100percent_of_parent(data_dir):
     with open(data_dir / "profile-10seconds.out", "rb") as p:
         profile_data = p.read()
 
-    profile_dict = parse_golang_profile(profile_data)
-    parser_obj = ProfileParser(filename="abc")
-    profile = parser_obj.parse(profile_dict)
+    profile = parse_profile(profile_data, filename="abc")
 
     app = FlameGraphApp(
         profile,
@@ -31,29 +30,25 @@ async def test_render_goroutine_child_not_100percent_of_parent(data_dir):
 
 def test_default_sample_types_heap():
     p = Profile()
-    app = FlameGraphApp(
-        Profile(),
-        15,
-        False,
-    )
     p.sample_types = [
         SampleType("alloc_objects", "count"),
         SampleType("alloc_space", "bytes"),
         SampleType("inuse_objects", "count"),
         SampleType("inuse_space", "bytes"),
     ]
-    assert app._choose_default_index(p.sample_types) == 3
-
-
-def test_default_sample_types_profile():
-    p = Profile()
     app = FlameGraphApp(
-        Profile(),
+        p,
         15,
         False,
     )
-    p.sample_types = [
-        SampleType("samples", "count"),
-        SampleType("cpu", "nanoseconds"),
-    ]
-    assert app._choose_default_index(p.sample_types) == 0
+    assert app.sample_index == 3
+
+
+def test_render_detail_when_parent_zero():
+    root = PprofFrame("root", 0, values=[0])
+    s1 = PprofFrame("s1", 1, values=[0], parent=root, root=root)
+    s1.line = Line()
+    s1.line.function.name = "asdf"
+
+    detail = s1.render_detail(0, "bytes")
+    assert "(0.0% of parent, 0.0% of root)" in detail

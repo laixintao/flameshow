@@ -11,6 +11,8 @@ from flameshow.utils import fgid
 
 logger = logging.getLogger(__name__)
 
+FILL_WIDTH = 500 * " "
+
 
 class Span(Widget):
     DEFAULT_CSS = """
@@ -60,11 +62,14 @@ class Span(Widget):
         )
 
     def render(self) -> RenderableType:
-        # actuall, just display self.s_text will still work
+        # actually, just display self.s_text will still work
         display_text = self.s_stack.display_name
+
         if self.s_deepest:
             display_text = "+more"
+
         display_color = self.s_stack.display_color
+
         t = Text.assemble(
             (
                 "▏",
@@ -73,8 +78,8 @@ class Span(Widget):
                 ),
             ),
             (
-                # +200 to use text background cover original background
-                display_text + " " * 200,
+                # to use text background cover original background
+                display_text + FILL_WIDTH,
                 Style(
                     color=display_color.get_contrast_text().rich_color,
                     bgcolor=display_color.rich_color,

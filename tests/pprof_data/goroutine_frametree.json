@@ -1,0 +1,245 @@
+{
+  "root": {
+    "net/http.(*conn).serve": {
+      "net/http.(*conn).readRequest": {
+        "net/http.readRequest": {
+          "net/textproto.(*Reader).ReadLine": {
+            "net/textproto.(*Reader).readLineSlice": {
+              "bufio.(*Reader).ReadLine": {
+                "bufio.(*Reader).ReadSlice": {
+                  "bufio.(*Reader).fill": {
+                    "net/http.(*connReader).Read": {
+                      "net.(*conn).Read": {
+                        "net.(*netFD).Read": {
+                          "internal/poll.(*FD).Read": {
+                            "internal/poll.(*pollDesc).waitRead": {
+                              "internal/poll.(*pollDesc).wait": {
+                                "internal/poll.runtime_pollWait": {
+                                  "runtime.netpollblock": {
+                                    "runtime.gopark": {}
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "net/http.serverHandler.ServeHTTP": {
+        "net/http.(*ServeMux).ServeHTTP": {
+          "main.(*handler).ServeHTTP": {
+            "net/http.HandlerFunc.ServeHTTP": {
+              "github.com/prometheus/client_golang/prometheus/promhttp.InstrumentHandlerCounter.func1": {
+                "net/http.HandlerFunc.ServeHTTP": {
+                  "github.com/prometheus/client_golang/prometheus/promhttp.InstrumentHandlerInFlight.func1": {
+                    "net/http.HandlerFunc.ServeHTTP": {
+                      "github.com/prometheus/client_golang/prometheus/promhttp.HandlerFor.func1": {
+                        "github.com/prometheus/client_golang/prometheus.Gatherers.Gather": {
+                          "github.com/prometheus/client_golang/prometheus.(*Registry).Gather": {
+                            "runtime.selectgo": { "runtime.gopark": {} }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "net/http.HandlerFunc.ServeHTTP": {
+            "net/http/pprof.Index": {
+              "net/http/pprof.handler.ServeHTTP": {
+                "runtime/pprof.(*Profile).WriteTo": {
+                  "runtime/pprof.writeGoroutine": {
+                    "runtime/pprof.writeRuntimeProfile": {
+                      "runtime/pprof.runtime_goroutineProfileWithLabels": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "github.com/godbus/dbus.(*Conn).inWorker": {
+      "github.com/godbus/dbus.(*unixTransport).ReadMessage": {
+        "io.ReadFull": {
+          "io.ReadAtLeast": {
+            "github.com/godbus/dbus.(*oobReader).Read": {
+              "net.(*UnixConn).ReadMsgUnix": {
+                "net.(*UnixConn).readMsg": {
+                  "net.(*netFD).readMsg": {
+                    "internal/poll.(*FD).ReadMsg": {
+                      "internal/poll.(*pollDesc).waitRead": {
+                        "internal/poll.(*pollDesc).wait": {
+                          "internal/poll.runtime_pollWait": {
+                            "runtime.netpollblock": { "runtime.gopark": {} }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "github.com/prometheus/client_golang/prometheus.(*Registry).Gather.func2": {
+      "sync.(*WaitGroup).Wait": {
+        "sync.runtime_Semacquire": {
+          "runtime.semacquire1": {
+            "runtime.goparkunlock": { "runtime.gopark": {} }
+          }
+        }
+      }
+    },
+    "github.com/prometheus/client_golang/prometheus.(*Registry).Gather.func1": {
+      "github.com/prometheus/node_exporter/collector.NodeCollector.Collect": {
+        "sync.(*WaitGroup).Wait": {
+          "sync.runtime_Semacquire": {
+            "runtime.semacquire1": {
+              "runtime.goparkunlock": { "runtime.gopark": {} }
+            }
+          }
+        }
+      }
+    },
+    "github.com/prometheus/node_exporter/collector.NodeCollector.Collect.func1": {
+      "github.com/prometheus/node_exporter/collector.execute": {
+        "github.com/prometheus/node_exporter/collector.(*systemdCollector).Update": {
+          "github.com/prometheus/node_exporter/collector.newSystemdDbusConn": {
+            "github.com/coreos/go-systemd/dbus.New": {
+              "github.com/coreos/go-systemd/dbus.NewSystemdConnection": {
+                "github.com/coreos/go-systemd/dbus.NewConnection": {
+                  "github.com/coreos/go-systemd/dbus.NewSystemdConnection.func1": {
+                    "github.com/coreos/go-systemd/dbus.dbusAuthConnection": {
+                      "github.com/godbus/dbus.(*Conn).Auth": {
+                        "github.com/godbus/dbus.(*Conn).tryAuth": {
+                          "github.com/godbus/dbus.authReadLine": {
+                            "bufio.(*Reader).ReadBytes": {
+                              "bufio.(*Reader).collectFragments": {
+                                "bufio.(*Reader).ReadSlice": {
+                                  "bufio.(*Reader).fill": {
+                                    "net.(*conn).Read": {
+                                      "net.(*netFD).Read": {
+                                        "internal/poll.(*FD).Read": {
+                                          "internal/poll.(*pollDesc).waitRead": {
+                                            "internal/poll.(*pollDesc).wait": {
+                                              "internal/poll.runtime_pollWait": {
+                                                "runtime.netpollblock": {
+                                                  "runtime.gopark": {}
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "github.com/godbus/dbus.authReadLine": {
+                          "bufio.(*Reader).ReadBytes": {
+                            "bufio.(*Reader).collectFragments": {
+                              "bufio.(*Reader).ReadSlice": {
+                                "bufio.(*Reader).fill": {
+                                  "net.(*conn).Read": {
+                                    "net.(*netFD).Read": {
+                                      "internal/poll.(*FD).Read": {
+                                        "internal/poll.(*pollDesc).waitRead": {
+                                          "internal/poll.(*pollDesc).wait": {
+                                            "internal/poll.runtime_pollWait": {
+                                              "runtime.netpollblock": {
+                                                "runtime.gopark": {}
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "github.com/prometheus/node_exporter/collector.(*systemdCollector).getAllUnits": {
+            "github.com/coreos/go-systemd/dbus.(*Conn).ListUnits": {
+              "github.com/godbus/dbus.(*Object).Call": {
+                "runtime.chanrecv1": {
+                  "runtime.chanrecv": { "runtime.gopark": {} }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "github.com/godbus/dbus.(*Object).createCall.func2": {
+      "runtime.chanrecv1": { "runtime.chanrecv": { "runtime.gopark": {} } }
+    },
+    "github.com/coreos/go-systemd/dbus.(*Conn).dispatch.func1": {
+      "runtime.chanrecv2": { "runtime.chanrecv": { "runtime.gopark": {} } }
+    },
+    "net/http.(*connReader).backgroundRead": {
+      "net.(*conn).Read": {
+        "net.(*netFD).Read": {
+          "internal/poll.(*FD).Read": {
+            "internal/poll.(*pollDesc).waitRead": {
+              "internal/poll.(*pollDesc).wait": {
+                "internal/poll.runtime_pollWait": {
+                  "runtime.netpollblock": { "runtime.gopark": {} }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "runtime.main": {
+      "main.main": {
+        "github.com/prometheus/exporter-toolkit/web.ListenAndServe": {
+          "github.com/prometheus/exporter-toolkit/web.Serve": {
+            "net/http.(*Server).Serve": {
+              "net.(*TCPListener).Accept": {
+                "net.(*TCPListener).accept": {
+                  "net.(*netFD).accept": {
+                    "internal/poll.(*FD).Accept": {
+                      "internal/poll.(*pollDesc).waitRead": {
+                        "internal/poll.(*pollDesc).wait": {
+                          "internal/poll.runtime_pollWait": {
+                            "runtime.netpollblock": { "runtime.gopark": {} }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

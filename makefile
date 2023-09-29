@@ -1,3 +1,8 @@
+.PHONY: proto
+
+proto:
+	docker run --rm -v${PWD}:${PWD} -w${PWD} namely/protoc-all --proto_path=${PWD}/proto \
+		    --python_out=${PWD}/flameshow/pprof_parser/ ${PWD}/proto/profile.proto
 bump_patch:
 	bumpversion patch
 
