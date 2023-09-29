@@ -11,6 +11,8 @@ from flameshow.utils import fgid
 
 logger = logging.getLogger(__name__)
 
+FILL_WIDTH = 500 * " "
+
 
 class Span(Widget):
     DEFAULT_CSS = """
@@ -78,8 +80,8 @@ class Span(Widget):
                 ),
             ),
             (
-                # +200 to use text background cover original background
-                display_text + " " * 200,
+                # to use text background cover original background
+                display_text + FILL_WIDTH,
                 Style(
                     color=display_color.get_contrast_text().rich_color,
                     bgcolor=display_color.rich_color,

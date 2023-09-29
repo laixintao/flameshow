@@ -1,46 +1,83 @@
-from dataclasses import dataclass
+"""
+Parse golang's pprof format into flameshow.models which can be rendered.
+
+Ref:
+https://github.com/google/pprof/tree/main/proto
+"""
+from dataclasses import dataclass, field
 import datetime
+import datetime
+import gzip
+import logging
 import logging
 import os
-import time
-from typing import Tuple
+from typing import List
 
+from flameshow.models import Profile
 from flameshow.models import Frame, Profile, SampleType
 from flameshow.utils import sizeof
 
+from . import profile_pb2
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass
+class Function:
+    id: int = 0
+    filename: str = ""
+    name: str = ""
+    start_line: int = 0
+    system_name: str = ""
+
+
+@dataclass
 class Line:
     line_no: int = 0
-    function_filename: str = ""
-    function_id: int = 0
-    function_name: str = ""
-    function_start_line: int = 0
-    function_system_name: str = ""
+    function: Function = field(default_factory=Function)
 
-    @classmethod
-    def from_dict(cls, data):
-        function = data.get("Function", {})
-        return cls(
-            line_no=data.get("Line"),
-            function_filename=function.get("Filename"),
-            function_id=function.get("ID"),
-            function_name=function.get("Name"),
-            function_start_line=function.get("StartLine"),
-            function_system_name=function.get("SystemName"),
-        )
+
+@dataclass
+class Mapping:
+    id: int = 0
+    memory_start: int = 0
+    memory_limit: int = 0
+    file_offset: int = 0
+
+    filename: str = ""
+    build_id: str = ""
+
+    has_functions: bool | None = None
+    has_filenames: bool | None = None
+    has_line_numbers: bool | None = None
+    has_inline_frames: bool | None = None
+
+
+@dataclass
+class Location:
+    id: int = 0
+    mapping: Mapping = field(default_factory=Mapping)
+    address: int = 0
+    lines: List[Line] = field(default_factory=list)
+    is_folded: bool = False
 
 
 class PprofFrame(Frame):
     def __init__(
-        self, name, _id, children=None, parent=None, values=None, root=None
+        self,
+        name,
+        _id,
+        children=None,
+        parent=None,
+        values=None,
+        root=None,
+        line=None,
+        mapping=None,
     ) -> None:
         super().__init__(name, _id, children, parent, values, root)
 
-        self.line = Line()
+        self.line = line
+        self.mapping = mapping
 
     def humanize(self, sample_unit, value):
         display_value = value
@@ -58,9 +95,9 @@ class PprofFrame(Frame):
             line1 = f"Total: {self.humanize(sample_unit, total)}"
             line2 = ""
             if self.children:
-                line2 = f"Binary: {self.children[0].mapping_file}"
+                line2 = f"Binary: {self.children[0].mapping.filename}"
         else:
-            line1 = f"{self.line.function_filename}, [b]line {self.line.line_no}[/b]"
+            line1 = f"{self.line.function.filename}, [b]line {self.line.line_no}[/b]"
             if not self.parent or not self.root:
                 logger.warning("self.parent or self.root is None!")
                 line2 = "<error>"
@@ -83,7 +120,7 @@ class PprofFrame(Frame):
 
                 value = self.humanize(sample_unit, self.values[sample_index])
                 line2 = (
-                    f"{self.line.function_name}: [b red]{value}[/b"
+                    f"{self.line.function.name}: [b red]{value}[/b"
                     f" red] ({p_parent:.1f}% of parent, {p_root:.1f}% of root)"
                 )
         return line1 + os.linesep + line2
@@ -92,15 +129,38 @@ class PprofFrame(Frame):
         return self.display_name
 
 
+def unmarshal(content) -> profile_pb2.Profile:
+    if len(content) < 2:
+        raise Exception(
+            "Profile content lengh is too short: {} bytes".format(len(content))
+        )
+    is_gzip = content[0] == 31 and content[1] == 139
+
+    if is_gzip:
+        print("the pprof file is gzip.")
+        content = gzip.decompress(content)
+
+    profile = profile_pb2.Profile()
+    profile.ParseFromString(content)
+
+    return profile
+
+
 class ProfileParser:
     def __init__(self, filename):
         self.filename = filename
-        self.highest = 0
+        # uniq id
         self.next_id = 0
-        # root must be created first, with id = 0
-        # when render, focused ip will be set to 0 by default
+
         self.root = PprofFrame("root", _id=self.idgenerator())
-        self.total_sample = 0
+
+        # store the pprof's string table
+        self._t = []
+        # parse cached locations, profile do not need this, so only store
+        # them on the parser
+        self.locations = []
+        self.highest = 0
+
         self.id_store = {self.root._id: self.root}
 
     def idgenerator(self):
@@ -109,105 +169,148 @@ class ProfileParser:
 
         return i
 
-    def parse_sample(self, sample, parent):
-        locations = sample["Location"]
+    def s(self, index):
+        return self._t[index]
 
-        locations_reverse = reversed(locations)
+    def parse_internal_data(self, pbdata):
+        self._t = pbdata.string_table
+        self.functions = self.parse_functions(pbdata.function)
+        self.mappings = self.parse_mapping(pbdata.mapping)
+        self.locations = self.parse_location(pbdata.location)
 
-        my_depth = sum(len(location["Line"]) for location in locations)
+    def parse(self, binary_data):
+        pbdata = unmarshal(binary_data)
+        self.parse_internal_data(pbdata)
 
+        pprof_profile = Profile()
+        pprof_profile.filename = self.filename
+        pprof_profile.sample_types = self.parse_sample_types(pbdata.sample_type)
+        pprof_profile.created_at = self.parse_created_at(pbdata.time_nanos)
+        pprof_profile.period = pbdata.period
+        pprof_profile.period_type = self.to_smaple_type(pbdata.period_type)
+
+        if pbdata.default_sample_type:
+            pprof_profile.default_sample_type_index = pbdata.default_sample_type
+
+        # WIP
+        root = self.root
+        root.values = [0] * len(pprof_profile.sample_types)
+        for pbsample in pbdata.sample:
+            child_frame = self.parse_sample(pbsample)
+            if not child_frame:
+                continue
+            root.values = list(map(sum, zip(root.values, child_frame.values)))
+            root.pile_up(child_frame)
+
+        pprof_profile.root_stack = root
+        pprof_profile.id_store = self.id_store
+        pprof_profile.total_sample = len(pbdata.sample)
+        pprof_profile.highest_lines = self.highest
+
+        return pprof_profile
+
+    def parse_sample(self, sample) -> PprofFrame | None:
+        values = sample.value
+        locations = list(reversed([self.locations[i] for i in sample.location_id]))
+
+        my_depth = sum(len(l.lines) for l in locations)
         self.highest = max(my_depth, self.highest)
 
-        stack = self.parse_location(
-            locations_reverse, values=sample["Value"], parent=parent
-        )
-        return stack
+        current_parent = None
+        head = None
+        for location in locations:
+            for line in location.lines:
+                frame = self.line2frame(location, line, values)
 
-    def parse_location(self, locations, values, parent):
-        """
-        recursive parse locations
-        """
-        location1, *rest = locations
+                if current_parent:
+                    frame.parent = current_parent
+                    current_parent.children = [frame]
+                if not head:
+                    head = frame
 
-        head, tail = self.parse_single_location(location1, values, parent)
-
-        if rest:
-            tail.children = [self.parse_location(rest, values, tail)]
-        else:
-            tail.children = []
+                current_parent = frame
 
         return head
 
-    def parse_single_location(self, location, values, parent) -> Tuple[Frame, Frame]:
-        """
-        Lines might be multiple, for every line, render to a stack
-        returns the first stack, and the last stack (to continue the recurssion)
-        """
-        head = None
-        tail = None
-        my_parent = parent
-        for line in reversed(location["Line"]):
-            name = line["Function"]["Name"]
-
-            stack = PprofFrame(name, self.idgenerator())
-            self.id_store[stack._id] = stack
-            stack.values = values
-            stack.parent = my_parent
-            stack.root = self.root
-
-            stack.line = Line.from_dict(line)
-
-            stack.mapping_file = location["Mapping"]["File"]
-
-            my_parent = stack
-            if not head:
-                head = stack
-            if tail:
-                tail.children = [stack]
-
-            tail = stack
-
-        return head, tail
-
-    def debug_root(self, root: Frame, indent=0):
-        num = str(indent)
-        space = num + " " * (indent - len(num))
-        logger.debug(f"{space}{root.name=} ({root.values})")
-        for child in root.children:
-            self.debug_root(child, indent + 2)
-
-    def parse(self, data: dict):
-        samples = data["Sample"]
-        sample_types = [SampleType(t["Type"], t["Unit"]) for t in data["SampleType"]]
-
-        self.total_sample = len(samples)
-
-        root = self.root
-        root.values = [0] * len(sample_types)
-        start = time.time()
-        for sample in samples:
-            child_stack = self.parse_sample(sample, parent=root)
-
-            root.values = list(map(sum, zip(root.values, child_stack.values)))
-            root.pile_up(child_stack)
-
-        end = time.time()
-        logger.info("Parse profile cost %.2fs", end - start)
-
-        profile = Profile(
-            filename=self.filename,
-            root_stack=root,
-            highest_lines=self.highest,
-            total_sample=self.total_sample,
-            id_store=self.id_store,
-            sample_types=sample_types,
+    def line2frame(self, location: Location, line: Line, values) -> PprofFrame:
+        frame = PprofFrame(
+            name=line.function.name,
+            _id=self.idgenerator(),
+            values=values,
+            root=self.root,
+            mapping=location.mapping,
         )
+        frame.line = line
+        self.id_store[frame._id] = frame
+        return frame
 
-        created_at = data.get("TimeNanos")
-        if created_at:
-            date = datetime.datetime.fromtimestamp(created_at / 1e9)
-            profile.created_at = date
-        return profile
+    def parse_location(self, pblocations):
+        parsed_locations = {}
+        for pl in pblocations:
+            l = Location()
+            l.id = pl.id
+            l.mapping = self.mappings[pl.mapping_id]
+            l.address = pl.address
+            l.lines = self.parse_line(pl.line)
+            l.is_folded = pl.is_folded
+            parsed_locations[l.id] = l
+
+        return parsed_locations
+
+    def parse_mapping(self, pbmappings):
+        mappings = {}
+        for pbm in pbmappings:
+            m = Mapping()
+            m.id = pbm.id
+            m.memory_start = pbm.memory_start
+            m.memory_limit = pbm.memory_limit
+            m.file_offset = pbm.file_offset
+            m.filename = self.s(pbm.filename)
+            m.build_id = self.s(pbm.build_id)
+            m.has_functions = pbm.has_functions
+            m.has_filenames = pbm.has_filenames
+            m.has_line_numbers = pbm.has_line_numbers
+            m.has_inline_frames = pbm.has_inline_frames
+
+            mappings[m.id] = m
+
+        return mappings
+
+    def parse_line(self, pblines) -> List[Line]:
+        lines = []
+        for pl in reversed(pblines):
+            line = Line(
+                line_no=pl.line,
+                function=self.functions[pl.function_id],
+            )
+            lines.append(line)
+        return lines
+
+    def parse_functions(self, pfs):
+        functions = {}
+        for pf in pfs:
+            functions[pf.id] = Function(
+                id=pf.id,
+                filename=self.s(pf.filename),
+                name=self.s(pf.name),
+                system_name=self.s(pf.system_name),
+                start_line=pf.start_line,
+            )
+        return functions
+
+    def parse_created_at(self, time_nanos):
+        date = datetime.datetime.fromtimestamp(time_nanos / 1e9)
+        return date
+
+    def parse_sample_types(self, sample_types):
+        result = []
+        for st in sample_types:
+            result.append(self.to_smaple_type(st))
+
+        return result
+
+    def to_smaple_type(self, st):
+        return SampleType(self.s(st.type), self.s(st.unit))
 
 
 def get_frame_tree(root_frame):
@@ -221,13 +324,16 @@ def get_frame_tree(root_frame):
     return {"root": _get_child(root_frame)}
 
 
-def parse_profile(profile_dict, filename):
-    parser_obj = ProfileParser(filename=filename)
-    t1 = time.time()
-    profile = parser_obj.parse(profile_dict)
-    logger.info("Max depth: %s", parser_obj.highest)
-    t2 = time.time()
-    logger.info("parse json files cost %s s", t2 - t1)
+def parse_profile(binary_data, filename):
+    parser = ProfileParser(filename)
+    profile = parser.parse(binary_data)
 
-
+    # import ipdb; ipdb.set_trace()
     return profile
+
+
+if __name__ == "__main__":
+    with open("tests/pprof_data/goroutine.out", "rb") as f:
+        content = f.read()
+
+    parse_profile(content, "abc")

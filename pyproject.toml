@@ -12,9 +12,6 @@ include = [
     { path = "go", format = "sdist" }
 ]
 
-[tool.poetry.build]
-script = "build.py"
-generate-setup-file = true
 
 [tool.poetry.dependencies]
 python = "^3.10"
