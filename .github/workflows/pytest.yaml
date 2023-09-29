@@ -46,9 +46,3 @@ jobs:
         run: |
           source $VENV
           pytest tests -v --cov=./flameshow --cov-report=xml:./coverage.xml --cov-report term-missing
-      - name: Upload snapshot report
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: snapshot-report-flameshow
-          path: snapshot_report.html
