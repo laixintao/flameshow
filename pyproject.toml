@@ -23,7 +23,6 @@ protobuf = "^4.24"
 
 [tool.poetry.scripts]
 flameshow = 'flameshow.main:main'
-debug-flameshow = "flameshow.pprof_parser.pb_parse::main"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.2"
