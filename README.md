@@ -5,6 +5,7 @@
 Flameshow is a terminal Flamegraph viewer.
 
 ![](./docs/flameshow.gif)
+[![Test](https://github.com/laixintao/flameshow/actions/workflows/pytest.yaml/badge.svg)](https://github.com/laixintao/flameshow/actions/workflows/pytest.yaml)
 
 ## Features
 
