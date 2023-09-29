@@ -6,7 +6,12 @@ from flameshow.pprof_parser.parser import (
     get_frame_tree,
     parse_profile as golang_parse_profile,
 )
-from flameshow.pprof_parser.pb_parse import parse_profile
+from flameshow.pprof_parser.pb_parse import (
+    ProfileParser,
+    parse_profile,
+    unmarshal,
+    Mapping,
+)
 
 
 def test_golang_goroutine_parse(goroutine_pprof):
@@ -60,3 +65,47 @@ def test_golang_profile10s_parse_using_protobuf(profile10s):
     assert profile.period == 10000000
 
     assert profile.default_sample_type_index == -1
+
+
+def test_protobuf_parse_gorouting_mapping(goroutine_pprof):
+    pb_binary = unmarshal(goroutine_pprof)
+    parser = ProfileParser("goroutine.out")
+    parser.parse_internal_data(pb_binary)
+    assert parser.mappings == {
+        1: Mapping(
+            id=1,
+            memory_start=4194304,
+            memory_limit=11280384,
+            file_offset=0,
+            filename="/usr/bin/node-exporter",
+            build_id="",
+            has_functions=True,
+            has_filenames=False,
+            has_line_numbers=False,
+            has_inline_frames=False,
+        ),
+        2: Mapping(
+            id=2,
+            memory_start=140721318682624,
+            memory_limit=140721318690816,
+            file_offset=0,
+            filename="[vdso]",
+            build_id="",
+            has_functions=False,
+            has_filenames=False,
+            has_line_numbers=False,
+            has_inline_frames=False,
+        ),
+        3: Mapping(
+            id=3,
+            memory_start=18446744073699065856,
+            memory_limit=18446744073699069952,
+            file_offset=0,
+            filename="[vsyscall]",
+            build_id="",
+            has_functions=False,
+            has_filenames=False,
+            has_line_numbers=False,
+            has_inline_frames=False,
+        ),
+    }
