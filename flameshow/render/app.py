@@ -397,7 +397,7 @@ class FlameGraphApp(App):
     def _find_left_sibling(self, me):
         """
         Find left.
-        Even not currently dislayed, still can be viewed on detail.
+        Even not currently displayed, still can be viewed on detail.
         No need to check if the fgid is currently rendered.
         """
         my_parent = me.parent

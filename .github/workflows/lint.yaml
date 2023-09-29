@@ -7,8 +7,31 @@ on:
       - master
 
 jobs:
-  lint:
-    name: flake8 & black
+  flake8:
+    name: flake8
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache venv
+        uses: actions/cache@v2
+        with:
+          path: venv
+          key: lintenv-flake8
+
+      - name: Install Dependencies
+        run: |
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install -U pip flake8
+
+      - name: Flake8 test
+        run: |
+          . venv/bin/activate
+          flake8 .
+
+  spell:
+    name: Spell Check
     runs-on: ubuntu-latest
 
     steps:
@@ -17,7 +40,7 @@ jobs:
       - uses: codespell-project/actions-codespell@v2
         with:
           check_filenames: true
-          skip: '*.log,./tests/pprof_data/*,poetry.lock'
+          skip: "*.log,./tests/pprof_data/*,poetry.lock"
 
       - uses: actions/setup-python@v4
         with:
@@ -25,23 +48,23 @@ jobs:
           python-version: 3.10
           architecture: "x64"
 
+  black:
+    name: black
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
       - name: Cache venv
         uses: actions/cache@v2
         with:
           path: venv
-          # Look to see if there is a cache hit for the corresponding requirements file
-          key: lintenv-v2
+          key: lintenv-black
 
       - name: Install Dependencies
         run: |
           python3 -m venv venv
           . venv/bin/activate
-          pip install -U pip flake8 black
-
-      - name: Flake8 test
-        run: |
-          . venv/bin/activate
-          flake8 .
+          pip install -U pip black
 
       - name: Black test
         run: |
