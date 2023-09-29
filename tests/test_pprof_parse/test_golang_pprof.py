@@ -1,38 +1,21 @@
 import datetime
 import json
+import json
 
-from flameshow.pprof_parser import parse_golang_profile
+import pytest
+
+from flameshow.pprof_parser.parser import ProfileParser
 from flameshow.pprof_parser.parser import (
-    get_frame_tree,
-    parse_profile as golang_parse_profile,
-)
-from flameshow.pprof_parser.pb_parse import (
+    Function,
+    Line,
+    Location,
+    Mapping,
     ProfileParser,
     parse_profile,
     unmarshal,
-    Mapping,
-    Location,
-    Line,
-    Function,
+    get_frame_tree,
 )
 
-
-def test_golang_goroutine_parse(goroutine_pprof):
-    result = parse_golang_profile(goroutine_pprof)
-    assert result["TimeNanos"] == 1694243309664362892
-    assert result["SampleType"][0] == {"Type": "goroutine", "Unit": "count"}
-
-
-def test_golang_goroutine_check_frame_tree(goroutine_pprof, data_dir):
-    bdata = parse_golang_profile(goroutine_pprof)
-    result = golang_parse_profile(bdata, "goroutine.out")
-
-    frame_tree = get_frame_tree(result.root_stack)
-
-    with open(data_dir / "goroutine_frametree.json") as f:
-        expected = json.load(f)
-
-    assert frame_tree == expected
 
 def test_python_protobuf_goroutine_check_frame_tree(goroutine_pprof, data_dir):
     profile = parse_profile(goroutine_pprof, "profile10s.out")
@@ -42,6 +25,7 @@ def test_python_protobuf_goroutine_check_frame_tree(goroutine_pprof, data_dir):
         expected = json.load(f)
 
     assert frame_tree == expected
+
 
 def test_golang_goroutine_parse_using_protobuf(goroutine_pprof):
     profile = parse_profile(goroutine_pprof, "goroutine.out")
@@ -157,3 +141,46 @@ def test_protobuf_parse_gorouting_mapping(goroutine_pprof):
         start_line=0,
         system_name="runtime.gopark",
     )
+
+
+@pytest.mark.skip(reason="todo, support json")
+def test_parse_sample_location_with_multiple_lines(data_dir):
+    parser = ProfileParser("abc")
+    with open(data_dir / "sample_location_line_multiple.json") as f:
+        content = json.load(f)
+
+    profile = parser.parse(content)
+    root = profile.root_stack
+
+    names = []
+    while root.children:
+        c0 = root.children[0]
+        names.append(c0.name)
+        root = c0
+
+    assert names == [
+        "github.com/prometheus/node_exporter/collector.NodeCollector.Collect.func1",
+        "github.com/prometheus/node_exporter/collector.execute",
+        "github.com/prometheus/node_exporter/collector.(*meminfoCollector).Update",
+        "github.com/prometheus/node_exporter/collector.(*meminfoCollector).getMemInfo",
+        "github.com/prometheus/node_exporter/collector.procFilePath",
+        "path/filepath.Join",
+        "path/filepath.join",
+        "strings.Join",
+        "strings.(*Builder).Grow",
+        "strings.(*Builder).grow",
+        "runtime.makeslice",
+        "runtime.newstack",
+        "runtime.copystack",
+        "runtime.gentraceback",
+    ]
+
+
+@pytest.mark.skip(reason="todo, support json")
+def test_parse_max_depth_when_have_multiple_lines(data_dir):
+    parser = ProfileParser("abc")
+    with open(data_dir / "profile10s_node_exporter.json") as f:
+        content = json.load(f)
+
+    profile = parser.parse(content)
+    assert profile.highest_lines == 26

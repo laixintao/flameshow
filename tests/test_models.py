@@ -1,4 +1,11 @@
-from flameshow.pprof_parser.parser import Line, PprofFrame, Frame
+from flameshow.pprof_parser.parser import ProfileParser, Frame
+
+
+def test_parse_max_depth_when_have_multiple_lines(profile10s):
+    parser = ProfileParser("abc")
+
+    profile = parser.parse(profile10s)
+    assert profile.highest_lines == 26
 
 
 def test_pile_up():
@@ -16,13 +23,3 @@ def test_pile_up():
     root.pile_up(s1)
     assert root.children[0].values == [7]
     assert root.children[0].children[0].values == [6]
-
-
-def test_render_detail_when_parent_zero():
-    root = PprofFrame("root", 0, values=[0])
-    s1 = PprofFrame("s1", 1, values=[0], parent=root, root=root)
-    s1.line = Line()
-    s1.line.function.name = "asdf"
-
-    detail = s1.render_detail(0, "bytes")
-    assert "(0.0% of parent, 0.0% of root)" in detail
