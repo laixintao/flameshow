@@ -50,7 +50,6 @@ class Span(Widget):
         self.i = sample_index
         self.sample_unit = sample_unit
 
-
     def on_mount(self) -> None:
         self.styles.background = self.s_stack.display_color
         self.styles.width = f"{self.my_width * 100:.2f}%"

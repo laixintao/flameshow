@@ -160,7 +160,9 @@ class FlameGraphApp(App):
         if not created_at:
             return Static("")
 
-        datetime_str = created_at.astimezone().strftime("Dumped at %Y %b %d(%A) %H:%M:%S %Z")
+        datetime_str = created_at.astimezone().strftime(
+            "Dumped at %Y %b %d(%A) %H:%M:%S %Z"
+        )
         return Static(datetime_str)
 
     def post_display_hook(self):
@@ -304,8 +306,9 @@ class FlameGraphApp(App):
             new_view = self.query_one(_add_id)
         except NoMatches:
             logger.critical(
-                "Not found when try to add class view-info-span to a Span, id={}"
-                .format(_add_id)
+                "Not found when try to add class view-info-span to a Span, id={}".format(
+                    _add_id
+                )
             )
             return
         else:
