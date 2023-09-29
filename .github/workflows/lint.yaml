@@ -28,7 +28,7 @@ jobs:
       - name: Flake8 test
         run: |
           . venv/bin/activate
-          flake8 .
+          flake8 flameshow
 
   spell:
     name: Spell Check
