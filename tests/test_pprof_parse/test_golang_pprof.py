@@ -11,6 +11,9 @@ from flameshow.pprof_parser.pb_parse import (
     parse_profile,
     unmarshal,
     Mapping,
+    Location,
+    Line,
+    Function,
 )
 
 
@@ -109,3 +112,39 @@ def test_protobuf_parse_gorouting_mapping(goroutine_pprof):
             has_inline_frames=False,
         ),
     }
+    assert parser.locations[1] == Location(
+        id=1,
+        mapping=Mapping(
+            id=1,
+            memory_start=4194304,
+            memory_limit=11280384,
+            file_offset=0,
+            filename="/usr/bin/node-exporter",
+            build_id="",
+            has_functions=True,
+            has_filenames=False,
+            has_line_numbers=False,
+            has_inline_frames=False,
+        ),
+        address=4435364,
+        lines=[
+            Line(
+                line_no=336,
+                function=Function(
+                    id=1,
+                    filename="/usr/local/go/src/runtime/proc.go",
+                    name="runtime.gopark",
+                    start_line=0,
+                    system_name="runtime.gopark",
+                ),
+            )
+        ],
+        is_folded=False,
+    )
+    assert parser.functions[1] == Function(
+        id=1,
+        filename="/usr/local/go/src/runtime/proc.go",
+        name="runtime.gopark",
+        start_line=0,
+        system_name="runtime.gopark",
+    )

@@ -23,25 +23,18 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
+class Function:
+    id: int = 0
+    filename: str = ""
+    name: str = ""
+    start_line: int = 0
+    system_name: str = ""
+
+
+@dataclass
 class Line:
     line_no: int = 0
-    function_filename: str = ""
-    function_id: int = 0
-    function_name: str = ""
-    function_start_line: int = 0
-    function_system_name: str = ""
-
-    @classmethod
-    def from_dict(cls, data):
-        function = data.get("Function", {})
-        return cls(
-            line_no=data.get("Line"),
-            function_filename=function.get("Filename"),
-            function_id=function.get("ID"),
-            function_name=function.get("Name"),
-            function_start_line=function.get("StartLine"),
-            function_system_name=function.get("SystemName"),
-        )
+    function: Function = field(default_factory=Function)
 
 
 @dataclass
@@ -169,6 +162,7 @@ class ProfileParser:
 
     def parse_internal_data(self, pbdata):
         self._t = pbdata.string_table
+        self.functions = self.parse_functions(pbdata.function)
         self.mappings = self.parse_mapping(pbdata.mapping)
         self.locations = self.parse_location(pbdata.location)
 
@@ -208,7 +202,7 @@ class ProfileParser:
             l.id = pl.id
             l.mapping = self.mappings[pl.mapping_id]
             l.address = pl.address
-            l.line = self.parse_line(pl.line)
+            l.lines = self.parse_line(pl.line)
             l.is_folded = pl.is_folded
             parsed_locations[l.id] = l
 
@@ -233,9 +227,27 @@ class ProfileParser:
 
         return mappings
 
-    def parse_line(self, pbline) -> Line:
-        line = Line()
-        return line
+    def parse_line(self, pblines) -> List[Line]:
+        lines = []
+        for pl in pblines:
+            line = Line(
+                line_no=pl.line,
+                function=self.functions[pl.function_id],
+            )
+            lines.append(line)
+        return lines
+
+    def parse_functions(self, pfs):
+        functions = {}
+        for pf in pfs:
+            functions[pf.id] = Function(
+                id=pf.id,
+                filename=self.s(pf.filename),
+                name=self.s(pf.name),
+                system_name=self.s(pf.system_name),
+                start_line=pf.start_line,
+            )
+        return functions
 
     def parse_sample(self, sample, parent) -> PprofFrame:
         print("parse sample: ", sample)
