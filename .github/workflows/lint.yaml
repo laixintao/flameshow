@@ -14,13 +14,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: codespell-project/actions-codespell@master
+      - uses: pell-project/actions-codespell@v2
         with:
-          ignore_words_list: fo,ists,oll,optin,ot,smove,tre,whe,EXAT,exat
+          check_filenames: true
           skip: ./tests/pprof_data/*
 
       - uses: actions/setup-python@v4
         with:
+          ignore_words_list: hello,world
           python-version: 3.10
           architecture: "x64"
 
