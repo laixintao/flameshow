@@ -27,7 +27,9 @@ logger = logging.getLogger(__name__)
 class FlameGraphScroll(VerticalScroll, inherit_bindings=False):
     BINDINGS: ClassVar[list[BindingType]] = [
         Binding("b", "scroll_up", "Scroll Up", show=True, key_display="B"),
-        Binding("f,space", "scroll_down", "Scroll Down", show=True, key_display="F"),
+        Binding(
+            "f,space", "scroll_down", "Scroll Down", show=True, key_display="F"
+        ),
         Binding("home", "scroll_home", "Scroll Home", show=False),
         Binding("end", "scroll_end", "Scroll End", show=False),
         Binding("pageup", "page_up", "Page Up", show=False),
@@ -229,7 +231,9 @@ class FlameGraphApp(App):
         try:
             header = self.query_one("FlameshowHeader")
         except NoMatches:
-            logger.warning("FlameshowHeader not found, might be not composed yet.")
+            logger.warning(
+                "FlameshowHeader not found, might be not composed yet."
+            )
             return
         header.center_text = center_text
 
@@ -252,7 +256,9 @@ class FlameGraphApp(App):
         try:
             old_container = self.query_one("#flamegraph-container")
         except NoMatches:
-            logger.warning("Can not find the old_container of #flamegraph-container")
+            logger.warning(
+                "Can not find the old_container of #flamegraph-container"
+            )
         else:
             old_container.remove()
 
@@ -439,7 +445,9 @@ class FlameGraphApp(App):
     def set_stack_detail(self, stack):
         span_detail = self.query_one("#span-detail")
         span_detail.border_subtitle = stack.render_title()
-        span_detail.update(stack.render_detail(self.sample_index, self.sample_unit))
+        span_detail.update(
+            stack.render_detail(self.sample_index, self.sample_unit)
+        )
 
     @property
     def sample_unit(self):

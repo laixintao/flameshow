@@ -114,7 +114,9 @@ class PprofFrame(Frame):
                     p_root = 0
                 else:
                     p_root = (
-                        self.values[sample_index] / self.root.values[sample_index] * 100
+                        self.values[sample_index]
+                        / self.root.values[sample_index]
+                        * 100
                     )
 
                 value = self.humanize(sample_unit, self.values[sample_index])
@@ -131,7 +133,9 @@ class PprofFrame(Frame):
 def unmarshal(content) -> profile_pb2.Profile:
     if len(content) < 2:
         raise Exception(
-            "Profile content length is too short: {} bytes".format(len(content))
+            "Profile content length is too short: {} bytes".format(
+                len(content)
+            )
         )
     is_gzip = content[0] == 31 and content[1] == 139
 
@@ -182,13 +186,17 @@ class ProfileParser:
 
         pprof_profile = Profile()
         pprof_profile.filename = self.filename
-        pprof_profile.sample_types = self.parse_sample_types(pbdata.sample_type)
+        pprof_profile.sample_types = self.parse_sample_types(
+            pbdata.sample_type
+        )
         pprof_profile.created_at = self.parse_created_at(pbdata.time_nanos)
         pprof_profile.period = pbdata.period
         pprof_profile.period_type = self.to_smaple_type(pbdata.period_type)
 
         if pbdata.default_sample_type:
-            pprof_profile.default_sample_type_index = pbdata.default_sample_type
+            pprof_profile.default_sample_type_index = (
+                pbdata.default_sample_type
+            )
 
         # WIP
         root = self.root
@@ -209,7 +217,9 @@ class ProfileParser:
 
     def parse_sample(self, sample) -> PprofFrame | None:
         values = sample.value
-        locations = list(reversed([self.locations[i] for i in sample.location_id]))
+        locations = list(
+            reversed([self.locations[i] for i in sample.location_id])
+        )
 
         my_depth = sum(len(l.lines) for l in locations)
         self.highest = max(my_depth, self.highest)

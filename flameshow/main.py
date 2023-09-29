@@ -26,7 +26,12 @@ def setup_log(enabled, level, loglocation):
     logger.info("------ flameshow ------")
 
 
-LOG_LEVEL = {0: logging.CRITICAL, 1: logging.WARNING, 2: logging.INFO, 3: logging.DEBUG}
+LOG_LEVEL = {
+    0: logging.CRITICAL,
+    1: logging.WARNING,
+    2: logging.INFO,
+    3: logging.DEBUG,
+}
 
 
 def run_app(verbose, log_to, format, profile_f, _debug_exit_after_rednder):
@@ -90,7 +95,11 @@ def print_version(ctx, param, value):
     default="flamegraph",
 )
 @click.option(
-    "--version", is_flag=True, callback=print_version, expose_value=False, is_eager=True
+    "--version",
+    is_flag=True,
+    callback=print_version,
+    expose_value=False,
+    is_eager=True,
 )
 @click.argument("profile", type=click.File("rb"))
 def main(verbose, log_to, format, profile):

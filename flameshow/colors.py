@@ -21,7 +21,9 @@ class ColorPlatteBase:
 
 class LinaerColorPlatte(ColorPlatteBase):
     def __init__(
-        self, start_color=Color.parse("#CD0000"), end_color=Color.parse("#FFE637")
+        self,
+        start_color=Color.parse("#CD0000"),
+        end_color=Color.parse("#FFE637"),
     ) -> None:
         super().__init__()
         self.assigned_color = {}
@@ -42,7 +44,9 @@ class LinaerColorPlatte(ColorPlatteBase):
     def generate_platte(self):
         color_platte = []
         for factor in range(0, 100, 5):
-            color_platte.append(self.start_color.blend(self.end_color, factor / 100))
+            color_platte.append(
+                self.start_color.blend(self.end_color, factor / 100)
+            )
         return color_platte
 
 
