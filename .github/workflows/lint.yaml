@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pell-project/actions-codespell@v2
+      - uses: codespell-project/actions-codespell@v2
         with:
           check_filenames: true
           skip: ./tests/pprof_data/*
