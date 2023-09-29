@@ -1,0 +1,7 @@
+[flake8]
+exclude =
+    .git,
+    __pycache__,
+    dist,
+    ./flameshow/pprof_parser/profile_pb2.py,
+    tests/

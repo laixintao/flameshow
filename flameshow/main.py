@@ -18,7 +18,10 @@ def setup_log(enabled, level, loglocation):
         logging.basicConfig(
             filename=os.path.expanduser(loglocation),
             filemode="a",
-            format="%(asctime)s %(levelname)5s (%(module)sL%(lineno)d) %(message)s",
+            format=(
+                "%(asctime)s %(levelname)5s (%(module)sL%(lineno)d)"
+                " %(message)s"
+            ),
             level=level,
         )
     else:

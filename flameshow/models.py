@@ -47,8 +47,10 @@ class Frame:
         for exist_child in self.children:
             # added to exist, no need to create one
             if exist_child.name == childstack.name:
-                # some cases, childstack.children total value not equal to childstack.values
-                # so, we need to add values of "parent" instead of add values by every child
+                # some cases, childstack.children total value not equal to
+                # childstack.values
+                # so, we need to add values of "parent" instead of add values
+                # by every child
                 exist_child.values = list(
                     map(sum, zip(exist_child.values, childstack.values))
                 )

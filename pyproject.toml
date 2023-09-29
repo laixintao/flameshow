@@ -28,6 +28,7 @@ flameshow = 'flameshow.main:main'
 pytest = "^7.4.2"
 pytest-asyncio = "^0.21.1"
 ipdb = "^0.13.13"
+flake8 = "^6.1.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -36,6 +37,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.black]
 line-length = 79
 target-version = ['py37']
+preview = true
 extend-exclude = '''
 # A regex preceded with ^/ will apply only to files and directories
 # in the root of the project.

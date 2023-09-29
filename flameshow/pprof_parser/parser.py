@@ -8,11 +8,9 @@ from dataclasses import dataclass, field
 import datetime
 import gzip
 import logging
-import logging
 import os
 from typing import List
 
-from flameshow.models import Profile
 from flameshow.models import Frame, Profile, SampleType
 from flameshow.utils import sizeof
 
@@ -96,7 +94,10 @@ class PprofFrame(Frame):
             if self.children:
                 line2 = f"Binary: {self.children[0].mapping.filename}"
         else:
-            line1 = f"{self.line.function.filename}, [b]line {self.line.line_no}[/b]"
+            line1 = (
+                f"{self.line.function.filename}, [b]line"
+                f" {self.line.line_no}[/b]"
+            )
             if not self.parent or not self.root:
                 logger.warning("self.parent or self.root is None!")
                 line2 = "<error>"
@@ -221,7 +222,7 @@ class ProfileParser:
             reversed([self.locations[i] for i in sample.location_id])
         )
 
-        my_depth = sum(len(l.lines) for l in locations)
+        my_depth = sum(len(loc.lines) for loc in locations)
         self.highest = max(my_depth, self.highest)
 
         current_parent = None
@@ -255,13 +256,13 @@ class ProfileParser:
     def parse_location(self, pblocations):
         parsed_locations = {}
         for pl in pblocations:
-            l = Location()
-            l.id = pl.id
-            l.mapping = self.mappings[pl.mapping_id]
-            l.address = pl.address
-            l.lines = self.parse_line(pl.line)
-            l.is_folded = pl.is_folded
-            parsed_locations[l.id] = l
+            loc = Location()
+            loc.id = pl.id
+            loc.mapping = self.mappings[pl.mapping_id]
+            loc.address = pl.address
+            loc.lines = self.parse_line(pl.line)
+            loc.is_folded = pl.is_folded
+            parsed_locations[loc.id] = loc
 
         return parsed_locations
 

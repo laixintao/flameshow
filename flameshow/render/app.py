@@ -312,9 +312,8 @@ class FlameGraphApp(App):
             new_view = self.query_one(_add_id)
         except NoMatches:
             logger.critical(
-                "Not found when try to add class view-info-span to a Span, id={}".format(
-                    _add_id
-                )
+                "Not found when try to add class view-info-span to a Span,"
+                " id={}".format(_add_id)
             )
             return
         else:

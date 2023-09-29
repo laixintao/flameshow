@@ -1,4 +1,4 @@
-from flameshow.main import main, run_app
+from flameshow.main import run_app
 
 
 run_app(

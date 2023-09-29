@@ -1,7 +1,6 @@
 import logging
 
 from rich.text import Text
-from textual import reactive
 from textual.app import RenderResult
 from textual.containers import Horizontal
 from textual.css.query import NoMatches
