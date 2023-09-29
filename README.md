@@ -17,13 +17,11 @@ Flameshow is a terminal Flamegraph viewer.
 
 ## Install
 
+Flameshow is written in pure Python, so you can install via `pip`:
+
 ```shell
 pip install flameshow
 ```
-
-Requirements: needs `go` command available for building `.so` file for Golang.
-
-(Python wheels are on the way!)
 
 ## Usage
 
@@ -34,11 +32,23 @@ $ curl http://localhost:9100/debug/pprof/goroutine -o goroutine.out
 $ flameshow goroutine.out
 ```
 
-use. Once you open Flameshow, the user-friendly UI should make it easy to
-navigate.
+After entering the TUI, the available actions are listed on Footer:
 
-Currently it only supports Golang's pprof dump, I am working on supporting more
-formats
+- <kbd>q</kbd> for quit
+- <kbd>j</kbd> <kbd>i</kbd> <kbd>j</kbd> <kbd>k</kbd> or <kbd>←</kbd>
+  <kbd>↓</kbd> <kbd>↑</kbd> <kbd>→</kbd> for moving around, and <kbd>Enter</kbd>
+  for zoom in, then <kbd>Esc</kbd> for zoom out.
+- You can also use a mouse, hover on a span will show it details, and click will
+  zoom it.
+
+## Supported Formats
+
+At the moment, Flameshow supports only Golang's pprof dump. I'm actively working
+on adding more formats. Admittedly, I might not be familiar with every tool and
+its specifics. So, if you'd like Flameshow to integrate with a tool you love,
+feel free reach out and drop an issue.
+
+- Golang pprof
 
 ## Development
 
