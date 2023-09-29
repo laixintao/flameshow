@@ -29,6 +29,7 @@ pytest = "^7.4.2"
 pytest-asyncio = "^0.21.1"
 ipdb = "^0.13.13"
 flake8 = "^6.1.0"
+pytest-cov = "^2.12.1"
 
 [build-system]
 requires = ["poetry-core"]
