@@ -1,5 +1,5 @@
 import json
-from flameshow.parser import ProfileParser, Frame
+from flameshow.pprof_parser.parser import ProfileParser, Frame
 from flameshow.pprof_parser import parse_golang_profile
 
 

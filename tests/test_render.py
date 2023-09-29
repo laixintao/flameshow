@@ -1,5 +1,5 @@
 import pytest
-from flameshow.parser import Profile, ProfileParser, SampleType
+from flameshow.pprof_parser.parser import Profile, ProfileParser, SampleType
 from flameshow.render import FlameGraphApp
 from flameshow.pprof_parser import parse_golang_profile
 

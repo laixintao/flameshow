@@ -1,0 +1,535 @@
+{
+  "root": {
+    "github.com/prometheus/node_exporter/collector.NodeCollector.Collect.func1": {
+      "github.com/prometheus/node_exporter/collector.execute": {
+        "github.com/prometheus/node_exporter/collector.(*meminfoCollector).Update": {
+          "github.com/prometheus/node_exporter/collector.(*meminfoCollector).getMemInfo": {
+            "github.com/prometheus/node_exporter/collector.procFilePath": {
+              "path/filepath.Join": {
+                "path/filepath.join": {
+                  "strings.Join": {
+                    "strings.(*Builder).Grow": {
+                      "strings.(*Builder).grow": {
+                        "runtime.makeslice": {
+                          "runtime.newstack": {
+                            "runtime.copystack": { "runtime.gentraceback": {} }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "github.com/prometheus/node_exporter/collector.(*netClassCollector).Update": {
+          "github.com/prometheus/node_exporter/collector.(*netClassCollector).getNetClassInfo": {
+            "github.com/prometheus/procfs/sysfs.FS.NetClassByIface": {
+              "github.com/prometheus/procfs/sysfs.parseNetClassIface": {
+                "io/ioutil.ReadDir": {
+                  "os.(*File).Readdir": {
+                    "os.(*File).readdir": {
+                      "os.Lstat": {
+                        "os.lstatNolog": {
+                          "os.ignoringEINTR": {
+                            "os.lstatNolog.func1": {
+                              "syscall.Lstat": {
+                                "syscall.fstatat": { "syscall.Syscall6": {} }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "os.direntReclen": {
+                        "os.readInt": { "os.readIntLE": {} }
+                      }
+                    }
+                  }
+                },
+                "github.com/prometheus/procfs/internal/util.SysReadFile": {
+                  "os.Open": {
+                    "os.OpenFile": {
+                      "os.openFileNolog": {
+                        "os.newFile": {
+                          "syscall.SetNonblock": {
+                            "syscall.fcntl": {
+                              "syscall.Syscall": { "runtime.exitsyscall": {} }
+                            }
+                          },
+                          "internal/poll.(*FD).Init": {
+                            "internal/poll.(*pollDesc).init": {
+                              "internal/poll.runtime_pollOpen": {
+                                "runtime.netpollopen": {
+                                  "runtime.epollctl": {}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "os.(*File).Fd": {
+                    "internal/poll.(*FD).SetBlocking": {
+                      "syscall.SetNonblock": {
+                        "syscall.fcntl": { "syscall.Syscall": {} }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "github.com/prometheus/node_exporter/collector.(*systemdCollector).Update": {
+          "github.com/prometheus/node_exporter/collector.(*systemdCollector).getAllUnits": {
+            "github.com/coreos/go-systemd/dbus.(*Conn).ListUnits": {
+              "github.com/coreos/go-systemd/dbus.(*Conn).listUnitsInternal": {
+                "github.com/godbus/dbus.(*Call).Store": {
+                  "github.com/godbus/dbus.Store": {
+                    "github.com/godbus/dbus.storeInterfaces": {
+                      "github.com/godbus/dbus.store": {
+                        "github.com/godbus/dbus.store": {
+                          "github.com/godbus/dbus.storeSlice": {
+                            "github.com/godbus/dbus.storeSliceIntoSlice": {
+                              "github.com/godbus/dbus.store": {
+                                "github.com/godbus/dbus.storeSlice": {
+                                  "github.com/godbus/dbus.storeSliceIntoSlice": {
+                                    "github.com/godbus/dbus.getVariantValue": {
+                                      "github.com/godbus/dbus.isVariant": {
+                                        "runtime.ifaceeq": {}
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "github.com/godbus/dbus.Store": {
+                  "github.com/godbus/dbus.storeInterfaces": {
+                    "github.com/godbus/dbus.store": {
+                      "github.com/godbus/dbus.store": {
+                        "github.com/godbus/dbus.storeSlice": {
+                          "github.com/godbus/dbus.storeStruct": {
+                            "github.com/godbus/dbus.Store": {
+                              "github.com/godbus/dbus.storeInterfaces": {
+                                "github.com/godbus/dbus.store": {
+                                  "github.com/godbus/dbus.store": {
+                                    "github.com/godbus/dbus.storeBase": {
+                                      "github.com/godbus/dbus.setDest": {
+                                        "github.com/godbus/dbus.isVariant": {
+                                          "runtime.ifaceeq": {}
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "github.com/prometheus/node_exporter/collector.(*udpQueuesCollector).Update": {
+          "github.com/prometheus/procfs.FS.NetUDPSummary": {
+            "github.com/prometheus/procfs.newNetUDPSummary": {
+              "github.com/prometheus/procfs.newNetIPSocketSummary": {
+                "bufio.(*Scanner).Scan": {
+                  "io.(*LimitedReader).Read": {
+                    "os.(*File).Read": {
+                      "os.(*File).read": {
+                        "internal/poll.(*FD).Read": {
+                          "internal/poll.ignoringEINTRIO": {
+                            "syscall.Read": {
+                              "syscall.read": { "syscall.Syscall": {} }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "runtime.gcBgMarkWorker": {
+      "runtime.gcMarkDone": {
+        "runtime.systemstack": {
+          "runtime.gcMarkDone.func1": {
+            "runtime.forEachP": {
+              "runtime.preemptall": {
+                "runtime.preemptone": {
+                  "runtime.preemptM": {
+                    "runtime.signalM": { "runtime.tgkill": {} }
+                  }
+                }
+              },
+              "runtime.notetsleep": {
+                "runtime.notetsleep_internal": {
+                  "runtime.futexsleep": { "runtime.futex": {} }
+                }
+              }
+            }
+          }
+        }
+      },
+      "runtime.systemstack": {
+        "runtime.gcBgMarkWorker.func2": {
+          "runtime.gcDrain": {
+            "runtime.scanobject": {
+              "runtime.greyobject": { "runtime.pageIndexOf": {} }
+            }
+          }
+        }
+      }
+    },
+    "runtime.mcall": {
+      "runtime.gosched_m": {
+        "runtime.goschedImpl": {
+          "runtime.schedule": {
+            "runtime.findrunnable": { "runtime.(*randomEnum).next": {} }
+          }
+        }
+      },
+      "runtime.park_m": {
+        "runtime.schedule": {
+          "runtime.findrunnable": {
+            "runtime.(*randomEnum).next": {},
+            "runtime.netpoll": { "runtime.epollwait": {} },
+            "runtime.runqget": {},
+            "runtime.checkTimers": {},
+            "runtime.pMask.read": {},
+            "runtime.stopm": {
+              "runtime.mPark": {
+                "runtime.notesleep": {
+                  "runtime.futexsleep": { "runtime.futex": {} }
+                }
+              }
+            },
+            "runtime.(*randomOrder).start": {},
+            "runtime.(*randomEnum).position": {},
+            "runtime.(*randomEnum).done": {}
+          },
+          "runtime.resetspinning": {
+            "runtime.wakep": {
+              "runtime.startm": {
+                "runtime.notewakeup": {
+                  "runtime.futexwakeup": { "runtime.futex": {} }
+                }
+              }
+            }
+          }
+        }
+      },
+      "runtime.goexit0": {
+        "runtime.schedule": {
+          "runtime.findrunnable": {
+            "runtime.netpoll": { "runtime.epollwait": {} }
+          }
+        }
+      }
+    },
+    "github.com/godbus/dbus.(*Conn).inWorker": {
+      "github.com/godbus/dbus.(*unixTransport).ReadMessage": {
+        "github.com/godbus/dbus.DecodeMessage": {
+          "github.com/godbus/dbus.(*decoder).Decode": {
+            "github.com/godbus/dbus.(*decoder).decode": {
+              "github.com/godbus/dbus.(*decoder).decode": {
+                "github.com/godbus/dbus.(*decoder).decode": {
+                  "github.com/godbus/dbus.alignment": { "runtime.ifaceeq": {} },
+                  "github.com/godbus/dbus.(*decoder).decode": {
+                    "github.com/godbus/dbus.(*decoder).binread": {
+                      "encoding/binary.Read": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "runtime.mapassign": {
+            "runtime.newobject": {
+              "runtime.mallocgc": { "runtime.heapBitsSetType": {} }
+            }
+          }
+        },
+        "io.ReadFull": {
+          "io.ReadAtLeast": {
+            "github.com/godbus/dbus.(*oobReader).Read": {
+              "net.(*UnixConn).ReadMsgUnix": {
+                "net.(*UnixConn).readMsg": {
+                  "net.(*netFD).readMsg": {
+                    "internal/poll.(*FD).ReadMsg": {
+                      "syscall.Recvmsg": {
+                        "syscall.recvmsg": { "syscall.Syscall": {} }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "net/http.(*conn).serve": {
+      "net/http.serverHandler.ServeHTTP": {
+        "net/http.(*ServeMux).ServeHTTP": {
+          "main.(*handler).ServeHTTP": {
+            "net/http.HandlerFunc.ServeHTTP": {
+              "github.com/prometheus/client_golang/prometheus/promhttp.InstrumentHandlerCounter.func1": {
+                "net/http.HandlerFunc.ServeHTTP": {
+                  "github.com/prometheus/client_golang/prometheus/promhttp.InstrumentHandlerInFlight.func1": {
+                    "net/http.HandlerFunc.ServeHTTP": {
+                      "github.com/prometheus/client_golang/prometheus/promhttp.HandlerFor.func1": {
+                        "github.com/prometheus/client_golang/prometheus.Gatherers.Gather": {
+                          "github.com/prometheus/client_golang/prometheus/internal.NormalizeMetricFamilies": {
+                            "sort.Sort": {
+                              "sort.quickSort": {
+                                "sort.quickSort": { "sort.doPivot": {} }
+                              }
+                            }
+                          },
+                          "github.com/prometheus/client_golang/prometheus.(*Registry).Gather": {
+                            "github.com/prometheus/client_golang/prometheus.processMetric": {
+                              "github.com/prometheus/client_golang/prometheus.checkMetricConsistency": {
+                                "runtime.mapassign_fast64": {
+                                  "runtime.growWork_fast64": {
+                                    "runtime.evacuate_fast64": {}
+                                  }
+                                }
+                              },
+                              "runtime.mapaccess2_faststr": { "memeqbody": {} }
+                            },
+                            "github.com/prometheus/client_golang/prometheus/internal.NormalizeMetricFamilies": {
+                              "sort.Sort": {
+                                "sort.quickSort": {
+                                  "sort.doPivot": {
+                                    "github.com/prometheus/client_golang/prometheus/internal.metricSorter.Less": {
+                                      "runtime.memequal": {}
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "github.com/prometheus/common/expfmt.encoderCloser.Encode": {
+                          "github.com/prometheus/common/expfmt.NewEncoder.func7": {
+                            "github.com/prometheus/common/expfmt.MetricFamilyToText": {
+                              "github.com/prometheus/common/expfmt.MetricFamilyToText.func1": {
+                                "bufio.(*Writer).Flush": {
+                                  "compress/gzip.(*Writer).Write": {
+                                    "compress/flate.(*Writer).Write": {
+                                      "compress/flate.(*compressor).write": {
+                                        "compress/flate.(*compressor).deflate": {
+                                          "compress/flate.(*compressor).findMatch": {
+                                            "compress/flate.matchLen": {}
+                                          },
+                                          "runtime.asyncPreempt": {}
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "github.com/prometheus/common/expfmt.writeSample": {
+                                "github.com/prometheus/common/expfmt.writeLabelPairs": {
+                                  "github.com/prometheus/common/expfmt.writeEscapedString": {
+                                    "strings.(*Replacer).WriteString": {
+                                      "strings.(*byteStringReplacer).WriteString": {
+                                        "bufio.(*Writer).WriteString": {}
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "net/http.(*conn).readRequest": {
+        "net/http.readRequest": {
+          "net/textproto.(*Reader).ReadLine": {
+            "net/textproto.(*Reader).readLineSlice": {
+              "bufio.(*Reader).ReadLine": {
+                "bufio.(*Reader).ReadSlice": {
+                  "bufio.(*Reader).fill": {
+                    "net/http.(*connReader).Read": {
+                      "net.(*conn).Read": {
+                        "net.(*netFD).Read": {
+                          "internal/poll.(*FD).Read": {
+                            "internal/poll.ignoringEINTRIO": {
+                              "syscall.Read": {
+                                "syscall.read": { "syscall.Syscall": {} }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "runtime.morestack": {
+      "runtime.newstack": {
+        "runtime.gopreempt_m": {
+          "runtime.goschedImpl": {
+            "runtime.lock": {
+              "runtime.lockWithRank": {
+                "runtime.lock2": { "runtime.procyield": {} }
+              }
+            }
+          }
+        }
+      }
+    },
+    "golang.org/x/sync/errgroup.(*Group).Go.func1": {
+      "github.com/prometheus/procfs/sysfs.FS.SystemCpufreq.func1": {
+        "github.com/prometheus/procfs/sysfs.parseCpufreqCpuinfo": {
+          "github.com/prometheus/procfs/internal/util.SysReadFile": {
+            "os.(*File).Close": {
+              "os.(*file).close": {
+                "internal/poll.(*FD).Close": {
+                  "internal/poll.(*FD).decref": {
+                    "internal/poll.(*FD).destroy": {
+                      "syscall.Close": { "syscall.Syscall": {} }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "runtime.newobject": {
+            "runtime.mallocgc": { "runtime.heapBitsSetType": {} }
+          },
+          "github.com/prometheus/procfs/internal/util.ReadUintFromFile": {
+            "io/ioutil.ReadFile": {
+              "os.ReadFile": {
+                "os.(*File).Close": {
+                  "os.(*file).close": {
+                    "runtime.SetFinalizer": {
+                      "runtime.systemstack": {
+                        "runtime.SetFinalizer.func1": {
+                          "runtime.removefinalizer": {
+                            "runtime.removespecial": {
+                              "runtime.(*mspan).ensureSwept": {
+                                "runtime.osyield": {}
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "os.Open": {
+                  "os.OpenFile": {
+                    "os.openFileNolog": {
+                      "syscall.Open": {
+                        "syscall.openat": { "syscall.Syscall6": {} }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "github.com/prometheus/node_exporter/collector.(*systemdCollector).Update.func1": {
+      "github.com/prometheus/node_exporter/collector.(*systemdCollector).collectUnitStatusMetrics": {
+        "github.com/prometheus/client_golang/prometheus.MustNewConstMetric": {
+          "github.com/prometheus/client_golang/prometheus.NewConstMetric": {
+            "github.com/prometheus/client_golang/prometheus.validateLabelValues": {
+              "unicode/utf8.ValidString": {}
+            }
+          }
+        },
+        "github.com/coreos/go-systemd/dbus.(*Conn).GetUnitTypeProperty": {
+          "github.com/coreos/go-systemd/dbus.(*Conn).getProperty": {
+            "github.com/godbus/dbus.(*Object).Call": {
+              "github.com/godbus/dbus.(*Object).createCall": {
+                "github.com/godbus/dbus.(*Conn).sendMessageAndIfClosed": {
+                  "github.com/godbus/dbus.(*outputHandler).sendAndIfClosed": {
+                    "github.com/godbus/dbus.(*unixTransport).SendMessage": {
+                      "github.com/godbus/dbus.(*Message).EncodeTo": {
+                        "github.com/godbus/dbus.(*encoder).Encode": {
+                          "github.com/godbus/dbus.(*encoder).encode": {
+                            "github.com/godbus/dbus.(*encoder).encode": {
+                              "github.com/godbus/dbus.(*encoder).encode": {
+                                "github.com/godbus/dbus.(*encoder).encode": {
+                                  "bytes.(*Buffer).Write": {
+                                    "bytes.(*Buffer).grow": {
+                                      "bytes.makeSlice": {
+                                        "runtime.makeslice": {
+                                          "runtime.mallocgc": {
+                                            "runtime.(*mcache).nextFree": {
+                                              "runtime.(*mcache).refill": {
+                                                "runtime.(*mcentral).cacheSpan": {
+                                                  "runtime.(*mcentral).grow": {
+                                                    "runtime.(*mheap).alloc": {
+                                                      "runtime.memclrNoHeapPointers": {}
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            "runtime.memclrNoHeapPointers": {}
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "runtime.bgsweep": {
+      "runtime.sweepone": {
+        "runtime.(*mspan).sweep": {
+          "runtime.newMarkBits": { "runtime.(*gcBitsArena).tryAlloc": {} }
+        }
+      }
+    }
+  }
+}

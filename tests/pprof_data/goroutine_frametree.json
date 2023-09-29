@@ -1,0 +1,515 @@
+{
+  "root": {
+    "net/http.(*conn).serve": {
+      "root": {
+        "net/http.(*conn).readRequest": {
+          "root": {
+            "net/http.readRequest": {
+              "root": {
+                "net/textproto.(*Reader).ReadLine": {
+                  "root": {
+                    "net/textproto.(*Reader).readLineSlice": {
+                      "root": {
+                        "bufio.(*Reader).ReadLine": {
+                          "root": {
+                            "bufio.(*Reader).ReadSlice": {
+                              "root": {
+                                "bufio.(*Reader).fill": {
+                                  "root": {
+                                    "net/http.(*connReader).Read": {
+                                      "root": {
+                                        "net.(*conn).Read": {
+                                          "root": {
+                                            "net.(*netFD).Read": {
+                                              "root": {
+                                                "internal/poll.(*FD).Read": {
+                                                  "root": {
+                                                    "internal/poll.(*pollDesc).waitRead": {
+                                                      "root": {
+                                                        "internal/poll.(*pollDesc).wait": {
+                                                          "root": {
+                                                            "internal/poll.runtime_pollWait": {
+                                                              "root": {
+                                                                "runtime.netpollblock": {
+                                                                  "root": {
+                                                                    "runtime.gopark": {
+                                                                      "root": {}
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "net/http.serverHandler.ServeHTTP": {
+          "root": {
+            "net/http.(*ServeMux).ServeHTTP": {
+              "root": {
+                "main.(*handler).ServeHTTP": {
+                  "root": {
+                    "net/http.HandlerFunc.ServeHTTP": {
+                      "root": {
+                        "github.com/prometheus/client_golang/prometheus/promhttp.InstrumentHandlerCounter.func1": {
+                          "root": {
+                            "net/http.HandlerFunc.ServeHTTP": {
+                              "root": {
+                                "github.com/prometheus/client_golang/prometheus/promhttp.InstrumentHandlerInFlight.func1": {
+                                  "root": {
+                                    "net/http.HandlerFunc.ServeHTTP": {
+                                      "root": {
+                                        "github.com/prometheus/client_golang/prometheus/promhttp.HandlerFor.func1": {
+                                          "root": {
+                                            "github.com/prometheus/client_golang/prometheus.Gatherers.Gather": {
+                                              "root": {
+                                                "github.com/prometheus/client_golang/prometheus.(*Registry).Gather": {
+                                                  "root": {
+                                                    "runtime.selectgo": {
+                                                      "root": {
+                                                        "runtime.gopark": {
+                                                          "root": {}
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "net/http.HandlerFunc.ServeHTTP": {
+                  "root": {
+                    "net/http/pprof.Index": {
+                      "root": {
+                        "net/http/pprof.handler.ServeHTTP": {
+                          "root": {
+                            "runtime/pprof.(*Profile).WriteTo": {
+                              "root": {
+                                "runtime/pprof.writeGoroutine": {
+                                  "root": {
+                                    "runtime/pprof.writeRuntimeProfile": {
+                                      "root": {
+                                        "runtime/pprof.runtime_goroutineProfileWithLabels": {
+                                          "root": {}
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "github.com/godbus/dbus.(*Conn).inWorker": {
+      "root": {
+        "github.com/godbus/dbus.(*unixTransport).ReadMessage": {
+          "root": {
+            "io.ReadFull": {
+              "root": {
+                "io.ReadAtLeast": {
+                  "root": {
+                    "github.com/godbus/dbus.(*oobReader).Read": {
+                      "root": {
+                        "net.(*UnixConn).ReadMsgUnix": {
+                          "root": {
+                            "net.(*UnixConn).readMsg": {
+                              "root": {
+                                "net.(*netFD).readMsg": {
+                                  "root": {
+                                    "internal/poll.(*FD).ReadMsg": {
+                                      "root": {
+                                        "internal/poll.(*pollDesc).waitRead": {
+                                          "root": {
+                                            "internal/poll.(*pollDesc).wait": {
+                                              "root": {
+                                                "internal/poll.runtime_pollWait": {
+                                                  "root": {
+                                                    "runtime.netpollblock": {
+                                                      "root": {
+                                                        "runtime.gopark": {
+                                                          "root": {}
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "github.com/prometheus/client_golang/prometheus.(*Registry).Gather.func2": {
+      "root": {
+        "sync.(*WaitGroup).Wait": {
+          "root": {
+            "sync.runtime_Semacquire": {
+              "root": {
+                "runtime.semacquire1": {
+                  "root": {
+                    "runtime.goparkunlock": {
+                      "root": { "runtime.gopark": { "root": {} } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "github.com/prometheus/client_golang/prometheus.(*Registry).Gather.func1": {
+      "root": {
+        "github.com/prometheus/node_exporter/collector.NodeCollector.Collect": {
+          "root": {
+            "sync.(*WaitGroup).Wait": {
+              "root": {
+                "sync.runtime_Semacquire": {
+                  "root": {
+                    "runtime.semacquire1": {
+                      "root": {
+                        "runtime.goparkunlock": {
+                          "root": { "runtime.gopark": { "root": {} } }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "github.com/prometheus/node_exporter/collector.NodeCollector.Collect.func1": {
+      "root": {
+        "github.com/prometheus/node_exporter/collector.execute": {
+          "root": {
+            "github.com/prometheus/node_exporter/collector.(*systemdCollector).Update": {
+              "root": {
+                "github.com/prometheus/node_exporter/collector.newSystemdDbusConn": {
+                  "root": {
+                    "github.com/coreos/go-systemd/dbus.New": {
+                      "root": {
+                        "github.com/coreos/go-systemd/dbus.NewSystemdConnection": {
+                          "root": {
+                            "github.com/coreos/go-systemd/dbus.NewConnection": {
+                              "root": {
+                                "github.com/coreos/go-systemd/dbus.NewSystemdConnection.func1": {
+                                  "root": {
+                                    "github.com/coreos/go-systemd/dbus.dbusAuthConnection": {
+                                      "root": {
+                                        "github.com/godbus/dbus.(*Conn).Auth": {
+                                          "root": {
+                                            "github.com/godbus/dbus.(*Conn).tryAuth": {
+                                              "root": {
+                                                "github.com/godbus/dbus.authReadLine": {
+                                                  "root": {
+                                                    "bufio.(*Reader).ReadBytes": {
+                                                      "root": {
+                                                        "bufio.(*Reader).collectFragments": {
+                                                          "root": {
+                                                            "bufio.(*Reader).ReadSlice": {
+                                                              "root": {
+                                                                "bufio.(*Reader).fill": {
+                                                                  "root": {
+                                                                    "net.(*conn).Read": {
+                                                                      "root": {
+                                                                        "net.(*netFD).Read": {
+                                                                          "root": {
+                                                                            "internal/poll.(*FD).Read": {
+                                                                              "root": {
+                                                                                "internal/poll.(*pollDesc).waitRead": {
+                                                                                  "root": {
+                                                                                    "internal/poll.(*pollDesc).wait": {
+                                                                                      "root": {
+                                                                                        "internal/poll.runtime_pollWait": {
+                                                                                          "root": {
+                                                                                            "runtime.netpollblock": {
+                                                                                              "root": {
+                                                                                                "runtime.gopark": {
+                                                                                                  "root": {}
+                                                                                                }
+                                                                                              }
+                                                                                            }
+                                                                                          }
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            "github.com/godbus/dbus.authReadLine": {
+                                              "root": {
+                                                "bufio.(*Reader).ReadBytes": {
+                                                  "root": {
+                                                    "bufio.(*Reader).collectFragments": {
+                                                      "root": {
+                                                        "bufio.(*Reader).ReadSlice": {
+                                                          "root": {
+                                                            "bufio.(*Reader).fill": {
+                                                              "root": {
+                                                                "net.(*conn).Read": {
+                                                                  "root": {
+                                                                    "net.(*netFD).Read": {
+                                                                      "root": {
+                                                                        "internal/poll.(*FD).Read": {
+                                                                          "root": {
+                                                                            "internal/poll.(*pollDesc).waitRead": {
+                                                                              "root": {
+                                                                                "internal/poll.(*pollDesc).wait": {
+                                                                                  "root": {
+                                                                                    "internal/poll.runtime_pollWait": {
+                                                                                      "root": {
+                                                                                        "runtime.netpollblock": {
+                                                                                          "root": {
+                                                                                            "runtime.gopark": {
+                                                                                              "root": {}
+                                                                                            }
+                                                                                          }
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "github.com/prometheus/node_exporter/collector.(*systemdCollector).getAllUnits": {
+                  "root": {
+                    "github.com/coreos/go-systemd/dbus.(*Conn).ListUnits": {
+                      "root": {
+                        "github.com/godbus/dbus.(*Object).Call": {
+                          "root": {
+                            "runtime.chanrecv1": {
+                              "root": {
+                                "runtime.chanrecv": {
+                                  "root": { "runtime.gopark": { "root": {} } }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "github.com/godbus/dbus.(*Object).createCall.func2": {
+      "root": {
+        "runtime.chanrecv1": {
+          "root": {
+            "runtime.chanrecv": { "root": { "runtime.gopark": { "root": {} } } }
+          }
+        }
+      }
+    },
+    "github.com/coreos/go-systemd/dbus.(*Conn).dispatch.func1": {
+      "root": {
+        "runtime.chanrecv2": {
+          "root": {
+            "runtime.chanrecv": { "root": { "runtime.gopark": { "root": {} } } }
+          }
+        }
+      }
+    },
+    "net/http.(*connReader).backgroundRead": {
+      "root": {
+        "net.(*conn).Read": {
+          "root": {
+            "net.(*netFD).Read": {
+              "root": {
+                "internal/poll.(*FD).Read": {
+                  "root": {
+                    "internal/poll.(*pollDesc).waitRead": {
+                      "root": {
+                        "internal/poll.(*pollDesc).wait": {
+                          "root": {
+                            "internal/poll.runtime_pollWait": {
+                              "root": {
+                                "runtime.netpollblock": {
+                                  "root": { "runtime.gopark": { "root": {} } }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "runtime.main": {
+      "root": {
+        "main.main": {
+          "root": {
+            "github.com/prometheus/exporter-toolkit/web.ListenAndServe": {
+              "root": {
+                "github.com/prometheus/exporter-toolkit/web.Serve": {
+                  "root": {
+                    "net/http.(*Server).Serve": {
+                      "root": {
+                        "net.(*TCPListener).Accept": {
+                          "root": {
+                            "net.(*TCPListener).accept": {
+                              "root": {
+                                "net.(*netFD).accept": {
+                                  "root": {
+                                    "internal/poll.(*FD).Accept": {
+                                      "root": {
+                                        "internal/poll.(*pollDesc).waitRead": {
+                                          "root": {
+                                            "internal/poll.(*pollDesc).wait": {
+                                              "root": {
+                                                "internal/poll.runtime_pollWait": {
+                                                  "root": {
+                                                    "runtime.netpollblock": {
+                                                      "root": {
+                                                        "runtime.gopark": {
+                                                          "root": {}
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
