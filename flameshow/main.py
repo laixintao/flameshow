@@ -37,11 +37,9 @@ LOG_LEVEL = {
 }
 
 
-def run_app(verbose, log_to, format, profile_f, _debug_exit_after_rednder):
+def run_app(verbose, log_to, profile_f, _debug_exit_after_rednder):
     log_level = LOG_LEVEL[verbose]
     setup_log(log_to is not None, log_level, log_to)
-
-    logger.info(f"run app, {format=}")
 
     t0 = time.time()
     profile_data = profile_f.read()
@@ -92,12 +90,6 @@ def print_version(ctx, param, value):
     help="Printing logs to a file, for debugging, default is no logs.",
 )
 @click.option(
-    "-f",
-    "--format",
-    type=click.Choice(["flamegraph", "json"], case_sensitive=False),
-    default="flamegraph",
-)
-@click.option(
     "--version",
     is_flag=True,
     callback=print_version,
@@ -105,8 +97,8 @@ def print_version(ctx, param, value):
     is_eager=True,
 )
 @click.argument("profile", type=click.File("rb"))
-def main(verbose, log_to, format, profile):
-    run_app(verbose, log_to, format, profile, _debug_exit_after_rednder=False)
+def main(verbose, log_to, profile):
+    run_app(verbose, log_to, profile, _debug_exit_after_rednder=False)
 
 
 if __name__ == "__main__":
