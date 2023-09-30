@@ -49,10 +49,6 @@ class Span(Widget):
         self.my_width = my_width
         self.i = sample_index
         self.sample_unit = sample_unit
-        logger.info(
-            "Span created, %s, value=%s", self.s_stack, self.s_stack.values
-        )
-
 
     def on_mount(self) -> None:
         self.styles.background = self.s_stack.display_color
