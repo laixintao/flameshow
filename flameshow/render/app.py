@@ -202,10 +202,8 @@ class FlameGraphApp(App):
         t2 = time.time()
 
         logger.debug(
-            (
-                "compute spans that should render, took %.3f, total sample=%d,"
-                " max_level=%d"
-            ),
+            "compute spans that should render, took %.3f, total sample=%d,"
+            " max_level=%d",
             t2 - t1,
             total_frame,
             max_level,
