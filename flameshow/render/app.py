@@ -194,10 +194,10 @@ class FlameGraphApp(App):
         t1 = time.time()
         total_frame = self._get_frames_should_render(stack)
 
-        # 20 and 4 is magic number that I tuned
+        # 15, 100 and 4 is magic number that I tuned
         # they fit the performance best while rendering enough information
         # 4 keeps every render < 1second
-        max_level = round(20 - total_frame / 10)
+        max_level = round(15 - total_frame / 100)
         max_level = max(4, max_level)
         t2 = time.time()
 
