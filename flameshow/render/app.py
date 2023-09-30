@@ -2,6 +2,8 @@ from datetime import datetime
 import logging
 import time
 from typing import ClassVar
+from rich.style import Style
+from rich.text import Text
 
 import textual
 from textual import on
@@ -161,7 +163,7 @@ class FlameGraphApp(App):
 
     def set_status_loading(self):
         widget = self.query_one("#loading-status")
-        widget.update("loading")
+        widget.update(Text("● loading...", Style(color="green")))
 
     def set_status_loading_done(self):
         widget = self.query_one("#loading-status")
@@ -262,6 +264,7 @@ class FlameGraphApp(App):
             return
         logger.info("re-render the new focused_stack: %s", stack.name)
 
+        self.set_status_loading()
         try:
             old_container = self.query_one("#flamegraph-container")
         except NoMatches:
@@ -272,7 +275,6 @@ class FlameGraphApp(App):
             old_container.remove()
 
         out_container = self.query_one("#flamegraph-out-container")
-        self.set_status_loading()
         new_flame = self.render_flamegraph(stack)
         await out_container.mount(new_flame)
 
@@ -281,6 +283,7 @@ class FlameGraphApp(App):
 
         flamegraph_continer = self.query_one("#flamegraph-out-container")
         flamegraph_continer.focus()
+
         self.set_status_loading_done()
 
     def __debug_dom(self, node, indent: int):
