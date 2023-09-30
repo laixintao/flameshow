@@ -72,7 +72,7 @@ class SpanContainer(Widget):
             width = width * c0.values[self.i] / current_stack_value
             current_stack = c0
 
-        yield self.render_children(current_stack, width)
+        yield from self.render_children(current_stack, width)
 
     def on_mount(self) -> None:
         self.styles.width = self.my_width
@@ -81,7 +81,7 @@ class SpanContainer(Widget):
         total = stack.values[self.i]
         children = stack.children
         if not total:
-            return Horizontal()
+            return
 
         ordered_children = sorted(
             children, key=lambda c: c.values[self.i], reverse=True
@@ -94,7 +94,10 @@ class SpanContainer(Widget):
         widgets = []
         for child in children:
             w = child.values[self.i] / total * parent_width * 100
+            if not w:
+                continue
             style_w = f"{w:.2f}%"
+            logger.debug("render %s width=%s", child, style_w)
 
             if child._id in render_children_ids:
                 level = self.level - 1
@@ -111,4 +114,4 @@ class SpanContainer(Widget):
                 )
             )
 
-        return Horizontal(*widgets)
+        yield Horizontal(*widgets)
