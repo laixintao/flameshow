@@ -42,6 +42,13 @@ class SpanContainer(Widget):
                 self.level == 0 and len(current_stack.children) > 1
             )
 
+            if current_stack.values[self.i] == 0:
+                logger.debug(
+                    "%s value is 0, skip render and terminate children render",
+                    current_stack,
+                )
+                return
+
             yield Span(
                 current_stack,
                 is_deepest_level,
