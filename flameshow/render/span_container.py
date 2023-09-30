@@ -94,6 +94,8 @@ class SpanContainer(Widget):
         widgets = []
         for child in children:
             w = child.values[self.i] / total * parent_width * 100
+            if not w:
+                continue
             style_w = f"{w:.2f}%"
             logger.debug("render %s width=%s", child, style_w)
 
