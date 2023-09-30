@@ -16,7 +16,6 @@ async def test_render_goroutine_child_not_100percent_of_parent(data_dir):
 
     app = FlameGraphApp(
         profile,
-        15,
         False,
     )
     async with app.run_test() as pilot:
@@ -38,7 +37,6 @@ def test_default_sample_types_heap():
     ]
     app = FlameGraphApp(
         p,
-        15,
         False,
     )
     assert app.sample_index == 3
