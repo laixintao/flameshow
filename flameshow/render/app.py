@@ -419,6 +419,7 @@ class FlameGraphApp(App):
 
         right = self._find_right_sibling(self.view_info_stack)
 
+        logger.debug("found right sibling: %s, %s", right, right.values)
         if not right:
             logger.debug("Got no right sibling")
             return
@@ -446,10 +447,18 @@ class FlameGraphApp(App):
         while my_parent:
             siblings = my_parent.children
             if len(siblings) >= 2:
-                my_index = siblings.index(me)
-                left_index = my_index - 1
-                if left_index >= 0:
-                    return siblings[left_index]
+                choose_index = siblings.index(me)
+                # move left, until:
+                # got a sibling while value is not 0 (0 won't render)
+                # and index >= 0
+                while choose_index >= 0:
+                    choose_index = choose_index - 1
+                    if (
+                        choose_index >= 0
+                        and siblings[choose_index].values[self.sample_index]
+                        > 0
+                    ):
+                        return siblings[choose_index]
 
             me = my_parent
             my_parent = my_parent.parent
@@ -459,10 +468,15 @@ class FlameGraphApp(App):
         while my_parent:
             siblings = my_parent.children
             if len(siblings) >= 2:
-                my_index = siblings.index(me)
-                right_index = my_index + 1
-                if right_index < len(siblings):
-                    return siblings[right_index]
+                choose_index = siblings.index(me)
+                while choose_index < len(siblings):
+                    choose_index = choose_index + 1
+                    if (
+                        choose_index < len(siblings)
+                        and siblings[choose_index].values[self.sample_index]
+                        > 0
+                    ):
+                        return siblings[choose_index]
 
             me = my_parent
             my_parent = my_parent.parent
