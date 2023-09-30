@@ -97,7 +97,6 @@ class SpanContainer(Widget):
             if not w:
                 continue
             style_w = f"{w:.2f}%"
-            logger.debug("render %s width=%s", child, style_w)
 
             if child._id in render_children_ids:
                 level = self.level - 1

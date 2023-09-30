@@ -5,7 +5,6 @@ import time
 import click
 
 from flameshow import __version__
-from flameshow.const import MAX_RENDER_DEPTH, MIN_RENDER_DEPTH
 from flameshow.pprof_parser import parse_profile
 from flameshow.render import FlameGraphApp
 
@@ -48,20 +47,9 @@ def run_app(verbose, log_to, profile_f, _debug_exit_after_rednder):
 
     t01 = time.time()
     logger.info("Parse profile, took %.3fs", t01 - t0)
-    render_depth = MAX_RENDER_DEPTH - int(profile.total_sample / 100)
-    # limit to 3 - 10
-    render_depth = max(MIN_RENDER_DEPTH, render_depth)
-    render_depth = min(MAX_RENDER_DEPTH, render_depth)
-
-    logger.info(
-        "Start to render app, total samples=%d, render_depth=%d",
-        profile.total_sample,
-        render_depth,
-    )
 
     app = FlameGraphApp(
         profile,
-        render_depth,
         _debug_exit_after_rednder,
     )
     app.run()

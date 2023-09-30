@@ -2,6 +2,8 @@ from datetime import datetime
 import logging
 import time
 from typing import ClassVar
+from rich.style import Style
+from rich.text import Text
 
 import textual
 from textual import on
@@ -81,7 +83,6 @@ class FlameGraphApp(App):
     def __init__(
         self,
         profile,
-        max_level,
         _debug_exit_after_rednder=False,
         *args,
         **kwargs,
@@ -89,14 +90,11 @@ class FlameGraphApp(App):
         super().__init__(*args, **kwargs)
         self.profile = profile
         self.root_stack = profile.root_stack
-        self._create_time = time.time()
         self._rendered_once = False
 
-        self._max_level = max_level
         # +1 is extra "root" node
         self.viewer_height = self.profile.highest_lines + 1
         self._debug_exit_after_rednder = _debug_exit_after_rednder
-        logger.info("App render level limit to %d", self._max_level)
 
         self.view_info_stack = self.root_stack
         self.parents_that_only_one_child = []
@@ -147,6 +145,7 @@ class FlameGraphApp(App):
             id="flamegraph-out-container",
         )
 
+        yield Static(id="loading-status")
         yield self._profile_info(self.profile.created_at)
         yield Footer()
 
@@ -157,6 +156,20 @@ class FlameGraphApp(App):
             f" {chosen_sample_type.sample_unit})"
         )
         return center_header
+
+    def set_status_loading(self):
+        widget = self.query_one("#loading-status")
+        widget.update(Text("● loading...", Style(color="green")))
+        self.loading_start_time = time.time()
+
+    def set_status_loading_done(self):
+        widget = self.query_one("#loading-status")
+        widget.update("")
+        self.loading_end_time = time.time()
+        logger.info(
+            "rerender done, took %.3f seconds.",
+            self.loading_end_time - self.loading_start_time,
+        )
 
     def _profile_info(self, created_at: datetime):
         if not created_at:
@@ -171,19 +184,34 @@ class FlameGraphApp(App):
         if self._rendered_once:
             return
         self._rendered_once = True
-        rendered_time = time.time()
-        render_cost = rendered_time - self._create_time
-        logger.info("First render cost %.2f s", render_cost)
         if self._debug_exit_after_rednder:
             logger.warn("_debug_exit_after_rednder set to True, exit now")
             self.exit()
 
     def render_flamegraph(self, stack):
         parents = self._render_parents(stack)
+
+        t1 = time.time()
+        total_frame = self._get_frames_should_render(stack)
+
+        # 15, 100 and 4 is magic number that I tuned
+        # they fit the performance best while rendering enough information
+        # 4 keeps every render < 1second
+        max_level = round(15 - total_frame / 100)
+        max_level = max(4, max_level)
+        t2 = time.time()
+
+        logger.debug(
+            "compute spans that should render, took %.3f, total sample=%d,"
+            " max_level=%d",
+            t2 - t1,
+            total_frame,
+            max_level,
+        )
         children = SpanContainer(
             stack,
             "100%",
-            level=self._max_level,
+            level=max_level,
             i=self.sample_index,
             sample_unit=self.sample_unit,
         )
@@ -195,6 +223,16 @@ class FlameGraphApp(App):
         )
         v.styles.height = self.viewer_height
         return v
+
+    def _get_frames_should_render(self, frame) -> int:
+        if frame.values[self.sample_index] == 0:
+            return 0
+
+        count = 1
+        for c in frame.children:
+            count += self._get_frames_should_render(c)
+
+        return count
 
     def _render_parents(self, stack):
         parents = []
@@ -253,6 +291,7 @@ class FlameGraphApp(App):
             return
         logger.info("re-render the new focused_stack: %s", stack.name)
 
+        self.set_status_loading()
         try:
             old_container = self.query_one("#flamegraph-container")
         except NoMatches:
@@ -271,6 +310,8 @@ class FlameGraphApp(App):
 
         flamegraph_continer = self.query_one("#flamegraph-out-container")
         flamegraph_continer.focus()
+
+        self.set_status_loading_done()
 
     def __debug_dom(self, node, indent: int):
         for c in node.children:
@@ -377,6 +418,7 @@ class FlameGraphApp(App):
 
         right = self._find_right_sibling(self.view_info_stack)
 
+        logger.debug("found right sibling: %s, %s", right, right.values)
         if not right:
             logger.debug("Got no right sibling")
             return
@@ -404,10 +446,18 @@ class FlameGraphApp(App):
         while my_parent:
             siblings = my_parent.children
             if len(siblings) >= 2:
-                my_index = siblings.index(me)
-                left_index = my_index - 1
-                if left_index >= 0:
-                    return siblings[left_index]
+                choose_index = siblings.index(me)
+                # move left, until:
+                # got a sibling while value is not 0 (0 won't render)
+                # and index >= 0
+                while choose_index >= 0:
+                    choose_index = choose_index - 1
+                    if (
+                        choose_index >= 0
+                        and siblings[choose_index].values[self.sample_index]
+                        > 0
+                    ):
+                        return siblings[choose_index]
 
             me = my_parent
             my_parent = my_parent.parent
@@ -417,10 +467,15 @@ class FlameGraphApp(App):
         while my_parent:
             siblings = my_parent.children
             if len(siblings) >= 2:
-                my_index = siblings.index(me)
-                right_index = my_index + 1
-                if right_index < len(siblings):
-                    return siblings[right_index]
+                choose_index = siblings.index(me)
+                while choose_index < len(siblings):
+                    choose_index = choose_index + 1
+                    if (
+                        choose_index < len(siblings)
+                        and siblings[choose_index].values[self.sample_index]
+                        > 0
+                    ):
+                        return siblings[choose_index]
 
             me = my_parent
             my_parent = my_parent.parent
