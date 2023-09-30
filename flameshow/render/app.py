@@ -147,6 +147,7 @@ class FlameGraphApp(App):
             id="flamegraph-out-container",
         )
 
+        yield Static(id="loading-status")
         yield self._profile_info(self.profile.created_at)
         yield Footer()
 
@@ -157,6 +158,14 @@ class FlameGraphApp(App):
             f" {chosen_sample_type.sample_unit})"
         )
         return center_header
+
+    def set_status_loading(self):
+        widget = self.query_one("#loading-status")
+        widget.update("loading")
+
+    def set_status_loading_done(self):
+        widget = self.query_one("#loading-status")
+        widget.update("")
 
     def _profile_info(self, created_at: datetime):
         if not created_at:
@@ -263,6 +272,7 @@ class FlameGraphApp(App):
             old_container.remove()
 
         out_container = self.query_one("#flamegraph-out-container")
+        self.set_status_loading()
         new_flame = self.render_flamegraph(stack)
         await out_container.mount(new_flame)
 
@@ -271,6 +281,7 @@ class FlameGraphApp(App):
 
         flamegraph_continer = self.query_one("#flamegraph-out-container")
         flamegraph_continer.focus()
+        self.set_status_loading_done()
 
     def __debug_dom(self, node, indent: int):
         for c in node.children:
