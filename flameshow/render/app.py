@@ -83,7 +83,6 @@ class FlameGraphApp(App):
     def __init__(
         self,
         profile,
-        max_level,
         _debug_exit_after_rednder=False,
         *args,
         **kwargs,
@@ -93,11 +92,9 @@ class FlameGraphApp(App):
         self.root_stack = profile.root_stack
         self._rendered_once = False
 
-        self._max_level = max_level
         # +1 is extra "root" node
         self.viewer_height = self.profile.highest_lines + 1
         self._debug_exit_after_rednder = _debug_exit_after_rednder
-        logger.info("App render level limit to %d", self._max_level)
 
         self.view_info_stack = self.root_stack
         self.parents_that_only_one_child = []
@@ -196,6 +193,10 @@ class FlameGraphApp(App):
 
         t1 = time.time()
         total_frame = self._get_frames_should_render(stack)
+
+        # 20 and 4 is magic number that I tuned
+        # they fit the performance best while rendering enough information
+        # 4 keeps every render < 1second
         max_level = round(20 - total_frame / 10)
         max_level = max(4, max_level)
         t2 = time.time()

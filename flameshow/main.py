@@ -61,7 +61,6 @@ def run_app(verbose, log_to, profile_f, _debug_exit_after_rednder):
 
     app = FlameGraphApp(
         profile,
-        render_depth,
         _debug_exit_after_rednder,
     )
     app.run()
