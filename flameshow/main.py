@@ -5,7 +5,6 @@ import time
 import click
 
 from flameshow import __version__
-from flameshow.const import MAX_RENDER_DEPTH, MIN_RENDER_DEPTH
 from flameshow.pprof_parser import parse_profile
 from flameshow.render import FlameGraphApp
 
