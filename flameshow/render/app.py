@@ -258,17 +258,6 @@ class FlameGraphApp(App):
         )
 
 
-    def action_move_right(self):
-        logger.debug("move right")
-
-        right = self._find_right_sibling(self.view_info_stack)
-
-        logger.debug("found right sibling: %s, %s", right, right.values)
-        if not right:
-            logger.debug("Got no right sibling")
-            return
-
-        self._set_new_viewinfostack(right)
 
     def action_move_left(self):
         logger.debug("move left")
@@ -307,23 +296,6 @@ class FlameGraphApp(App):
             me = my_parent
             my_parent = my_parent.parent
 
-    def _find_right_sibling(self, me):
-        my_parent = me.parent
-        while my_parent:
-            siblings = my_parent.children
-            if len(siblings) >= 2:
-                choose_index = siblings.index(me)
-                while choose_index < len(siblings):
-                    choose_index = choose_index + 1
-                    if (
-                        choose_index < len(siblings)
-                        and siblings[choose_index].values[self.sample_index]
-                        > 0
-                    ):
-                        return siblings[choose_index]
-
-            me = my_parent
-            my_parent = my_parent.parent
 
     def action_zoom_in(self):
         logger.info("Zoom in!")
