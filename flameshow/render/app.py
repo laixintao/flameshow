@@ -41,7 +41,6 @@ class FlameGraphScroll(VerticalScroll, inherit_bindings=False):
 
 class FlameGraphApp(App):
     BINDINGS = [
-        Binding("enter", "zoom_in", "Zoom In"),
         Binding("escape", "zoom_out", "Zoom Out", show=False),
         Binding("d", "toggle_dark", "Toggle dark mode", show=False),
         Binding(
@@ -252,9 +251,6 @@ class FlameGraphApp(App):
             new_frame.render_detail(self.sample_index, self.sample_unit)
         )
 
-    def action_zoom_in(self):
-        logger.info("Zoom in!")
-        self.focused_stack_id = self.view_info_stack._id
 
     def action_zoom_out(self):
         logger.info("Zoom out!")

@@ -145,6 +145,9 @@ class FlameGraph(Widget, can_focus=True):
         new_focused_stack = self.profile.id_store[focused_stack_id]
         await self._rerender(new_focused_stack, self.sample_index)
 
+        # add the view_frame class back
+        await self.watch_view_frame(new_focused_stack, new_focused_stack)
+
     async def _rerender(self, stack, sample_index):
         if not stack:
             return
@@ -169,6 +172,7 @@ class FlameGraph(Widget, can_focus=True):
 
     def action_zoom_in(self):
         logger.info("Zoom in!")
+        self.focused_stack_id = self.view_frame._id
 
     def action_move_down(self):
         logger.debug("move down")
