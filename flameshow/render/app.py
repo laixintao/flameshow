@@ -181,32 +181,6 @@ class FlameGraphApp(App):
         )
         return Static(datetime_str)
 
-    async def watch_sample_index(self, sample_index):
-        logger.info("sample index changed to %d", sample_index)
-
-        center_text = self._center_header_text(self.sample_index)
-        try:
-            header = self.query_one("FlameshowHeader")
-        except NoMatches:
-            logger.warning(
-                "FlameshowHeader not found, might be not composed yet."
-            )
-            return
-        header.center_text = center_text
-
-        # TODO cache it to self instead of query every time
-        flamegraph = self.query_one("FlameGraph")
-        flamegraph.sample_index = sample_index
-
-    async def watch_focused_stack_id(
-        self,
-        focused_stack_id,
-    ):
-        logger.info(f"{focused_stack_id=} changed")
-        flamegraph_widget = self.query_one("FlameGraph")
-        flamegraph_widget.focused_stack_id = focused_stack_id
-        # await self._rerender(new_focused_stack, self.sample_index)
-
     def __debug_dom(self, node, indent: int):
         for c in node.children:
             logger.debug("%s %s", indent * " ", c)
@@ -238,18 +212,47 @@ class FlameGraphApp(App):
         flamegraph = self.query_one("FlameGraph")
         flamegraph.view_frame = new_frame
 
+    async def watch_sample_index(self, sample_index):
+        logger.info("sample index changed to %d", sample_index)
+
+        center_text = self._center_header_text(self.sample_index)
+        try:
+            header = self.query_one("FlameshowHeader")
+        except NoMatches:
+            logger.warning(
+                "FlameshowHeader not found, might be not composed yet."
+            )
+            return
+        header.center_text = center_text
+
+        # TODO cache it to self instead of query every time
+        flamegraph = self.query_one("FlameGraph")
+        flamegraph.sample_index = sample_index
+
+        self._update_span_detail(self.view_frame)
+
+    async def watch_focused_stack_id(
+        self,
+        focused_stack_id,
+    ):
+        logger.info(f"{focused_stack_id=} changed")
+        flamegraph_widget = self.query_one("FlameGraph")
+        flamegraph_widget.focused_stack_id = focused_stack_id
+
     async def watch_view_frame(self, old, new_frame):
         logger.debug(
             "view info stack changed: old: %s, new: %s",
             old,
             new_frame,
         )
+        self._update_span_detail(new_frame)
 
+    def _update_span_detail(self, frame):
         # set the span detail info
         span_detail = self.query_one("#span-detail")
-        span_detail.border_subtitle = new_frame.render_title()
+        span_detail.border_subtitle = frame.render_title()
         span_detail.update(
-            new_frame.render_detail(self.sample_index, self.sample_unit)
+            frame.render_detail(self.sample_index, self.sample_unit)
         )
 
     def action_switch_sample_type(self):
