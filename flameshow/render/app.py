@@ -138,8 +138,10 @@ class FlameGraphApp(App):
 
         yield detail_row
 
+        fg = FlameGraph(self.profile, self.focused_stack_id, self.sample_index)
+        fg.styles.height = self.profile.highest_lines + 1
         yield FlameGraphScroll(
-            FlameGraph(profile=self.profile),
+            fg,
             id="flamegraph-out-container",
         )
 

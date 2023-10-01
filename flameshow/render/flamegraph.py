@@ -14,11 +14,12 @@ class FlameGraph(Widget):
     focused_stack_id = reactive(0)
     sample_index = reactive(0, init=False)
 
-    def __init__(self, profile, *args, **kwargs):
+    def __init__(self, profile, focused_stack_id, sample_index, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.profile = profile
         # +1 is extra "root" node
-        self.viewer_height = self.profile.highest_lines + 1
+        self.focused_stack_id = focused_stack_id
+        self.sample_index = sample_index
 
     def compose(self):
         yield self.get_flamegraph()
@@ -58,7 +59,6 @@ class FlameGraph(Widget):
             *widgets,
             id="flamegraph-container",
         )
-        v.styles.height = self.viewer_height
         return v
 
     def _render_parents(self, stack):
