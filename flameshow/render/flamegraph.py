@@ -142,15 +142,14 @@ class FlameGraph(Widget, can_focus=True):
         focused_stack_id,
     ):
         logger.info(f"{focused_stack_id=} changed")
-        new_focused_stack = self.profile.id_store[focused_stack_id]
-        await self._rerender(new_focused_stack, self.sample_index)
+        await self._rerender()
 
-        # add the view_frame class back
-        await self.watch_view_frame(new_focused_stack, new_focused_stack)
+    async def watch_sample_index(self, new_sample_index):
+        logger.info("sample_index changed to %d", new_sample_index)
+        await self._rerender()
 
-    async def _rerender(self, stack, sample_index):
-        if not stack:
-            return
+    async def _rerender(self):
+        stack = self.profile.id_store[self.focused_stack_id]
         logger.info("re-render the new focused_stack: %s", stack.name)
 
         try:
@@ -170,9 +169,17 @@ class FlameGraph(Widget, can_focus=True):
 
         self.focus()
 
+        # force set class add the view_frame class back
+        self.post_message(self.ViewFrameChanged(stack))
+        await self.watch_view_frame(stack, stack)
+
     def action_zoom_in(self):
         logger.info("Zoom in!")
         self.focused_stack_id = self.view_frame._id
+
+    def action_zoom_out(self):
+        logger.info("Zoom out!")
+        self.focused_stack_id = self.profile.root_stack._id
 
     def action_move_down(self):
         logger.debug("move down")

@@ -41,7 +41,6 @@ class FlameGraphScroll(VerticalScroll, inherit_bindings=False):
 
 class FlameGraphApp(App):
     BINDINGS = [
-        Binding("escape", "zoom_out", "Zoom Out", show=False),
         Binding("d", "toggle_dark", "Toggle dark mode", show=False),
         Binding(
             "s",
@@ -195,8 +194,9 @@ class FlameGraphApp(App):
             return
         header.center_text = center_text
 
-        stack = self.profile.id_store[self.focused_stack_id]
-        # await self._rerender(stack, sample_index)
+        # TODO cache it to self instead of query every time
+        flamegraph = self.query_one("FlameGraph")
+        flamegraph.sample_index = sample_index
 
     async def watch_focused_stack_id(
         self,
@@ -227,6 +227,7 @@ class FlameGraphApp(App):
     async def handle_radioset_changed(self, e):
         logger.info("event: %s", e)
         self.sample_index = e.index
+        self.query_one("RadioSet").blur()
 
     @on(FlameGraph.ViewFrameChanged)
     async def handle_view_frame_changed(self, e):
@@ -250,11 +251,6 @@ class FlameGraphApp(App):
         span_detail.update(
             new_frame.render_detail(self.sample_index, self.sample_unit)
         )
-
-
-    def action_zoom_out(self):
-        logger.info("Zoom out!")
-        self.focused_stack_id = self.root_stack._id
 
     def action_switch_sample_type(self):
         logger.info("Focus on radio type")
