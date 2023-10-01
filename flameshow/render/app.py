@@ -78,7 +78,7 @@ class FlameGraphApp(App):
 
     focused_stack_id = reactive(0)
     sample_index = reactive(None, init=False)
-    view_frame_id = reactive(0)
+    view_frame = reactive(None, init=False)
 
     def __init__(
         self,
@@ -108,6 +108,8 @@ class FlameGraphApp(App):
         logger.info("mounted")
         self.title = "flameshow"
         self.sub_title = f"v{__version__}"
+
+        self.view_frame = self.root_stack
 
         fg = self.query_one("FlameGraph")
         fg.focus()
@@ -141,7 +143,7 @@ class FlameGraphApp(App):
             self.profile,
             self.focused_stack_id,
             self.sample_index,
-            self.view_frame_id,
+            self.root_stack._id,
         )
         fg.styles.height = self.profile.highest_lines + 1
 
@@ -235,18 +237,17 @@ class FlameGraphApp(App):
     async def handle_view_frame_changed(self, e):
         logger.debug("app handle_view_frame_changed...")
         new_frame = e.frame_id
-        self.view_frame_id = new_frame
+        self.view_frame = self.profile.id_store[new_frame]
 
         flamegraph = self.query_one("FlameGraph")
         flamegraph.view_frame_id = new_frame
 
-    async def watch_view_frame_id(self, old, new_fram_id):
+    async def watch_view_frame(self, old, new_frame):
         logger.debug(
             "view info stack changed: old: %s, new: %s",
             old,
-            new_fram_id,
+            new_frame,
         )
-        new_frame = self.profile.id_store[new_fram_id]
         # set the viewstack info
         self.set_stack_detail(new_frame)
 

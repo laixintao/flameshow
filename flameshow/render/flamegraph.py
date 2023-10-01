@@ -207,7 +207,6 @@ class FlameGraph(Widget, can_focus=True):
                 pass
 
     async def watch_view_frame_id(self, old_id, new_id):
-
         # delete old first
         try:
             old_dom = self.query_one(f"#{fgid(old_id)}")
