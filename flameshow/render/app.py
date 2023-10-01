@@ -259,42 +259,6 @@ class FlameGraphApp(App):
 
 
 
-    def action_move_left(self):
-        logger.debug("move left")
-
-        left = self._find_left_sibling(self.view_info_stack)
-
-        if not left:
-            logger.debug("Got no left sibling")
-            return
-
-        self._set_new_viewinfostack(left)
-
-    def _find_left_sibling(self, me):
-        """
-        Find left.
-        Even not currently displayed, still can be viewed on detail.
-        No need to check if the fgid is currently rendered.
-        """
-        my_parent = me.parent
-        while my_parent:
-            siblings = my_parent.children
-            if len(siblings) >= 2:
-                choose_index = siblings.index(me)
-                # move left, until:
-                # got a sibling while value is not 0 (0 won't render)
-                # and index >= 0
-                while choose_index >= 0:
-                    choose_index = choose_index - 1
-                    if (
-                        choose_index >= 0
-                        and siblings[choose_index].values[self.sample_index]
-                        > 0
-                    ):
-                        return siblings[choose_index]
-
-            me = my_parent
-            my_parent = my_parent.parent
 
 
     def action_zoom_in(self):
