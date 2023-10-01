@@ -41,7 +41,6 @@ class FlameGraphScroll(VerticalScroll, inherit_bindings=False):
 
 class FlameGraphApp(App):
     BINDINGS = [
-        Binding("j,down", "move_down", "Down", key_display="↓"),
         Binding("k,up", "move_up", "Up", key_display="↑"),
         Binding("l,right", "move_right", "Right", key_display="→"),
         Binding("h,left", "move_left", "Left", key_display="←"),
@@ -79,6 +78,7 @@ class FlameGraphApp(App):
 
     focused_stack_id = reactive(0)
     sample_index = reactive(None, init=False)
+    view_frame_id = reactive(0)
 
     def __init__(
         self,
@@ -93,7 +93,6 @@ class FlameGraphApp(App):
 
         self._debug_exit_after_rednder = _debug_exit_after_rednder
 
-        self.view_info_stack = self.root_stack
         self.parents_that_only_one_child = []
 
         self.filename = self.profile.filename
@@ -109,8 +108,6 @@ class FlameGraphApp(App):
         logger.info("mounted")
         self.title = "flameshow"
         self.sub_title = f"v{__version__}"
-
-        self.set_stack_detail(self.root_stack)
 
         fg = self.query_one("FlameGraph")
         fg.focus()
@@ -140,7 +137,12 @@ class FlameGraphApp(App):
 
         yield detail_row
 
-        fg = FlameGraph(self.profile, self.focused_stack_id, self.sample_index)
+        fg = FlameGraph(
+            self.profile,
+            self.focused_stack_id,
+            self.sample_index,
+            self.view_frame_id,
+        )
         fg.styles.height = self.profile.highest_lines + 1
 
         yield FlameGraphScroll(
@@ -229,6 +231,32 @@ class FlameGraphApp(App):
         logger.info("event: %s", e)
         self.sample_index = e.index
 
+    @on(FlameGraph.ViewFrameChanged)
+    async def handle_view_frame_changed(self, e):
+        logger.debug("app handle_view_frame_changed...")
+        new_frame = e.frame_id
+        self.view_frame_id = new_frame
+
+        flamegraph = self.query_one("FlameGraph")
+        flamegraph.view_frame_id = new_frame
+
+    async def watch_view_frame_id(self, old, new_fram_id):
+        logger.debug(
+            "view info stack changed: old: %s, new: %s",
+            old,
+            new_fram_id,
+        )
+        new_frame = self.profile.id_store[new_fram_id]
+        # set the viewstack info
+        self.set_stack_detail(new_frame)
+
+    def set_stack_detail(self, stack):
+        span_detail = self.query_one("#span-detail")
+        span_detail.border_subtitle = stack.render_title()
+        span_detail.update(
+            stack.render_detail(self.sample_index, self.sample_unit)
+        )
+
     def _set_new_viewinfostack(self, new_view_info_stack: Frame):
         old_view_info_stack = self.view_info_stack
 
@@ -258,44 +286,7 @@ class FlameGraphApp(App):
             self.view_info_stack = new_view_info_stack
             new_view.scroll_visible()
 
-        # set the viewstack info
-        self.set_stack_detail(new_view_info_stack)
-
         logger.debug("view: %s", self.view_info_stack.name)
-
-    def action_move_down(self):
-        logger.debug("move down")
-        children = self.view_info_stack.children
-
-        if not children:
-            logger.debug("no more children")
-            return
-
-        if self.view_info_stack._id in self.parents_that_only_one_child:
-            new_view_info_stack = self.parents_that_only_one_child[
-                self.view_info_stack._id
-            ]
-            self._set_new_viewinfostack(new_view_info_stack)
-        else:
-            # go to the biggest value
-            new_view_info_stack = self._get_biggest_exist_child(children)
-            if not new_view_info_stack:
-                logger.warn("Got no children displayed!")
-                return
-            self._set_new_viewinfostack(new_view_info_stack)
-
-    def _get_biggest_exist_child(self, stacks):
-        ordered = sorted(
-            stacks, key=lambda s: s.values[self.sample_index], reverse=True
-        )
-        for s in ordered:
-            _id = f"#{fgid(s._id)}"
-            try:
-                found = self.query_one(_id)
-                if found:
-                    return s
-            except textual.css.query.NoMatches:
-                pass
 
     def action_move_up(self):
         logger.debug("move up")
@@ -390,13 +381,6 @@ class FlameGraphApp(App):
             sample_radio.blur()
         else:
             sample_radio.focus()
-
-    def set_stack_detail(self, stack):
-        span_detail = self.query_one("#span-detail")
-        span_detail.border_subtitle = stack.render_title()
-        span_detail.update(
-            stack.render_detail(self.sample_index, self.sample_unit)
-        )
 
     @property
     def sample_unit(self):

@@ -1,4 +1,6 @@
 import logging
+from flameshow.utils import fgid
+from textual.message import Message
 import time
 
 from textual.binding import Binding, BindingType
@@ -25,15 +27,33 @@ class FlameGraph(Widget, can_focus=True):
 
     focused_stack_id = reactive(0)
     sample_index = reactive(0, init=False)
+    view_frame_id = reactive(0, init=False)
+
+    class ViewFrameChanged(Message):
+        """View Frame changed"""
+
+        def __init__(self, frame_id) -> None:
+            super().__init__()
+            self.frame_id = frame_id
+
+        def __repr__(self) -> str:
+            return f"ViewFrameChanged({self.frame_id=})"
 
     def __init__(
-        self, profile, focused_stack_id, sample_index, *args, **kwargs
+        self,
+        profile,
+        focused_stack_id,
+        sample_index,
+        view_frame_id,
+        *args,
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.profile = profile
         # +1 is extra "root" node
         self.focused_stack_id = focused_stack_id
         self.sample_index = sample_index
+        self.view_frame_id = view_frame_id
 
     def compose(self):
         yield self.get_flamegraph()
@@ -149,3 +169,39 @@ class FlameGraph(Widget, can_focus=True):
 
     def action_zoom_in(self):
         logger.info("Zoom in!")
+
+    def action_move_down(self):
+        logger.debug("move down")
+        view_frame = self.profile.id_store[self.view_frame_id]
+        view_frame_id = self.view_frame_id
+        children = view_frame.children
+
+        if not children:
+            logger.debug("no more children")
+            return
+
+        if view_frame_id in self.parents_that_only_one_child:
+            new_view_info_frame = self.parents_that_only_one_child[
+                view_frame_id
+            ]
+            self.post_message(self.ViewFrameChanged(new_view_info_frame._id))
+        else:
+            # go to the biggest value
+            new_view_info_frame = self._get_biggest_exist_child(children)
+            if not new_view_info_frame:
+                logger.warn("Got no children displayed!")
+                return
+            self.post_message(self.ViewFrameChanged(new_view_info_frame._id))
+
+    def _get_biggest_exist_child(self, stacks):
+        ordered = sorted(
+            stacks, key=lambda s: s.values[self.sample_index], reverse=True
+        )
+        for s in ordered:
+            _id = f"#{fgid(s._id)}"
+            try:
+                found = self.query_one(_id)
+                if found:
+                    return s
+            except NoMatches:
+                pass
