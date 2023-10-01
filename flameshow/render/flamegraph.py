@@ -205,3 +205,30 @@ class FlameGraph(Widget, can_focus=True):
                     return s
             except NoMatches:
                 pass
+
+    async def watch_view_frame_id(self, old_id, new_id):
+
+        # delete old first
+        try:
+            old_dom = self.query_one(f"#{fgid(old_id)}")
+            logger.info("delete class from old span: %s", old_dom)
+            old_dom.remove_class("view-info-span")
+        except NoMatches:
+            logger.warning(
+                "try to remove view-info-span class from span, but not found"
+            )
+
+        # set new one
+        _add_id = f"#{fgid(new_id)}"
+        try:
+            new_view = self.query_one(_add_id)
+        except NoMatches:
+            logger.critical(
+                "Not found when try to add class view-info-span to a Span,"
+                " id={}".format(_add_id)
+            )
+            return
+        else:
+            logger.info("add class to %s", new_view)
+            new_view.add_class("view-info-span")
+            new_view.scroll_visible()

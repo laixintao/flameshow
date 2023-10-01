@@ -257,37 +257,6 @@ class FlameGraphApp(App):
             stack.render_detail(self.sample_index, self.sample_unit)
         )
 
-    def _set_new_viewinfostack(self, new_view_info_stack: Frame):
-        old_view_info_stack = self.view_info_stack
-
-        # delete old first
-        try:
-            self.query_one(f"#{fgid(old_view_info_stack._id)}").remove_class(
-                "view-info-span"
-            )
-        except NoMatches:
-            logger.warning(
-                "try to remove view-info-span class from span, but not found"
-            )
-
-        # set new one
-        _add_id = f"#{fgid(new_view_info_stack._id)}"
-        try:
-            new_view = self.query_one(_add_id)
-        except NoMatches:
-            logger.critical(
-                "Not found when try to add class view-info-span to a Span,"
-                " id={}".format(_add_id)
-            )
-            return
-        else:
-            logger.info("add class to %s", new_view)
-            new_view.add_class("view-info-span")
-            self.view_info_stack = new_view_info_stack
-            new_view.scroll_visible()
-
-        logger.debug("view: %s", self.view_info_stack.name)
-
     def action_move_up(self):
         logger.debug("move up")
         parent = self.view_info_stack.parent
