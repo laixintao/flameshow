@@ -20,8 +20,8 @@ from flameshow.render.header import FlameshowHeader
 from flameshow.utils import fgid
 from flameshow import __version__
 
-from .span_container import SpanContainer
 from .span import Span
+from .flamegraph import FlameGraph
 
 logger = logging.getLogger(__name__)
 
@@ -92,8 +92,6 @@ class FlameGraphApp(App):
         self.root_stack = profile.root_stack
         self._rendered_once = False
 
-        # +1 is extra "root" node
-        self.viewer_height = self.profile.highest_lines + 1
         self._debug_exit_after_rednder = _debug_exit_after_rednder
 
         self.view_info_stack = self.root_stack
@@ -141,7 +139,7 @@ class FlameGraphApp(App):
         yield detail_row
 
         yield FlameGraphScroll(
-            Vertical(id="flamegraph-container"),
+            FlameGraph(profile=self.profile),
             id="flamegraph-out-container",
         )
 
@@ -188,80 +186,6 @@ class FlameGraphApp(App):
             logger.warn("_debug_exit_after_rednder set to True, exit now")
             self.exit()
 
-    def render_flamegraph(self, stack):
-        parents = self._render_parents(stack)
-
-        t1 = time.time()
-        total_frame = self._get_frames_should_render(stack)
-
-        # 15, 100 and 4 is magic number that I tuned
-        # they fit the performance best while rendering enough information
-        # 4 keeps every render < 1second
-        max_level = round(15 - total_frame / 100)
-        max_level = max(4, max_level)
-        t2 = time.time()
-
-        logger.debug(
-            "compute spans that should render, took %.3f, total sample=%d,"
-            " max_level=%d",
-            t2 - t1,
-            total_frame,
-            max_level,
-        )
-        children = SpanContainer(
-            stack,
-            "100%",
-            level=max_level,
-            i=self.sample_index,
-            sample_unit=self.sample_unit,
-        )
-
-        widgets = [*parents, children]
-        v = Vertical(
-            *widgets,
-            id="flamegraph-container",
-        )
-        v.styles.height = self.viewer_height
-        return v
-
-    def _get_frames_should_render(self, frame) -> int:
-        if frame.values[self.sample_index] == 0:
-            return 0
-
-        count = 1
-        for c in frame.children:
-            count += self._get_frames_should_render(c)
-
-        return count
-
-    def _render_parents(self, stack):
-        parents = []
-        parent = stack.parent
-        logger.debug("stack name: %s %d", stack.name, stack._id)
-
-        parents_that_only_one_child = {}
-        while parent:
-            parents_that_only_one_child[parent._id] = stack
-            parents.append(parent)
-            stack = parent
-            parent = parent.parent
-
-        parent_widgets = []
-        for s in reversed(parents):
-            parent_widgets.append(
-                Span(
-                    s,
-                    is_deepest_level=False,
-                    sample_index=self.sample_index,
-                    sample_unit=self.sample_unit,
-                    classes="parent-of-focus",
-                )
-            )
-
-        self.parents_that_only_one_child = parents_that_only_one_child
-
-        return parent_widgets
-
     async def watch_sample_index(self, sample_index):
         logger.info("sample index changed to %d", sample_index)
 
@@ -276,7 +200,7 @@ class FlameGraphApp(App):
         header.center_text = center_text
 
         stack = self.profile.id_store[self.focused_stack_id]
-        await self._rerender(stack, sample_index)
+        # await self._rerender(stack, sample_index)
 
     async def watch_focused_stack_id(
         self,
@@ -284,7 +208,7 @@ class FlameGraphApp(App):
     ):
         logger.info(f"{focused_stack_id=} changed")
         new_focused_stack = self.profile.id_store[focused_stack_id]
-        await self._rerender(new_focused_stack, self.sample_index)
+        # await self._rerender(new_focused_stack, self.sample_index)
 
     async def _rerender(self, stack, sample_index):
         if not stack:
