@@ -6,7 +6,7 @@ import click
 
 from flameshow import __version__
 from flameshow.pprof_parser import parse_profile
-from flameshow.render import FlameGraphApp
+from flameshow.render import FlameshowApp
 
 
 logger = logging.getLogger(__name__)
@@ -48,7 +48,7 @@ def run_app(verbose, log_to, profile_f, _debug_exit_after_rednder):
     t01 = time.time()
     logger.info("Parse profile, took %.3fs", t01 - t0)
 
-    app = FlameGraphApp(
+    app = FlameshowApp(
         profile,
         _debug_exit_after_rednder,
     )

@@ -37,7 +37,7 @@ class FlameGraphScroll(VerticalScroll, inherit_bindings=False):
     ]
 
 
-class FlameGraphApp(App):
+class FlameshowApp(App):
     BINDINGS = [
         Binding("d", "toggle_dark", "Toggle dark mode", show=False),
         Binding(

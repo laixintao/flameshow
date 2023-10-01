@@ -1,3 +1,3 @@
-from .app import FlameGraphApp
+from .app import FlameshowApp
 
-__all__ = ["FlameGraphApp"]
+__all__ = ["FlameshowApp"]
