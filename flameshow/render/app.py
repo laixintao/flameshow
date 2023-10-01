@@ -90,7 +90,6 @@ class FlameGraphApp(App):
         super().__init__(*args, **kwargs)
         self.profile = profile
         self.root_stack = profile.root_stack
-        self._rendered_once = False
 
         self._debug_exit_after_rednder = _debug_exit_after_rednder
 
@@ -140,6 +139,7 @@ class FlameGraphApp(App):
 
         fg = FlameGraph(self.profile, self.focused_stack_id, self.sample_index)
         fg.styles.height = self.profile.highest_lines + 1
+
         yield FlameGraphScroll(
             fg,
             id="flamegraph-out-container",
@@ -179,14 +179,6 @@ class FlameGraphApp(App):
             "Dumped at %Y %b %d(%A) %H:%M:%S %Z"
         )
         return Static(datetime_str)
-
-    def post_display_hook(self):
-        if self._rendered_once:
-            return
-        self._rendered_once = True
-        if self._debug_exit_after_rednder:
-            logger.warn("_debug_exit_after_rednder set to True, exit now")
-            self.exit()
 
     async def watch_sample_index(self, sample_index):
         logger.info("sample index changed to %d", sample_index)
