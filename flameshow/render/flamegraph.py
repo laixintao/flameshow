@@ -206,6 +206,16 @@ class FlameGraph(Widget, can_focus=True):
             except NoMatches:
                 pass
 
+    def action_move_up(self):
+        logger.debug("move up")
+        parent = self.view_frame.parent
+
+        if not parent:
+            logger.debug("no more children")
+            return
+
+        self.post_message(self.ViewFrameChanged(parent))
+
     async def watch_view_frame(self, old, new):
         if old:  # default is None
             old_id = old._id
@@ -216,7 +226,8 @@ class FlameGraph(Widget, can_focus=True):
                 old_dom.remove_class("view-info-span")
             except NoMatches:
                 logger.warning(
-                    "try to remove view-info-span class from span, but not found"
+                    "try to remove view-info-span class from span, but not"
+                    " found"
                 )
 
         # set new one

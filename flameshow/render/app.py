@@ -111,9 +111,6 @@ class FlameGraphApp(App):
 
         self.view_frame = self.root_stack
 
-        fg = self.query_one("FlameGraph")
-        fg.focus()
-
     def compose(self) -> ComposeResult:
         """Create child widgets for the app."""
 
@@ -126,6 +123,8 @@ class FlameGraphApp(App):
         ]
         options[self.sample_index].value = True
         radioset = RadioSet(*options, id="sample-type-radio")
+        radioset.blur()
+
         detail_row = Horizontal(
             Static(
                 id="span-detail",
@@ -133,7 +132,6 @@ class FlameGraphApp(App):
             radioset,
             id="span-detail-container",
         )
-
         # set min height, 2 lines of detail + 2 lines border
         detail_row.styles.height = max(4, len(options) + 2)
 
@@ -146,6 +144,7 @@ class FlameGraphApp(App):
             self.root_stack,
         )
         fg.styles.height = self.profile.highest_lines + 1
+        fg.focus()
 
         yield FlameGraphScroll(
             fg,
@@ -258,16 +257,6 @@ class FlameGraphApp(App):
             stack.render_detail(self.sample_index, self.sample_unit)
         )
 
-    def action_move_up(self):
-        logger.debug("move up")
-        parent = self.view_info_stack.parent
-
-        if not parent:
-            logger.debug("no more children")
-            return
-
-        new_view_info_stack = parent
-        self._set_new_viewinfostack(new_view_info_stack)
 
     def action_move_right(self):
         logger.debug("move right")
