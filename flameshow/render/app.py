@@ -5,17 +5,15 @@ from typing import ClassVar
 from rich.style import Style
 from rich.text import Text
 
-import textual
 from textual import on
 from textual.app import App, ComposeResult
 from textual.binding import Binding, BindingType
-from textual.containers import Horizontal, Vertical, VerticalScroll
+from textual.containers import Horizontal, VerticalScroll
 from textual.css.query import NoMatches
 from textual.reactive import reactive
 from textual.widgets import Footer, Static, RadioSet, RadioButton
 from textual.events import Click
 
-from flameshow.models import Frame
 from flameshow.render.header import FlameshowHeader
 from flameshow.utils import fgid
 from flameshow import __version__

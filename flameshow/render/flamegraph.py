@@ -3,8 +3,8 @@ from flameshow.utils import fgid
 from textual.message import Message
 import time
 
-from textual.binding import Binding, BindingType
-from textual.containers import Horizontal, Vertical, VerticalScroll
+from textual.binding import Binding
+from textual.containers import Vertical
 from textual.css.query import NoMatches
 from textual.reactive import reactive
 from textual.widget import Widget
