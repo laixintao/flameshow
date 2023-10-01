@@ -112,6 +112,9 @@ class FlameGraphApp(App):
 
         self.set_stack_detail(self.root_stack)
 
+        fg = self.query_one("FlameGraph")
+        fg.focus()
+
     def compose(self) -> ComposeResult:
         """Create child widgets for the app."""
 
@@ -204,7 +207,6 @@ class FlameGraphApp(App):
         flamegraph_widget = self.query_one("FlameGraph")
         flamegraph_widget.focused_stack_id = focused_stack_id
         # await self._rerender(new_focused_stack, self.sample_index)
-
 
     def __debug_dom(self, node, indent: int):
         for c in node.children:

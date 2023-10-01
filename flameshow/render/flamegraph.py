@@ -1,8 +1,9 @@
 import logging
-from textual.css.query import NoMatches
 import time
 
+from textual.binding import Binding, BindingType
 from textual.containers import Horizontal, Vertical, VerticalScroll
+from textual.css.query import NoMatches
 from textual.reactive import reactive
 from textual.widget import Widget
 
@@ -12,7 +13,16 @@ from .span_container import SpanContainer
 logger = logging.getLogger(__name__)
 
 
-class FlameGraph(Widget):
+class FlameGraph(Widget, can_focus=True):
+    BINDINGS = [
+        Binding("j,down", "move_down", "Down", key_display="↓"),
+        Binding("k,up", "move_up", "Up", key_display="↑"),
+        Binding("l,right", "move_right", "Right", key_display="→"),
+        Binding("h,left", "move_left", "Left", key_display="←"),
+        Binding("enter", "zoom_in", "Zoom In"),
+        Binding("escape", "zoom_out", "Zoom Out", show=False),
+    ]
+
     focused_stack_id = reactive(0)
     sample_index = reactive(0, init=False)
 
@@ -136,3 +146,6 @@ class FlameGraph(Widget):
         # self._set_new_viewinfostack(stack)
 
         self.focus()
+
+    def action_zoom_in(self):
+        logger.info("Zoom in!")
