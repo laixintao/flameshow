@@ -143,7 +143,7 @@ class FlameGraphApp(App):
             self.profile,
             self.focused_stack_id,
             self.sample_index,
-            self.root_stack._id,
+            self.root_stack,
         )
         fg.styles.height = self.profile.highest_lines + 1
 
@@ -236,11 +236,11 @@ class FlameGraphApp(App):
     @on(FlameGraph.ViewFrameChanged)
     async def handle_view_frame_changed(self, e):
         logger.debug("app handle_view_frame_changed...")
-        new_frame = e.frame_id
-        self.view_frame = self.profile.id_store[new_frame]
+        new_frame = e.frame
+        self.view_frame = new_frame
 
         flamegraph = self.query_one("FlameGraph")
-        flamegraph.view_frame_id = new_frame
+        flamegraph.view_frame = new_frame
 
     async def watch_view_frame(self, old, new_frame):
         logger.debug(
