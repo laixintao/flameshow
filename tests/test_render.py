@@ -2,7 +2,7 @@ import pytest
 
 from flameshow.pprof_parser import parse_profile
 from flameshow.pprof_parser.parser import Line, Profile, SampleType, PprofFrame
-from flameshow.render import FlameGraphApp
+from flameshow.render import FlameshowApp
 
 
 @pytest.mark.asyncio
@@ -14,7 +14,7 @@ async def test_render_goroutine_child_not_100percent_of_parent(data_dir):
 
     profile = parse_profile(profile_data, filename="abc")
 
-    app = FlameGraphApp(
+    app = FlameshowApp(
         profile,
         False,
     )
@@ -35,7 +35,7 @@ def test_default_sample_types_heap():
         SampleType("inuse_objects", "count"),
         SampleType("inuse_space", "bytes"),
     ]
-    app = FlameGraphApp(
+    app = FlameshowApp(
         p,
         False,
     )
