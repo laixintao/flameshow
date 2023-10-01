@@ -1,10 +1,12 @@
 import logging
+from textual.css.query import NoMatches
 import time
 
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.reactive import reactive
 from textual.widget import Widget
 
+from .span import Span
 from .span_container import SpanContainer
 
 logger = logging.getLogger(__name__)
@@ -14,7 +16,9 @@ class FlameGraph(Widget):
     focused_stack_id = reactive(0)
     sample_index = reactive(0, init=False)
 
-    def __init__(self, profile, focused_stack_id, sample_index, *args, **kwargs):
+    def __init__(
+        self, profile, focused_stack_id, sample_index, *args, **kwargs
+    ):
         super().__init__(*args, **kwargs)
         self.profile = profile
         # +1 is extra "root" node
@@ -102,3 +106,33 @@ class FlameGraph(Widget):
     @property
     def sample_unit(self):
         return self.profile.sample_types[self.sample_index].sample_unit
+
+    async def watch_focused_stack_id(
+        self,
+        focused_stack_id,
+    ):
+        logger.info(f"{focused_stack_id=} changed")
+        new_focused_stack = self.profile.id_store[focused_stack_id]
+        await self._rerender(new_focused_stack, self.sample_index)
+
+    async def _rerender(self, stack, sample_index):
+        if not stack:
+            return
+        logger.info("re-render the new focused_stack: %s", stack.name)
+
+        try:
+            old_container = self.query_one("#flamegraph-container")
+        except NoMatches:
+            logger.warning(
+                "Can not find the old_container of #flamegraph-container"
+            )
+        else:
+            old_container.remove()
+
+        new_flame = self.get_flamegraph()
+        await self.mount(new_flame)
+
+        # reset view_info_stack after new flamegraph is mounted
+        # self._set_new_viewinfostack(stack)
+
+        self.focus()

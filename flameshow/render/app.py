@@ -201,35 +201,10 @@ class FlameGraphApp(App):
         focused_stack_id,
     ):
         logger.info(f"{focused_stack_id=} changed")
-        new_focused_stack = self.profile.id_store[focused_stack_id]
+        flamegraph_widget = self.query_one("FlameGraph")
+        flamegraph_widget.focused_stack_id = focused_stack_id
         # await self._rerender(new_focused_stack, self.sample_index)
 
-    async def _rerender(self, stack, sample_index):
-        if not stack:
-            return
-        logger.info("re-render the new focused_stack: %s", stack.name)
-
-        self.set_status_loading()
-        try:
-            old_container = self.query_one("#flamegraph-container")
-        except NoMatches:
-            logger.warning(
-                "Can not find the old_container of #flamegraph-container"
-            )
-        else:
-            old_container.remove()
-
-        out_container = self.query_one("#flamegraph-out-container")
-        new_flame = self.render_flamegraph(stack)
-        await out_container.mount(new_flame)
-
-        # reset view_info_stack after new flamegraph is mounted
-        self._set_new_viewinfostack(stack)
-
-        flamegraph_continer = self.query_one("#flamegraph-out-container")
-        flamegraph_continer.focus()
-
-        self.set_status_loading_done()
 
     def __debug_dom(self, node, indent: int):
         for c in node.children:
