@@ -41,6 +41,10 @@ class Frame:
         self.mapping_file = ""
         self.root = root
 
+        # internal values for renders
+        self.offset_p = None
+        self.values_p = None
+
     def pile_up(self, childstack: Self):
         childstack.parent = self
 

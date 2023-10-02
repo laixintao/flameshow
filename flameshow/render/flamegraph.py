@@ -1,4 +1,8 @@
 import logging
+from rich.segment import Segment
+
+from textual.strip import Strip
+from flameshow.models import Frame
 from flameshow.utils import fgid
 from textual.message import Message
 import time
@@ -8,11 +12,32 @@ from textual.containers import Vertical
 from textual.css.query import NoMatches
 from textual.reactive import reactive
 from textual.widget import Widget
+from textual.events import Resize
 
 from .span import Span
 from .span_container import SpanContainer
 
 logger = logging.getLogger(__name__)
+
+
+def percent_of_parent(child: Frame):
+    parent = child.parent
+    values_p = []
+    for i in range(len(child.values)):
+        if parent.values[i] == 0:
+            values_p.append(0)
+            continue
+        logger.debug(
+            f"{child.values=} {parent.values=}, {parent.values_p=},"
+            f" {parent.name=}"
+        )
+        v = child.values[i] / parent.values[i] * parent.values_p[i]
+        values_p.append(v)
+    return values_p
+
+
+def add_array(arr1, arr2):
+    return list(map(sum, zip(arr1, arr2)))
 
 
 class FlameGraph(Widget, can_focus=True):
@@ -55,8 +80,104 @@ class FlameGraph(Widget, can_focus=True):
         self.sample_index = sample_index
         self.view_frame = view_frame
 
-    def compose(self):
-        yield self.get_flamegraph()
+        # pre-render
+        self.lines = self.create_lines(profile)
+
+    def create_lines(self, profile):
+        t1 = time.time()
+        logger.info("start to create lines...")
+
+        root = profile.root_stack
+        value_count = len(root.values)
+
+        root.values_p = [1] * value_count
+        root.offset_p = [0] * value_count
+
+        lines = [
+            [root],
+        ]
+        current = [root.children]
+        line_no = 1
+
+        while len(current) > 0:
+            line = []
+            next_line = []
+
+            for children_group in current:
+                group_offset = [0] * value_count
+                for child in children_group:
+                    # TODO cmopute for all values here
+                    values_p = percent_of_parent(child)
+                    offset_p = add_array(child.parent.offset_p, group_offset)
+
+                    child.values_p = values_p
+                    child.offset_p = offset_p
+
+                    group_offset = add_array(group_offset, values_p)
+
+                    logger.debug(
+                        "%d, line created, name=%s, offset=%.2f, value=%.2f",
+                        line_no,
+                        child.name,
+                        offset_p,
+                        values_p,
+                    )
+                    line.append(child)
+                    next_line.append(child.children)
+
+            lines.append(line)
+            line_no += 1
+            current = next_line
+
+        t2 = time.time()
+        logger.info("create lines done, took %.2f seconds", t2 - t1)
+        return lines
+
+    def render_line(self, y: int) -> Strip:
+        line = self.lines[y]
+        width = 100
+        index = 0
+        segments = []
+
+        progress = 0
+        for frame in line:
+            my_offset = round(width * frame.offset_p[index])
+            my_width = round(width * frame.values_p[index])
+
+            pad = my_offset - progress
+            if pad:
+                segments.append(Segment(" " * pad))
+
+            text = "|" + frame.name
+            if len(text) < my_width:
+                text += " " * (my_width - len(text))
+            if len(text) > my_width:
+                text = text[:my_width]
+
+            segments.append(Segment(text))
+
+            progress += pad + my_width
+
+            logger.debug(
+                "%s in line %d should pad %d, offset=%d, width=%d",
+                frame.name,
+                y,
+                pad,
+                my_offset,
+                my_width,
+            )
+
+        strip = Strip(segments, 100)
+        return strip
+
+    def on_resize(self, resize_event: Resize):
+        size = resize_event.size
+        virtual_size = resize_event.virtual_size
+        logger.info(
+            "FlameGraph got Resize event, size=%s, virtual_size=%s",
+            size,
+            virtual_size,
+        )
 
     def get_flamegraph(self):
         stack = self.profile.id_store[self.focused_stack_id]
@@ -137,16 +258,16 @@ class FlameGraph(Widget, can_focus=True):
     def sample_unit(self):
         return self.profile.sample_types[self.sample_index].sample_unit
 
-    async def watch_focused_stack_id(
-        self,
-        focused_stack_id,
-    ):
-        logger.info(f"{focused_stack_id=} changed")
-        await self._rerender()
+    # async def watch_focused_stack_id(
+    #     self,
+    #     focused_stack_id,
+    # ):
+    #     logger.info(f"{focused_stack_id=} changed")
+    #     await self._rerender()
 
-    async def watch_sample_index(self, new_sample_index):
-        logger.info("sample_index changed to %d", new_sample_index)
-        await self._rerender()
+    # async def watch_sample_index(self, new_sample_index):
+    #     logger.info("sample_index changed to %d", new_sample_index)
+    #     await self._rerender()
 
     async def _rerender(self):
         stack = self.profile.id_store[self.focused_stack_id]
