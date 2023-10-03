@@ -132,13 +132,19 @@ class FlameGraph(Widget, can_focus=True):
             my_maps = frame_maps[frame._id]
             for sample_i, my_map in enumerate(my_maps):
                 parent_width = my_map.width
-                child_widthes = [
-                    child.values[sample_i]
-                    / frame.values[sample_i]
-                    * parent_width
-                    for child in frame.children
-                ]
+                if frame.values[sample_i] <= 0:
+                    child_widthes = [0.0 for _ in frame.children]
+                else:
+                    child_widthes = [
+                        child.values[sample_i]
+                        / frame.values[sample_i]
+                        * parent_width
+                        for child in frame.children
+                    ]
 
+                # the tail_spaces here only for iteround, in the case that
+                # child total is not 100% of parent, so tail need to be here
+                # to take some spaces
                 tail_spaces = float(parent_width - sum(child_widthes))
                 if tail_spaces < 0:
                     logger.warning(
@@ -190,12 +196,12 @@ class FlameGraph(Widget, can_focus=True):
             text = "▏" + frame.display_name
             frame_map = self.frame_maps[frame._id][self.sample_index]
             my_width = frame_map.width
-            followspaces = frame_map.followspaces
             offset = frame_map.offset
 
             pre_pad = offset - cursor
             if pre_pad > 0:
                 segments.append(Segment(" " * pre_pad))
+                cursor += pre_pad
             elif pre_pad < 0:
                 raise Exception("Prepad is negative! {}".format(pre_pad))
 
@@ -215,10 +221,6 @@ class FlameGraph(Widget, can_focus=True):
                 )
             )
             cursor += my_width
-
-            if followspaces:
-                segments.append(Segment(" " * followspaces))
-                cursor += followspaces
 
             logger.debug(
                 "%s in line %d, frame_map=%s",
