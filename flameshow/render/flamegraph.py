@@ -15,7 +15,6 @@ from textual.reactive import reactive
 from textual.strip import Strip
 from textual.widget import Widget
 
-from flameshow.models import Frame
 from flameshow.utils import fgid
 import iteround
 
@@ -120,6 +119,7 @@ class FlameGraph(Widget, can_focus=True):
 
         only re-computes with width, focused_stack changeing
         """
+        logger.info("lru cache miss, Generates frame map, for width=%d", width)
         root = self.profile.root_stack
         st_count = len(root.values)
         frame_maps: Dict[int, List[FrameMap]] = {
@@ -211,15 +211,26 @@ class FlameGraph(Widget, can_focus=True):
                 text = text[:my_width]
 
             display_color = frame.display_color
-            segments.append(
-                Segment(
-                    text,
-                    Style(
-                        color=display_color.get_contrast_text().rich_color,
-                        bgcolor=display_color.rich_color,
-                    ),
+            if my_width > 0:
+                # | is always black
+                segments.append(
+                    Segment(
+                        text[0],
+                        Style(
+                            bgcolor=display_color.rich_color,
+                        ),
+                    )
                 )
-            )
+            if my_width > 1:
+                segments.append(
+                    Segment(
+                        text[1:],
+                        Style(
+                            color=display_color.get_contrast_text().rich_color,
+                            bgcolor=display_color.rich_color,
+                        ),
+                    )
+                )
             cursor += my_width
 
             logger.debug(
