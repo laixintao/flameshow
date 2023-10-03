@@ -1,39 +1,30 @@
+from collections import namedtuple
+from rich.style import Style
+from functools import lru_cache
 import logging
-from rich.segment import Segment
-
-from textual.strip import Strip
-from flameshow.models import Frame
-from flameshow.utils import fgid
-from textual.message import Message
 import time
+from typing import Dict, List
 
+from rich.segment import Segment
 from textual.binding import Binding
 from textual.containers import Vertical
 from textual.css.query import NoMatches
-from textual.reactive import reactive
-from textual.widget import Widget
 from textual.events import Resize
+from textual.message import Message
+from textual.reactive import reactive
+from textual.strip import Strip
+from textual.widget import Widget
+
+from flameshow.models import Frame
+from flameshow.utils import fgid
+import iteround
 
 from .span import Span
 from .span_container import SpanContainer
 
 logger = logging.getLogger(__name__)
 
-
-def percent_of_parent(child: Frame):
-    parent = child.parent
-    values_p = []
-    for i in range(len(child.values)):
-        if parent.values[i] == 0:
-            values_p.append(0)
-            continue
-        logger.debug(
-            f"{child.values=} {parent.values=}, {parent.values_p=},"
-            f" {parent.name=}"
-        )
-        v = child.values[i] / parent.values[i] * parent.values_p[i]
-        values_p.append(v)
-    return values_p
+FrameMap = namedtuple("FrameMap", "offset width followspaces")
 
 
 def add_array(arr1, arr2):
@@ -82,16 +73,13 @@ class FlameGraph(Widget, can_focus=True):
 
         # pre-render
         self.lines = self.create_lines(profile)
+        self.frame_maps = None
 
     def create_lines(self, profile):
         t1 = time.time()
         logger.info("start to create lines...")
 
         root = profile.root_stack
-        value_count = len(root.values)
-
-        root.values_p = [1] * value_count
-        root.offset_p = [0] * value_count
 
         lines = [
             [root],
@@ -104,24 +92,7 @@ class FlameGraph(Widget, can_focus=True):
             next_line = []
 
             for children_group in current:
-                group_offset = [0] * value_count
                 for child in children_group:
-                    # TODO cmopute for all values here
-                    values_p = percent_of_parent(child)
-                    offset_p = add_array(child.parent.offset_p, group_offset)
-
-                    child.values_p = values_p
-                    child.offset_p = offset_p
-
-                    group_offset = add_array(group_offset, values_p)
-
-                    logger.debug(
-                        "%d, line created, name=%s, offset=%.2f, value=%.2f",
-                        line_no,
-                        child.name,
-                        offset_p,
-                        values_p,
-                    )
                     line.append(child)
                     next_line.append(child.children)
 
@@ -133,41 +104,130 @@ class FlameGraph(Widget, can_focus=True):
         logger.info("create lines done, took %.2f seconds", t2 - t1)
         return lines
 
+    def render_lines(self, crop):
+        logger.info("render_lines!! crop: %s", crop)
+        my_width = crop.size.width
+        t1 = time.time()
+        self.frame_maps = self.generate_frame_maps(my_width)
+        t2 = time.time()
+        logger.info("Generates frame maps, took %.4f seconds", t2 - t1)
+        return super().render_lines(crop)
+
+    @lru_cache
+    def generate_frame_maps(self, width):
+        """
+        compute attributes for render for every frame
+
+        only re-computes with width, focused_stack changeing
+        """
+        root = self.profile.root_stack
+        st_count = len(root.values)
+        frame_maps: Dict[int, List[FrameMap]] = {
+            root._id: [FrameMap(0, width, 0) for _ in range(st_count)]
+        }
+
+        def _generate_for_children(frame):
+            logger.debug("generate frame_maps for %s", frame)
+            # generate for children
+            my_maps = frame_maps[frame._id]
+            for sample_i, my_map in enumerate(my_maps):
+                parent_width = my_map.width
+                child_widthes = [
+                    child.values[sample_i]
+                    / frame.values[sample_i]
+                    * parent_width
+                    for child in frame.children
+                ]
+
+                tail_spaces = float(parent_width - sum(child_widthes))
+                if tail_spaces < 0:
+                    logger.warning(
+                        "Child total width is larger than parent: %f",
+                        tail_spaces,
+                    )
+                    tail_spaces = 0.0
+                else:
+                    child_widthes.append(tail_spaces)
+
+                rounded_child_widthes = iteround.saferound(
+                    child_widthes, 0, topline=parent_width
+                )
+
+                offset = my_map.offset
+                total_children = len(frame.children)
+                for index, child in enumerate(frame.children):
+                    child_width = int(rounded_child_widthes[index])
+                    followspaces = 0
+                    if index == total_children - 1:  # last one
+                        if tail_spaces >= 0:
+                            followspaces = int(tail_spaces)
+                    frame_maps.setdefault(child._id, []).append(
+                        FrameMap(
+                            offset=offset,
+                            width=child_width,
+                            followspaces=followspaces,
+                        )
+                    )
+                    offset += child_width
+
+            for child in frame.children:
+                _generate_for_children(child)
+
+        _generate_for_children(root)
+
+        return frame_maps
+
     def render_line(self, y: int) -> Strip:
+        # logger.info("container_size: %s", self.container_size)
         line = self.lines[y]
-        width = 100
-        index = 0
+
+        if not self.frame_maps:
+            raise Exception("frame_maps is not init yet!")
+
         segments = []
-
-        progress = 0
+        cursor = 0
         for frame in line:
-            my_offset = round(width * frame.offset_p[index])
-            my_width = round(width * frame.values_p[index])
+            text = "▏" + frame.display_name
+            frame_map = self.frame_maps[frame._id][self.sample_index]
+            my_width = frame_map.width
+            followspaces = frame_map.followspaces
+            offset = frame_map.offset
 
-            pad = my_offset - progress
-            if pad:
-                segments.append(Segment(" " * pad))
+            pre_pad = offset - cursor
+            if pre_pad > 0:
+                segments.append(Segment(" " * pre_pad))
+            elif pre_pad < 0:
+                raise Exception("Prepad is negative! {}".format(pre_pad))
 
-            text = "|" + frame.name
             if len(text) < my_width:
                 text += " " * (my_width - len(text))
             if len(text) > my_width:
                 text = text[:my_width]
 
-            segments.append(Segment(text))
+            display_color = frame.display_color
+            segments.append(
+                Segment(
+                    text,
+                    Style(
+                        color=display_color.get_contrast_text().rich_color,
+                        bgcolor=display_color.rich_color,
+                    ),
+                )
+            )
+            cursor += my_width
 
-            progress += pad + my_width
+            if followspaces:
+                segments.append(Segment(" " * followspaces))
+                cursor += followspaces
 
             logger.debug(
-                "%s in line %d should pad %d, offset=%d, width=%d",
-                frame.name,
+                "%s in line %d, frame_map=%s",
+                frame,
                 y,
-                pad,
-                my_offset,
-                my_width,
+                frame_map,
             )
 
-        strip = Strip(segments, 100)
+        strip = Strip(segments)
         return strip
 
     def on_resize(self, resize_event: Resize):
