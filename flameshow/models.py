@@ -41,7 +41,6 @@ class Frame:
         self.mapping_file = ""
         self.root = root
 
-
     def pile_up(self, childstack: Self):
         childstack.parent = self
 
@@ -78,7 +77,7 @@ class Frame:
         return r.get_color(self.color_key)
 
     def __repr__(self) -> str:
-        return f"<Frame {self.name}>"
+        return f"<Frame #{self._id} {self.name}>"
 
 
 @dataclass

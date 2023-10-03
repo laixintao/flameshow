@@ -1,25 +1,22 @@
 from collections import namedtuple
-from rich.style import Style
 from functools import lru_cache
 import logging
 import time
 from typing import Dict, List
 
+import iteround
 from rich.segment import Segment
+from rich.style import Style
 from textual.binding import Binding
-from textual.containers import Vertical
-from textual.css.query import NoMatches
+from textual.color import Color
 from textual.events import Resize
 from textual.message import Message
 from textual.reactive import reactive
 from textual.strip import Strip
 from textual.widget import Widget
 
-from flameshow.utils import fgid
-import iteround
+from flameshow.const import VIEW_INFO_COLOR
 
-from .span import Span
-from .span_container import SpanContainer
 
 logger = logging.getLogger(__name__)
 
@@ -107,24 +104,40 @@ class FlameGraph(Widget, can_focus=True):
         logger.info("render_lines!! crop: %s", crop)
         my_width = crop.size.width
         t1 = time.time()
-        self.frame_maps = self.generate_frame_maps(my_width)
+        self.frame_maps = self.generate_frame_maps(
+            my_width, self.focused_stack_id
+        )
         t2 = time.time()
         logger.info("Generates frame maps, took %.4f seconds", t2 - t1)
         return super().render_lines(crop)
 
     @lru_cache
-    def generate_frame_maps(self, width):
+    def generate_frame_maps(self, width, focused_stack_id):
         """
         compute attributes for render for every frame
 
         only re-computes with width, focused_stack changeing
         """
-        logger.info("lru cache miss, Generates frame map, for width=%d", width)
-        root = self.profile.root_stack
-        st_count = len(root.values)
-        frame_maps: Dict[int, List[FrameMap]] = {
-            root._id: [FrameMap(0, width, 0) for _ in range(st_count)]
-        }
+        logger.info(
+            "lru cache miss, Generates frame map, for width=%d,"
+            " focused_stack_id=%s",
+            width,
+            focused_stack_id,
+        )
+        frame_maps: Dict[int, List[FrameMap]] = {}
+        current_focused_stack = self.profile.id_store[focused_stack_id]
+        st_count = len(current_focused_stack.values)
+        logger.debug("values count: %s", st_count)
+
+        # set me to 100% and siblins to 0
+        me = current_focused_stack
+        while me:
+            frame_maps[me._id] = [
+                FrameMap(0, width, 0) for _ in range(st_count)
+            ]
+            me = me.parent
+
+        logger.info("frame maps: %s", frame_maps)
 
         def _generate_for_children(frame):
             logger.debug("generate frame_maps for %s", frame)
@@ -179,7 +192,7 @@ class FlameGraph(Widget, can_focus=True):
             for child in frame.children:
                 _generate_for_children(child)
 
-        _generate_for_children(root)
+        _generate_for_children(current_focused_stack)
 
         return frame_maps
 
@@ -193,12 +206,21 @@ class FlameGraph(Widget, can_focus=True):
         segments = []
         cursor = 0
         for frame in line:
-            text = "▏" + frame.display_name
-            frame_map = self.frame_maps[frame._id][self.sample_index]
+            frame_maps = self.frame_maps.get(frame._id)
+            if not frame_maps:
+                logger.debug(
+                    "frame %s not found in frame_map, not render this.", frame
+                )
+                continue
+            frame_map = frame_maps[self.sample_index]
             my_width = frame_map.width
-            offset = frame_map.offset
+            if not my_width:
+                continue
 
+            text = "▏" + frame.display_name
+            offset = frame_map.offset
             pre_pad = offset - cursor
+
             if pre_pad > 0:
                 segments.append(Segment(" " * pre_pad))
                 cursor += pre_pad
@@ -211,8 +233,12 @@ class FlameGraph(Widget, can_focus=True):
                 text = text[:my_width]
 
             display_color = frame.display_color
+
+            if frame is self.view_frame:
+                display_color = Color.parse(VIEW_INFO_COLOR)
+
             if my_width > 0:
-                # | is always black
+                # | is always default color
                 segments.append(
                     Segment(
                         text[0],
@@ -252,120 +278,9 @@ class FlameGraph(Widget, can_focus=True):
             virtual_size,
         )
 
-    def get_flamegraph(self):
-        stack = self.profile.id_store[self.focused_stack_id]
-        logger.info("render frame: %s", stack)
-        parents = self._render_parents(stack)
-
-        t1 = time.time()
-        total_frame = self._get_frames_should_render(stack)
-
-        # 15, 100 and 4 is magic number that I tuned
-        # they fit the performance best while rendering enough information
-        # 4 keeps every render < 1second
-        max_level = round(15 - total_frame / 100)
-        max_level = max(4, max_level)
-        t2 = time.time()
-
-        logger.debug(
-            "compute spans that should render, took %.3f, total sample=%d,"
-            " max_level=%d",
-            t2 - t1,
-            total_frame,
-            max_level,
-        )
-        children = SpanContainer(
-            stack,
-            "100%",
-            level=max_level,
-            i=self.sample_index,
-            sample_unit=self.sample_unit,
-        )
-
-        widgets = [*parents, children]
-        v = Vertical(
-            *widgets,
-            id="flamegraph-container",
-        )
-        return v
-
-    def _render_parents(self, stack):
-        parents = []
-        parent = stack.parent
-        logger.debug("stack name: %s %d", stack.name, stack._id)
-
-        parents_that_only_one_child = {}
-        while parent:
-            parents_that_only_one_child[parent._id] = stack
-            parents.append(parent)
-            stack = parent
-            parent = parent.parent
-
-        parent_widgets = []
-        for s in reversed(parents):
-            parent_widgets.append(
-                Span(
-                    s,
-                    is_deepest_level=False,
-                    sample_index=self.sample_index,
-                    sample_unit=self.sample_unit,
-                    classes="parent-of-focus",
-                )
-            )
-
-        self.parents_that_only_one_child = parents_that_only_one_child
-
-        return parent_widgets
-
-    def _get_frames_should_render(self, frame) -> int:
-        if frame.values[self.sample_index] == 0:
-            return 0
-
-        count = 1
-        for c in frame.children:
-            count += self._get_frames_should_render(c)
-
-        return count
-
     @property
     def sample_unit(self):
         return self.profile.sample_types[self.sample_index].sample_unit
-
-    # async def watch_focused_stack_id(
-    #     self,
-    #     focused_stack_id,
-    # ):
-    #     logger.info(f"{focused_stack_id=} changed")
-    #     await self._rerender()
-
-    # async def watch_sample_index(self, new_sample_index):
-    #     logger.info("sample_index changed to %d", new_sample_index)
-    #     await self._rerender()
-
-    async def _rerender(self):
-        stack = self.profile.id_store[self.focused_stack_id]
-        logger.info("re-render the new focused_stack: %s", stack.name)
-
-        try:
-            old_container = self.query_one("#flamegraph-container")
-        except NoMatches:
-            logger.warning(
-                "Can not find the old_container of #flamegraph-container"
-            )
-        else:
-            old_container.remove()
-
-        new_flame = self.get_flamegraph()
-        await self.mount(new_flame)
-
-        # reset view_info_stack after new flamegraph is mounted
-        # self._set_new_viewinfostack(stack)
-
-        self.focus()
-
-        # force set class add the view_frame class back
-        self.post_message(self.ViewFrameChanged(stack))
-        await self.watch_view_frame(stack, stack)
 
     def action_zoom_in(self):
         logger.info("Zoom in!")
@@ -378,38 +293,22 @@ class FlameGraph(Widget, can_focus=True):
     def action_move_down(self):
         logger.debug("move down")
         view_frame = self.view_frame
-        view_frame_id = view_frame._id
         children = view_frame.children
 
         if not children:
             logger.debug("no more children")
             return
 
-        if view_frame_id in self.parents_that_only_one_child:
-            new_view_info_frame = self.parents_that_only_one_child[
-                view_frame_id
-            ]
-            self.post_message(self.ViewFrameChanged(new_view_info_frame))
-        else:
-            # go to the biggest value
-            new_view_info_frame = self._get_biggest_exist_child(children)
-            if not new_view_info_frame:
-                logger.warn("Got no children displayed!")
-                return
-            self.post_message(self.ViewFrameChanged(new_view_info_frame))
+        # go to the biggest value
+        new_view_info_frame = self._get_biggest_exist_child(children)
+        if not new_view_info_frame:
+            logger.warn("Got no children displayed!")
+            return
+        self.post_message(self.ViewFrameChanged(new_view_info_frame))
 
     def _get_biggest_exist_child(self, stacks):
-        ordered = sorted(
-            stacks, key=lambda s: s.values[self.sample_index], reverse=True
-        )
-        for s in ordered:
-            _id = f"#{fgid(s._id)}"
-            try:
-                found = self.query_one(_id)
-                if found:
-                    return s
-            except NoMatches:
-                pass
+        biggest = max(stacks, key=lambda s: s.values[self.sample_index])
+        return biggest
 
     def action_move_up(self):
         logger.debug("move up")
@@ -426,7 +325,7 @@ class FlameGraph(Widget, can_focus=True):
 
         right = self._find_right_sibling(self.view_frame)
 
-        logger.debug("found right sibling: %s, %s", right, right.values)
+        logger.debug("found right sibling: %s", right)
         if not right:
             logger.debug("Got no right sibling")
             return
@@ -487,33 +386,3 @@ class FlameGraph(Widget, can_focus=True):
 
             me = my_parent
             my_parent = my_parent.parent
-
-    async def watch_view_frame(self, old, new):
-        if old:  # default is None
-            old_id = old._id
-            # delete old first
-            try:
-                old_dom = self.query_one(f"#{fgid(old_id)}")
-                logger.info("delete class from old span: %s", old_dom)
-                old_dom.remove_class("view-info-span")
-            except NoMatches:
-                logger.warning(
-                    "try to remove view-info-span class from span, but not"
-                    " found"
-                )
-
-        # set new one
-        new_id = new._id
-        _add_id = f"#{fgid(new_id)}"
-        try:
-            new_view = self.query_one(_add_id)
-        except NoMatches:
-            logger.critical(
-                "Not found when try to add class view-info-span to a Span,"
-                " id={}".format(_add_id)
-            )
-            return
-        else:
-            logger.info("add class to %s", new_view)
-            new_view.add_class("view-info-span")
-            new_view.scroll_visible()
