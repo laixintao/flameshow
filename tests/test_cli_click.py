@@ -1,6 +1,6 @@
 from click.testing import CliRunner
-from flameshow.main import main
-from unittest.mock import patch
+from flameshow.main import main, ensure_tty
+from unittest.mock import patch, MagicMock
 
 
 def test_print_version():
@@ -11,10 +11,29 @@ def test_print_version():
         assert result.output == "1.2.3\n"
 
 
-def test_run_app():
+@patch("flameshow.main.os")
+def test_run_app(mock_os, data_dir):
+    mock_os.isatty.return_value = True
     runner = CliRunner()
     result = runner.invoke(
-        main, ["tests/pprof_data/profile-10seconds.out"], input="q"
+        main, [str(data_dir / "profile-10seconds.out")], input="q"
     )
 
     assert result.exit_code == 0
+
+
+@patch("flameshow.main.sys")
+@patch("flameshow.main.os")
+def test_ensure_tty_when_its_not(mock_os, mock_sys):
+    mock_os.isatty.return_value = False
+    opened_fd = object()
+    mock_os.fdopen.return_value = opened_fd
+
+    fake_stdin = MagicMock()
+    mock_sys.stdin = fake_stdin
+
+    ensure_tty()
+
+    fake_stdin.close.assert_called()
+    assert hasattr(mock_sys, "stdin")
+    assert mock_sys.stdin is opened_fd

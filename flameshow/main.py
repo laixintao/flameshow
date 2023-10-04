@@ -2,6 +2,8 @@ import logging
 import os
 import time
 
+import sys
+
 import click
 
 from flameshow import __version__
@@ -36,6 +38,15 @@ LOG_LEVEL = {
 }
 
 
+def ensure_tty():
+    if os.isatty(0):
+        return
+
+    logger.info("stdin is not a tty, replace it to fd=2")
+    sys.stdin.close()
+    sys.stdin = os.fdopen(2)
+
+
 def run_app(verbose, log_to, profile_f, _debug_exit_after_rednder):
     log_level = LOG_LEVEL[verbose]
     setup_log(log_to is not None, log_level, log_to)
@@ -48,6 +59,7 @@ def run_app(verbose, log_to, profile_f, _debug_exit_after_rednder):
     t01 = time.time()
     logger.info("Parse profile, took %.3fs", t01 - t0)
 
+    ensure_tty()
     app = FlameshowApp(
         profile,
         _debug_exit_after_rednder,
