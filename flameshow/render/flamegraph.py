@@ -203,9 +203,11 @@ class FlameGraph(Widget, can_focus=True):
                 text = text[:my_width]
 
             display_color = frame.display_color
+            bold = False
 
             if frame is self.view_frame:
                 display_color = Color.parse(VIEW_INFO_COLOR)
+                bold = True
 
             if my_width > 0:
                 # | is always default color
@@ -224,6 +226,7 @@ class FlameGraph(Widget, can_focus=True):
                         Style(
                             color=display_color.get_contrast_text().rich_color,
                             bgcolor=display_color.rich_color,
+                            bold=bold,
                         ),
                     )
                 )
