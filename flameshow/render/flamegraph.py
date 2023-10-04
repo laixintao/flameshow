@@ -116,7 +116,6 @@ class FlameGraph(Widget, can_focus=True):
         logger.info("frame maps: %s", frame_maps)
 
         def _generate_for_children(frame):
-            logger.debug("generate frame_maps for %s", frame)
             # generate for children
             my_maps = frame_maps[frame._id]
             for sample_i, my_map in enumerate(my_maps):
@@ -247,13 +246,6 @@ class FlameGraph(Widget, can_focus=True):
                     )
                 )
             cursor += my_width
-
-            logger.debug(
-                "%s in line %d, frame_map=%s",
-                frame,
-                y,
-                frame_map,
-            )
 
         strip = Strip(segments)
         return strip

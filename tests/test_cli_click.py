@@ -1,6 +1,6 @@
 from click.testing import CliRunner
-from flameshow.main import main
-from unittest.mock import patch
+from flameshow.main import main, ensure_tty
+from unittest.mock import patch, Mock
 
 
 def test_print_version():
@@ -11,7 +11,9 @@ def test_print_version():
         assert result.output == "1.2.3\n"
 
 
-def test_run_app(data_dir):
+@patch("flameshow.main.os")
+def test_run_app(mock_os, data_dir):
+    mock_os.isatty.return_value = True
     runner = CliRunner()
     result = runner.invoke(
         main, [str(data_dir / "profile-10seconds.out")], input="q"
@@ -20,13 +22,15 @@ def test_run_app(data_dir):
     assert result.exit_code == 0
 
 
-def test_run_app_with_pipe(data_dir):
-    runner = CliRunner()
-    with open(data_dir / "profile-10seconds.out", "br") as f:
-        import sys
+@patch("flameshow.main.sys")
+@patch("flameshow.main.os")
+def test_ensure_tty_when_its_not(mock_os, mock_sys):
+    mock_os.isatty.return_value = False
+    ensure_tty()
 
-        sys.stdin = f
+    fake_stdin = Mock()
+    mock_sys.stdin = fake_stdin
 
-        result = runner.invoke(main, ["-"], input="q")
-
-    assert result.exit_code == 0
+    fake_stdin.close.assert_called()
+    assert hasattr(mock_sys, "stdin")
+    assert mock_sys.stdin.fileno == 2
