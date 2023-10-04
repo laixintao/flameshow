@@ -68,37 +68,7 @@ class FlameGraph(Widget, can_focus=True):
         self.view_frame = view_frame
 
         # pre-render
-        self.lines = self.create_lines(profile)
         self.frame_maps = None
-
-    def create_lines(self, profile):
-        t1 = time.time()
-        logger.info("start to create lines...")
-
-        root = profile.root_stack
-
-        lines = [
-            [root],
-        ]
-        current = [root.children]
-        line_no = 1
-
-        while len(current) > 0:
-            line = []
-            next_line = []
-
-            for children_group in current:
-                for child in children_group:
-                    line.append(child)
-                    next_line.append(child.children)
-
-            lines.append(line)
-            line_no += 1
-            current = next_line
-
-        t2 = time.time()
-        logger.info("create lines done, took %.2f seconds", t2 - t1)
-        return lines
 
     def render_lines(self, crop):
         logger.info("render_lines!! crop: %s", crop)
@@ -116,7 +86,7 @@ class FlameGraph(Widget, can_focus=True):
         """
         compute attributes for render for every frame
 
-        only re-computes with width, focused_stack changeing
+        only re-computes with width, focused_stack changing
         """
         logger.info(
             "lru cache miss, Generates frame map, for width=%d,"
@@ -198,7 +168,7 @@ class FlameGraph(Widget, can_focus=True):
 
     def render_line(self, y: int) -> Strip:
         # logger.info("container_size: %s", self.container_size)
-        line = self.lines[y]
+        line = self.profile.lines[y]
 
         if not self.frame_maps:
             raise Exception("frame_maps is not init yet!")
