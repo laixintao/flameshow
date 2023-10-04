@@ -86,7 +86,7 @@ class FlameGraph(Widget, can_focus=True):
         """
         compute attributes for render for every frame
 
-        only re-computes with width, focused_stack changeing
+        only re-computes with width, focused_stack changing
         """
         logger.info(
             "lru cache miss, Generates frame map, for width=%d,"
