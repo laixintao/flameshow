@@ -195,10 +195,6 @@ class FlameshowApp(App):
             logger.debug("%s %s", indent * " ", c)
             self.__debug_dom(c, indent + 2)
 
-    @on(Click)
-    def handle_switch_to_mouse(self):
-        logger.debug("mouse click")
-
     @on(RadioSet.Changed)
     async def handle_radioset_changed(self, e):
         logger.info("event: %s", e)
