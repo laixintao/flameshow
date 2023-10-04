@@ -10,7 +10,7 @@ from rich.style import Style
 from textual import on
 from textual.binding import Binding
 from textual.color import Color
-from textual.events import Click, MouseEvent, MouseMove, Resize
+from textual.events import Click, MouseEvent, MouseMove
 from textual.message import Message
 from textual.reactive import reactive
 from textual.strip import Strip
@@ -26,7 +26,7 @@ from flameshow.models import Frame
 
 logger = logging.getLogger(__name__)
 
-FrameMap = namedtuple("FrameMap", "offset width followspaces")
+FrameMap = namedtuple("FrameMap", "offset width")
 
 
 def add_array(arr1, arr2):
@@ -109,9 +109,7 @@ class FlameGraph(Widget, can_focus=True):
         # set me to 100% and siblins to 0
         me = current_focused_stack
         while me:
-            frame_maps[me._id] = [
-                FrameMap(0, width, 0) for _ in range(st_count)
-            ]
+            frame_maps[me._id] = [FrameMap(0, width) for _ in range(st_count)]
             me = me.parent
 
         logger.info("frame maps: %s", frame_maps)
@@ -135,32 +133,19 @@ class FlameGraph(Widget, can_focus=True):
                 # child total is not 100% of parent, so tail need to be here
                 # to take some spaces
                 tail_spaces = float(parent_width - sum(child_widthes))
-                if tail_spaces < 0:
-                    logger.warning(
-                        "Child total width is larger than parent: %f",
-                        tail_spaces,
-                    )
-                    tail_spaces = 0.0
-                else:
+                if tail_spaces > 0:
                     child_widthes.append(tail_spaces)
-
                 rounded_child_widthes = iteround.saferound(
                     child_widthes, 0, topline=parent_width
                 )
 
                 offset = my_map.offset
-                total_children = len(frame.children)
                 for index, child in enumerate(frame.children):
                     child_width = int(rounded_child_widthes[index])
-                    followspaces = 0
-                    if index == total_children - 1:  # last one
-                        if tail_spaces >= 0:
-                            followspaces = int(tail_spaces)
                     frame_maps.setdefault(child._id, []).append(
                         FrameMap(
                             offset=offset,
                             width=child_width,
-                            followspaces=followspaces,
                         )
                     )
                     offset += child_width
@@ -250,15 +235,6 @@ class FlameGraph(Widget, can_focus=True):
 
         strip = Strip(segments)
         return strip
-
-    def on_resize(self, resize_event: Resize):
-        size = resize_event.size
-        virtual_size = resize_event.virtual_size
-        logger.info(
-            "FlameGraph got Resize event, size=%s, virtual_size=%s",
-            size,
-            virtual_size,
-        )
 
     @property
     def sample_unit(self):

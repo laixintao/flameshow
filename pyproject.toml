@@ -85,4 +85,5 @@ exclude_lines = [
     '@overload',
     '__rich_repr__',
     '@abstractmethod',
+    'NotImplementedError',
 ]
