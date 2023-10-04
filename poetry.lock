@@ -269,6 +269,16 @@ test = ["pytest (<7.1)", "pytest-asyncio", "testpath"]
 test-extra = ["curio", "matplotlib (!=3.2.0)", "nbformat", "numpy (>=1.21)", "pandas", "pytest (<7.1)", "pytest-asyncio", "testpath", "trio"]
 
 [[package]]
+name = "iteround"
+version = "1.0.4"
+description = "Rounds iterables (arrays, lists, sets, etc) while maintaining the sum of the initial array."
+optional = false
+python-versions = "*"
+files = [
+    {file = "iteround-1.0.4-py3-none-any.whl", hash = "sha256:17947dd5479177e6fb186b0a3d5d594b55eedea14dc722c6da7e84bbed45f5b2"},
+]
+
+[[package]]
 name = "jedi"
 version = "0.19.0"
 description = "An autocompletion tool for Python that can be used for text editors."
@@ -766,4 +776,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "bf9eb7c8d132944183c014871a7d05a5f4592599548699cb17028bbbbe2c83a4"
+content-hash = "1209ccea347a8940d306728bff1dd3505329ae7c27146c332d70dce61c5af26d"

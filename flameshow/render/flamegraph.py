@@ -1,18 +1,30 @@
+from collections import namedtuple
+from functools import lru_cache
 import logging
-from flameshow.utils import fgid
-from textual.message import Message
 import time
+from typing import Dict, List
 
+import iteround
+from rich.segment import Segment
+from rich.style import Style
 from textual.binding import Binding
-from textual.containers import Vertical
-from textual.css.query import NoMatches
+from textual.color import Color
+from textual.events import Resize
+from textual.message import Message
 from textual.reactive import reactive
+from textual.strip import Strip
 from textual.widget import Widget
 
-from .span import Span
-from .span_container import SpanContainer
+from flameshow.const import VIEW_INFO_COLOR
+
 
 logger = logging.getLogger(__name__)
+
+FrameMap = namedtuple("FrameMap", "offset width followspaces")
+
+
+def add_array(arr1, arr2):
+    return list(map(sum, zip(arr1, arr2)))
 
 
 class FlameGraph(Widget, can_focus=True):
@@ -55,123 +67,190 @@ class FlameGraph(Widget, can_focus=True):
         self.sample_index = sample_index
         self.view_frame = view_frame
 
-    def compose(self):
-        yield self.get_flamegraph()
+        # pre-render
+        self.frame_maps = None
 
-    def get_flamegraph(self):
-        stack = self.profile.id_store[self.focused_stack_id]
-        logger.info("render frame: %s", stack)
-        parents = self._render_parents(stack)
-
+    def render_lines(self, crop):
+        logger.info("render_lines!! crop: %s", crop)
+        my_width = crop.size.width
         t1 = time.time()
-        total_frame = self._get_frames_should_render(stack)
-
-        # 15, 100 and 4 is magic number that I tuned
-        # they fit the performance best while rendering enough information
-        # 4 keeps every render < 1second
-        max_level = round(15 - total_frame / 100)
-        max_level = max(4, max_level)
+        self.frame_maps = self.generate_frame_maps(
+            my_width, self.focused_stack_id
+        )
         t2 = time.time()
+        logger.info("Generates frame maps, took %.4f seconds", t2 - t1)
+        return super().render_lines(crop)
 
-        logger.debug(
-            "compute spans that should render, took %.3f, total sample=%d,"
-            " max_level=%d",
-            t2 - t1,
-            total_frame,
-            max_level,
+    @lru_cache
+    def generate_frame_maps(self, width, focused_stack_id):
+        """
+        compute attributes for render for every frame
+
+        only re-computes with width, focused_stack changing
+        """
+        logger.info(
+            "lru cache miss, Generates frame map, for width=%d,"
+            " focused_stack_id=%s",
+            width,
+            focused_stack_id,
         )
-        children = SpanContainer(
-            stack,
-            "100%",
-            level=max_level,
-            i=self.sample_index,
-            sample_unit=self.sample_unit,
-        )
+        frame_maps: Dict[int, List[FrameMap]] = {}
+        current_focused_stack = self.profile.id_store[focused_stack_id]
+        st_count = len(current_focused_stack.values)
+        logger.debug("values count: %s", st_count)
 
-        widgets = [*parents, children]
-        v = Vertical(
-            *widgets,
-            id="flamegraph-container",
-        )
-        return v
+        # set me to 100% and siblins to 0
+        me = current_focused_stack
+        while me:
+            frame_maps[me._id] = [
+                FrameMap(0, width, 0) for _ in range(st_count)
+            ]
+            me = me.parent
 
-    def _render_parents(self, stack):
-        parents = []
-        parent = stack.parent
-        logger.debug("stack name: %s %d", stack.name, stack._id)
+        logger.info("frame maps: %s", frame_maps)
 
-        parents_that_only_one_child = {}
-        while parent:
-            parents_that_only_one_child[parent._id] = stack
-            parents.append(parent)
-            stack = parent
-            parent = parent.parent
+        def _generate_for_children(frame):
+            logger.debug("generate frame_maps for %s", frame)
+            # generate for children
+            my_maps = frame_maps[frame._id]
+            for sample_i, my_map in enumerate(my_maps):
+                parent_width = my_map.width
+                if frame.values[sample_i] <= 0:
+                    child_widthes = [0.0 for _ in frame.children]
+                else:
+                    child_widthes = [
+                        child.values[sample_i]
+                        / frame.values[sample_i]
+                        * parent_width
+                        for child in frame.children
+                    ]
 
-        parent_widgets = []
-        for s in reversed(parents):
-            parent_widgets.append(
-                Span(
-                    s,
-                    is_deepest_level=False,
-                    sample_index=self.sample_index,
-                    sample_unit=self.sample_unit,
-                    classes="parent-of-focus",
+                # the tail_spaces here only for iteround, in the case that
+                # child total is not 100% of parent, so tail need to be here
+                # to take some spaces
+                tail_spaces = float(parent_width - sum(child_widthes))
+                if tail_spaces < 0:
+                    logger.warning(
+                        "Child total width is larger than parent: %f",
+                        tail_spaces,
+                    )
+                    tail_spaces = 0.0
+                else:
+                    child_widthes.append(tail_spaces)
+
+                rounded_child_widthes = iteround.saferound(
+                    child_widthes, 0, topline=parent_width
                 )
+
+                offset = my_map.offset
+                total_children = len(frame.children)
+                for index, child in enumerate(frame.children):
+                    child_width = int(rounded_child_widthes[index])
+                    followspaces = 0
+                    if index == total_children - 1:  # last one
+                        if tail_spaces >= 0:
+                            followspaces = int(tail_spaces)
+                    frame_maps.setdefault(child._id, []).append(
+                        FrameMap(
+                            offset=offset,
+                            width=child_width,
+                            followspaces=followspaces,
+                        )
+                    )
+                    offset += child_width
+
+            for child in frame.children:
+                _generate_for_children(child)
+
+        _generate_for_children(current_focused_stack)
+
+        return frame_maps
+
+    def render_line(self, y: int) -> Strip:
+        # logger.info("container_size: %s", self.container_size)
+        line = self.profile.lines[y]
+
+        if not self.frame_maps:
+            raise Exception("frame_maps is not init yet!")
+
+        segments = []
+        cursor = 0
+        for frame in line:
+            frame_maps = self.frame_maps.get(frame._id)
+            if not frame_maps:
+                logger.debug(
+                    "frame %s not found in frame_map, not render this.", frame
+                )
+                continue
+            frame_map = frame_maps[self.sample_index]
+            my_width = frame_map.width
+            if not my_width:
+                continue
+
+            text = "▏" + frame.display_name
+            offset = frame_map.offset
+            pre_pad = offset - cursor
+
+            if pre_pad > 0:
+                segments.append(Segment(" " * pre_pad))
+                cursor += pre_pad
+            elif pre_pad < 0:
+                raise Exception("Prepad is negative! {}".format(pre_pad))
+
+            if len(text) < my_width:
+                text += " " * (my_width - len(text))
+            if len(text) > my_width:
+                text = text[:my_width]
+
+            display_color = frame.display_color
+
+            if frame is self.view_frame:
+                display_color = Color.parse(VIEW_INFO_COLOR)
+
+            if my_width > 0:
+                # | is always default color
+                segments.append(
+                    Segment(
+                        text[0],
+                        Style(
+                            bgcolor=display_color.rich_color,
+                        ),
+                    )
+                )
+            if my_width > 1:
+                segments.append(
+                    Segment(
+                        text[1:],
+                        Style(
+                            color=display_color.get_contrast_text().rich_color,
+                            bgcolor=display_color.rich_color,
+                        ),
+                    )
+                )
+            cursor += my_width
+
+            logger.debug(
+                "%s in line %d, frame_map=%s",
+                frame,
+                y,
+                frame_map,
             )
 
-        self.parents_that_only_one_child = parents_that_only_one_child
+        strip = Strip(segments)
+        return strip
 
-        return parent_widgets
-
-    def _get_frames_should_render(self, frame) -> int:
-        if frame.values[self.sample_index] == 0:
-            return 0
-
-        count = 1
-        for c in frame.children:
-            count += self._get_frames_should_render(c)
-
-        return count
+    def on_resize(self, resize_event: Resize):
+        size = resize_event.size
+        virtual_size = resize_event.virtual_size
+        logger.info(
+            "FlameGraph got Resize event, size=%s, virtual_size=%s",
+            size,
+            virtual_size,
+        )
 
     @property
     def sample_unit(self):
         return self.profile.sample_types[self.sample_index].sample_unit
-
-    async def watch_focused_stack_id(
-        self,
-        focused_stack_id,
-    ):
-        logger.info(f"{focused_stack_id=} changed")
-        await self._rerender()
-
-    async def watch_sample_index(self, new_sample_index):
-        logger.info("sample_index changed to %d", new_sample_index)
-        await self._rerender()
-
-    async def _rerender(self):
-        stack = self.profile.id_store[self.focused_stack_id]
-        logger.info("re-render the new focused_stack: %s", stack.name)
-
-        try:
-            old_container = self.query_one("#flamegraph-container")
-        except NoMatches:
-            logger.warning(
-                "Can not find the old_container of #flamegraph-container"
-            )
-        else:
-            old_container.remove()
-
-        new_flame = self.get_flamegraph()
-        await self.mount(new_flame)
-
-        # reset view_info_stack after new flamegraph is mounted
-        # self._set_new_viewinfostack(stack)
-
-        self.focus()
-
-        # force set class add the view_frame class back
-        self.post_message(self.ViewFrameChanged(stack))
-        await self.watch_view_frame(stack, stack)
 
     def action_zoom_in(self):
         logger.info("Zoom in!")
@@ -184,38 +263,22 @@ class FlameGraph(Widget, can_focus=True):
     def action_move_down(self):
         logger.debug("move down")
         view_frame = self.view_frame
-        view_frame_id = view_frame._id
         children = view_frame.children
 
         if not children:
             logger.debug("no more children")
             return
 
-        if view_frame_id in self.parents_that_only_one_child:
-            new_view_info_frame = self.parents_that_only_one_child[
-                view_frame_id
-            ]
-            self.post_message(self.ViewFrameChanged(new_view_info_frame))
-        else:
-            # go to the biggest value
-            new_view_info_frame = self._get_biggest_exist_child(children)
-            if not new_view_info_frame:
-                logger.warn("Got no children displayed!")
-                return
-            self.post_message(self.ViewFrameChanged(new_view_info_frame))
+        # go to the biggest value
+        new_view_info_frame = self._get_biggest_exist_child(children)
+        if not new_view_info_frame:
+            logger.warn("Got no children displayed!")
+            return
+        self.post_message(self.ViewFrameChanged(new_view_info_frame))
 
     def _get_biggest_exist_child(self, stacks):
-        ordered = sorted(
-            stacks, key=lambda s: s.values[self.sample_index], reverse=True
-        )
-        for s in ordered:
-            _id = f"#{fgid(s._id)}"
-            try:
-                found = self.query_one(_id)
-                if found:
-                    return s
-            except NoMatches:
-                pass
+        biggest = max(stacks, key=lambda s: s.values[self.sample_index])
+        return biggest
 
     def action_move_up(self):
         logger.debug("move up")
@@ -232,7 +295,7 @@ class FlameGraph(Widget, can_focus=True):
 
         right = self._find_right_sibling(self.view_frame)
 
-        logger.debug("found right sibling: %s, %s", right, right.values)
+        logger.debug("found right sibling: %s", right)
         if not right:
             logger.debug("Got no right sibling")
             return
@@ -293,33 +356,3 @@ class FlameGraph(Widget, can_focus=True):
 
             me = my_parent
             my_parent = my_parent.parent
-
-    async def watch_view_frame(self, old, new):
-        if old:  # default is None
-            old_id = old._id
-            # delete old first
-            try:
-                old_dom = self.query_one(f"#{fgid(old_id)}")
-                logger.info("delete class from old span: %s", old_dom)
-                old_dom.remove_class("view-info-span")
-            except NoMatches:
-                logger.warning(
-                    "try to remove view-info-span class from span, but not"
-                    " found"
-                )
-
-        # set new one
-        new_id = new._id
-        _add_id = f"#{fgid(new_id)}"
-        try:
-            new_view = self.query_one(_add_id)
-        except NoMatches:
-            logger.critical(
-                "Not found when try to add class view-info-span to a Span,"
-                " id={}".format(_add_id)
-            )
-            return
-        else:
-            logger.info("add class to %s", new_view)
-            new_view.add_class("view-info-span")
-            new_view.scroll_visible()
