@@ -212,7 +212,9 @@ class FlameGraph(Widget, can_focus=True):
                 self.focused_stack_id
             ]
             if y <= expand_before_line:
-                display_color = display_color.blend(Color.parse("black"), 0.5)
+                display_color = display_color.blend(
+                    Color.parse("#b20000"), 0.7
+                )
 
             if frame is self.view_frame:
                 display_color = Color.parse(VIEW_INFO_COLOR)
