@@ -1,6 +1,6 @@
 from click.testing import CliRunner
 from flameshow.main import main, ensure_tty
-from unittest.mock import patch, Mock
+from unittest.mock import patch, MagicMock
 
 
 def test_print_version():
@@ -26,11 +26,14 @@ def test_run_app(mock_os, data_dir):
 @patch("flameshow.main.os")
 def test_ensure_tty_when_its_not(mock_os, mock_sys):
     mock_os.isatty.return_value = False
-    ensure_tty()
+    opened_fd = object()
+    mock_os.fdopen.return_value = opened_fd
 
-    fake_stdin = Mock()
+    fake_stdin = MagicMock()
     mock_sys.stdin = fake_stdin
+
+    ensure_tty()
 
     fake_stdin.close.assert_called()
     assert hasattr(mock_sys, "stdin")
-    assert mock_sys.stdin.fileno == 2
+    assert mock_sys.stdin is opened_fd
