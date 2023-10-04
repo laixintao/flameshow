@@ -266,11 +266,3 @@ class FlameshowApp(App):
     @property
     def sample_unit(self):
         return self.profile.sample_types[self.sample_index].sample_unit
-
-    def is_span_exist(self, span_id):
-        _id = f"#{fgid(span_id)}"
-        try:
-            self.query_one(_id)
-            return True
-        except NoMatches:
-            return False
