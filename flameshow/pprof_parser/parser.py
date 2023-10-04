@@ -213,6 +213,7 @@ class ProfileParser:
         pprof_profile.id_store = self.id_store
         pprof_profile.total_sample = len(pbdata.sample)
         pprof_profile.highest_lines = self.highest
+        pprof_profile.init_lines()
 
         return pprof_profile
 

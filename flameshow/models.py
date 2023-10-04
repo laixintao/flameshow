@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 import datetime
 import logging
+import time
 from typing import Dict, List
 from typing_extensions import Self
 
@@ -99,7 +100,41 @@ class Profile:
     period_type: SampleType | None = None
     period: int = 0
 
-    # TODO parse using protobuf
     root_stack: Frame | None = None
     highest_lines: int = 0
     total_sample: int = 0
+
+    lines: List = field(default_factory=list)
+
+    def init_lines(self):
+        """
+        init_lines must be called before render
+        """
+        t1 = time.time()
+        logger.info("start to create lines...")
+
+        root = self.root_stack
+
+        lines = [
+            [root],
+        ]
+        current = [root.children]
+        line_no = 1
+
+        while len(current) > 0:
+            line = []
+            next_line = []
+
+            for children_group in current:
+                for child in children_group:
+                    line.append(child)
+                    next_line.append(child.children)
+
+            lines.append(line)
+            line_no += 1
+            current = next_line
+
+        t2 = time.time()
+        logger.info("create lines done, took %.2f seconds", t2 - t1)
+        self.lines = lines
+        return lines
