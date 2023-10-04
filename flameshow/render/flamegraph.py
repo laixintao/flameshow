@@ -26,7 +26,7 @@ from flameshow.models import Frame
 
 logger = logging.getLogger(__name__)
 
-FrameMap = namedtuple("FrameMap", "offset width followspaces")
+FrameMap = namedtuple("FrameMap", "offset width")
 
 
 def add_array(arr1, arr2):
@@ -135,32 +135,19 @@ class FlameGraph(Widget, can_focus=True):
                 # child total is not 100% of parent, so tail need to be here
                 # to take some spaces
                 tail_spaces = float(parent_width - sum(child_widthes))
-                if tail_spaces < 0:
-                    logger.warning(
-                        "Child total width is larger than parent: %f",
-                        tail_spaces,
-                    )
-                    tail_spaces = 0.0
-                else:
+                if tail_spaces > 0:
                     child_widthes.append(tail_spaces)
-
                 rounded_child_widthes = iteround.saferound(
                     child_widthes, 0, topline=parent_width
                 )
 
                 offset = my_map.offset
-                total_children = len(frame.children)
                 for index, child in enumerate(frame.children):
                     child_width = int(rounded_child_widthes[index])
-                    followspaces = 0
-                    if index == total_children - 1:  # last one
-                        if tail_spaces >= 0:
-                            followspaces = int(tail_spaces)
                     frame_maps.setdefault(child._id, []).append(
                         FrameMap(
                             offset=offset,
                             width=child_width,
-                            followspaces=followspaces,
                         )
                     )
                     offset += child_width

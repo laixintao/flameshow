@@ -33,9 +33,9 @@ def test_flamegraph_generate_frame_maps_parents_with_only_child():
     print(frame_maps)
 
     assert frame_maps == {
-        0: [FrameMap(offset=0, width=20, followspaces=0)],
-        1: [FrameMap(offset=0, width=16, followspaces=4)],
-        2: [FrameMap(offset=0, width=8, followspaces=8)],
+        0: [FrameMap(offset=0, width=20)],
+        1: [FrameMap(offset=0, width=16)],
+        2: [FrameMap(offset=0, width=8)],
     }
 
 
@@ -81,20 +81,20 @@ def test_flamegraph_generate_frame_maps():
     frame_maps = flamegraph_widget.generate_frame_maps(20, 1)
 
     assert frame_maps == {
-        0: [FrameMap(offset=0, width=20, followspaces=0)],
-        1: [FrameMap(offset=0, width=20, followspaces=0)],
-        2: [FrameMap(offset=0, width=5, followspaces=0)],
-        3: [FrameMap(offset=5, width=10, followspaces=5)],
+        0: [FrameMap(offset=0, width=20)],
+        1: [FrameMap(offset=0, width=20)],
+        2: [FrameMap(offset=0, width=5)],
+        3: [FrameMap(offset=5, width=10)],
     }
 
     # focus on 1
     frame_maps = flamegraph_widget.generate_frame_maps(20, 1)
 
     assert frame_maps == {
-        0: [FrameMap(offset=0, width=20, followspaces=0)],
-        1: [FrameMap(offset=0, width=20, followspaces=0)],
-        2: [FrameMap(offset=0, width=5, followspaces=0)],
-        3: [FrameMap(offset=5, width=10, followspaces=5)],
+        0: [FrameMap(offset=0, width=20)],
+        1: [FrameMap(offset=0, width=20)],
+        2: [FrameMap(offset=0, width=5)],
+        3: [FrameMap(offset=5, width=10)],
     }
 
 
@@ -124,7 +124,7 @@ def test_flamegraph_generate_frame_maps_child_width_0():
     frame_maps = flamegraph_widget.generate_frame_maps(20, 1)
 
     assert frame_maps == {
-        1: [FrameMap(offset=0, width=20, followspaces=0)],
-        0: [FrameMap(offset=0, width=20, followspaces=0)],
-        2: [FrameMap(offset=0, width=0, followspaces=20)],
+        1: [FrameMap(offset=0, width=20)],
+        0: [FrameMap(offset=0, width=20)],
+        2: [FrameMap(offset=0, width=00)],
     }
