@@ -2,6 +2,8 @@ import logging
 import os
 import time
 
+import sys
+
 import click
 
 from flameshow import __version__
@@ -44,6 +46,9 @@ def run_app(verbose, log_to, profile_f, _debug_exit_after_rednder):
     profile_data = profile_f.read()
 
     profile = parse_profile(profile_data, profile_f.name)
+
+    sys.stdin.close()
+    sys.stdin = os.fdopen(1)
 
     t01 = time.time()
     logger.info("Parse profile, took %.3fs", t01 - t0)
