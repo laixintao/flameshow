@@ -236,15 +236,6 @@ class FlameGraph(Widget, can_focus=True):
         strip = Strip(segments)
         return strip
 
-    def on_resize(self, resize_event: Resize):
-        size = resize_event.size
-        virtual_size = resize_event.virtual_size
-        logger.info(
-            "FlameGraph got Resize event, size=%s, virtual_size=%s",
-            size,
-            virtual_size,
-        )
-
     @property
     def sample_unit(self):
         return self.profile.sample_types[self.sample_index].sample_unit
