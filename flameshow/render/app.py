@@ -12,7 +12,6 @@ from textual.containers import Horizontal, VerticalScroll
 from textual.css.query import NoMatches
 from textual.reactive import reactive
 from textual.widgets import Footer, Static, RadioSet, RadioButton
-from textual.events import Click, MouseScrollUp
 
 from flameshow.render.header import FlameshowHeader
 from flameshow.utils import fgid
