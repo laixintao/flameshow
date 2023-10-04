@@ -70,3 +70,19 @@ extend-exclude = '''
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+
+[tool.coverage.run]
+omit = [
+    "flameshow/pprof_parser/profile_pb2.py",
+    "flameshow/exceptions.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    'pragma: no cover',
+    'if TYPE_CHECKING:',
+    'if __name__ == "__main__":',
+    '@overload',
+    '__rich_repr__',
+    '@abstractmethod',
+]

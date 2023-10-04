@@ -1,4 +1,4 @@
-.PHONY: proto
+.PHONY: proto run-test
 
 proto:
 	docker run --rm -v${PWD}:${PWD} -w${PWD} namely/protoc-all --proto_path=${PWD}/proto \
@@ -16,3 +16,7 @@ patch: bump_patch
 
 _perf_startup:
 	sudo py-spy record python _perf_main.py
+
+run-test:
+	rm -rf htmlcov && pytest --cov-report html --cov=flameshow -vv --disable-warnings
+	open htmlcov/index.html
