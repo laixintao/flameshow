@@ -11,10 +11,22 @@ def test_print_version():
         assert result.output == "1.2.3\n"
 
 
-def test_run_app():
+def test_run_app(data_dir):
     runner = CliRunner()
     result = runner.invoke(
-        main, ["tests/pprof_data/profile-10seconds.out"], input="q"
+        main, [str(data_dir / "profile-10seconds.out")], input="q"
     )
+
+    assert result.exit_code == 0
+
+
+def test_run_app_with_pipe(data_dir):
+    runner = CliRunner()
+    with open(data_dir / "profile-10seconds.out", "br") as f:
+        import sys
+
+        sys.stdin = f
+
+        result = runner.invoke(main, ["-"], input="q")
 
     assert result.exit_code == 0
