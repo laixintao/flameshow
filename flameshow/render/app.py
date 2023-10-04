@@ -39,6 +39,11 @@ class FlameGraphScroll(VerticalScroll, inherit_bindings=False):
         Binding("pagedown", "page_down", "Page Down", show=False),
     ]
 
+    def scroll_to_make_line_center(self, line_no):
+        height = self.size.height
+        start_line = max(0, line_no - round(height / 2))
+        self.scroll_to(y=start_line)
+
 
 class FlameshowApp(App):
     BINDINGS = [
@@ -203,14 +208,12 @@ class FlameshowApp(App):
         new_frame = e.frame
         self.view_frame = new_frame
 
-        with self.batch_update():
-            flamegraph = self.query_one("FlameGraph")
-            flamegraph.view_frame = new_frame
+        flamegraph = self.query_one("FlameGraph")
+        flamegraph.view_frame = new_frame
 
-            region = flamegraph.get_scroll_region(new_frame)
-            if region:
-                container = self.query_one("#flamegraph-out-container")
-                container.scroll_to_region(region)
+        frame_line_no = self.profile.frameid_to_lineno[new_frame._id]
+        container = self.query_one("#flamegraph-out-container")
+        container.scroll_to_make_line_center(line_no=frame_line_no)
 
     async def watch_sample_index(self, sample_index):
         logger.info("sample index changed to %d", sample_index)

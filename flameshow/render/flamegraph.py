@@ -9,7 +9,7 @@ from rich.segment import Segment
 from rich.style import Style
 from textual.binding import Binding
 from textual.color import Color
-from textual.events import Resize
+from textual.events import Resize, MouseMove
 from textual.geometry import Region
 from textual.message import Message
 from textual.reactive import reactive
@@ -71,16 +71,13 @@ class FlameGraph(Widget, can_focus=True):
         # pre-render
         self.frame_maps = None
 
-        # manually maintain the offset
-        self.current_crop = None
-
     def render_lines(self, crop):
         my_width = crop.size.width
         self.frame_maps = self.generate_frame_maps(
             my_width, self.focused_stack_id
         )
 
-        self.current_crop = crop
+        logger.info("render crop: %s", crop)
 
         return super().render_lines(crop)
 
@@ -284,17 +281,6 @@ class FlameGraph(Widget, can_focus=True):
             return
         self.post_message(self.ViewFrameChanged(new_view_info_frame))
 
-    def get_scroll_region(self, frame) -> Union[None, Region]:
-        crop = self.current_crop
-        frame_line_no = self.profile.frameid_to_lineno[frame._id]
-        start_y = max(0, frame_line_no - round(crop.height / 2))
-        if start_y == crop.y == 0:
-            return None
-        display_region = Region(crop.x, start_y, crop.width, crop.height)
-        logger.info("scroll to %s", display_region)
-        # self.scroll_to_region(display_region, top=True)
-        return display_region
-
     def _get_biggest_exist_child(self, stacks):
         biggest = max(stacks, key=lambda s: s.values[self.sample_index])
         return biggest
@@ -375,3 +361,23 @@ class FlameGraph(Widget, can_focus=True):
 
             me = my_parent
             my_parent = my_parent.parent
+
+    def on_mouse_move(self, event: MouseMove) -> None:
+        line_no = event.y
+        x = event.x
+
+        line = self.profile.lines[line_no]
+
+        hover_frame = None
+        for frame in line:
+            frame_map = self.frame_maps[frame._id][self.sample_index]
+            offset = frame_map.offset
+            width = frame_map.offset
+
+            if offset + width > x:  # find it!
+                hover_frame = frame
+                break
+
+        logger.info(
+            "mouse hover on: %s, line_no=%s, x=%s", hover_frame, line_no, x
+        )
