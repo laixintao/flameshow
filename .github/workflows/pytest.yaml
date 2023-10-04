@@ -42,7 +42,13 @@ jobs:
       - name: Install dependencies
         run: poetry install
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+
       - name: Test with pytest
         run: |
           source $VENV
           pytest tests -v --cov=./flameshow --cov-report=xml:./coverage.xml --cov-report term-missing
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
