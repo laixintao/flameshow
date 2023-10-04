@@ -2,15 +2,15 @@ from collections import namedtuple
 from functools import lru_cache
 import logging
 import time
-from typing import Dict, List, Union
+from typing import Dict, List
 
 import iteround
 from rich.segment import Segment
 from rich.style import Style
+from textual import on
 from textual.binding import Binding
 from textual.color import Color
-from textual.events import Resize, MouseMove
-from textual.geometry import Region
+from textual.events import Click, MouseMove, Resize, MouseEvent
 from textual.message import Message
 from textual.reactive import reactive
 from textual.strip import Strip
@@ -45,9 +45,10 @@ class FlameGraph(Widget, can_focus=True):
     class ViewFrameChanged(Message):
         """View Frame changed"""
 
-        def __init__(self, frame) -> None:
+        def __init__(self, frame, by_mouse=False) -> None:
             super().__init__()
             self.frame = frame
+            self.by_mouse = by_mouse
 
         def __repr__(self) -> str:
             return f"ViewFrameChanged({self.frame=})"
@@ -70,6 +71,8 @@ class FlameGraph(Widget, can_focus=True):
 
         # pre-render
         self.frame_maps = None
+
+        self.visible_start_y = 0
 
     def render_lines(self, crop):
         my_width = crop.size.width
@@ -363,21 +366,33 @@ class FlameGraph(Widget, can_focus=True):
             my_parent = my_parent.parent
 
     def on_mouse_move(self, event: MouseMove) -> None:
-        line_no = event.y
+        hover_frame = self.get_frame_under_mouse(event)
+        if hover_frame:
+            logger.info("mouse hover on %s", hover_frame)
+            self.post_message(self.ViewFrameChanged(hover_frame, by_mouse=True))
+
+    @on(Click)
+    def handle_click_frame(self, event: Click):
+        frame = self.get_frame_under_mouse(event)
+        self.focused_stack_id = frame._id
+
+    def get_frame_under_mouse(self, event: MouseEvent):
+        line_no = event.y + self.visible_start_y
         x = event.x
+
+        if line_no >= len(self.profile.lines):
+            return
 
         line = self.profile.lines[line_no]
 
-        hover_frame = None
         for frame in line:
-            frame_map = self.frame_maps[frame._id][self.sample_index]
+            frame_maps = self.frame_maps.get(frame._id)
+            if not frame_maps:
+                # this frame not exist in current render
+                continue
+            frame_map = frame_maps[self.sample_index]
             offset = frame_map.offset
-            width = frame_map.offset
+            width = frame_map.width
 
             if offset + width > x:  # find it!
-                hover_frame = frame
-                break
-
-        logger.info(
-            "mouse hover on: %s, line_no=%s, x=%s", hover_frame, line_no, x
-        )
+                return frame

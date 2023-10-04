@@ -43,6 +43,7 @@ class FlameGraphScroll(VerticalScroll, inherit_bindings=False):
         height = self.size.height
         start_line = max(0, line_no - round(height / 2))
         self.scroll_to(y=start_line)
+        return start_line
 
 
 class FlameshowApp(App):
@@ -206,14 +207,20 @@ class FlameshowApp(App):
     async def handle_view_frame_changed(self, e):
         logger.debug("app handle_view_frame_changed...")
         new_frame = e.frame
+        by_mouse = e.by_mouse
         self.view_frame = new_frame
 
         flamegraph = self.query_one("FlameGraph")
         flamegraph.view_frame = new_frame
 
-        frame_line_no = self.profile.frameid_to_lineno[new_frame._id]
-        container = self.query_one("#flamegraph-out-container")
-        container.scroll_to_make_line_center(line_no=frame_line_no)
+        if not by_mouse:
+            frame_line_no = self.profile.frameid_to_lineno[new_frame._id]
+            container = self.query_one("#flamegraph-out-container")
+            start_line = container.scroll_to_make_line_center(
+                line_no=frame_line_no
+            )
+
+            flamegraph.visible_start_y = start_line
 
     async def watch_sample_index(self, sample_index):
         logger.info("sample index changed to %d", sample_index)
