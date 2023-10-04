@@ -70,7 +70,6 @@ class FlameGraph(Widget, can_focus=True):
         # pre-render
         self.frame_maps = None
 
-
     def render_lines(self, crop):
         logger.info("render_lines!! crop: %s", crop)
         my_width = crop.size.width
