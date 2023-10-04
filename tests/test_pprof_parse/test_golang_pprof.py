@@ -2,8 +2,6 @@ import datetime
 import json
 import json
 
-import pytest
-
 from flameshow.pprof_parser.parser import ProfileParser
 from flameshow.pprof_parser.parser import (
     Function,
@@ -43,6 +41,7 @@ def test_golang_goroutine_parse_using_protobuf(goroutine_pprof):
     assert profile.period_type.sample_unit == "count"
     assert profile.period == 1
     assert profile.default_sample_type_index == -1
+    assert profile.highest_lines == 24
 
 
 def test_golang_profile10s_parse_using_protobuf(profile10s):
@@ -145,46 +144,3 @@ def test_protobuf_parse_gorouting_mapping(goroutine_pprof):
         start_line=0,
         system_name="runtime.gopark",
     )
-
-
-@pytest.mark.skip(reason="todo, support json")
-def test_parse_sample_location_with_multiple_lines(data_dir):
-    parser = ProfileParser("abc")
-    with open(data_dir / "sample_location_line_multiple.json") as f:
-        content = json.load(f)
-
-    profile = parser.parse(content)
-    root = profile.root_stack
-
-    names = []
-    while root.children:
-        c0 = root.children[0]
-        names.append(c0.name)
-        root = c0
-
-    assert names == [
-        "github.com/prometheus/node_exporter/collector.NodeCollector.Collect.func1",
-        "github.com/prometheus/node_exporter/collector.execute",
-        "github.com/prometheus/node_exporter/collector.(*meminfoCollector).Update",
-        "github.com/prometheus/node_exporter/collector.(*meminfoCollector).getMemInfo",
-        "github.com/prometheus/node_exporter/collector.procFilePath",
-        "path/filepath.Join",
-        "path/filepath.join",
-        "strings.Join",
-        "strings.(*Builder).Grow",
-        "strings.(*Builder).grow",
-        "runtime.makeslice",
-        "runtime.newstack",
-        "runtime.copystack",
-        "runtime.gentraceback",
-    ]
-
-
-@pytest.mark.skip(reason="todo, support json")
-def test_parse_max_depth_when_have_multiple_lines(data_dir):
-    parser = ProfileParser("abc")
-    with open(data_dir / "profile10s_node_exporter.json") as f:
-        content = json.load(f)
-
-    profile = parser.parse(content)
-    assert profile.highest_lines == 26
