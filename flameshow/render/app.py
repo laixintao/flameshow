@@ -18,7 +18,6 @@ from flameshow.render.header import FlameshowHeader
 from flameshow.utils import fgid
 from flameshow import __version__
 
-from .span import Span
 from .flamegraph import FlameGraph
 
 logger = logging.getLogger(__name__)
@@ -183,13 +182,6 @@ class FlameshowApp(App):
         for c in node.children:
             logger.debug("%s %s", indent * " ", c)
             self.__debug_dom(c, indent + 2)
-
-    @on(Span.SpanSelected)
-    def handle_span_select(self, message):
-        logger.info("app message: %s", message)
-        newid = message.stack_id
-
-        self.focused_stack_id = newid
 
     @on(Click)
     def handle_switch_to_mouse(self):

@@ -205,6 +205,7 @@ class ProfileParser:
             id_store=self.id_store,
         )
 
+        # default is 0, by the doc, default should be the last one
         if pbdata.default_sample_type:
             pprof_profile.default_sample_type_index = (
                 pbdata.default_sample_type
