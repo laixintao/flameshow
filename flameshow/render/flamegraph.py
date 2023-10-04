@@ -2,7 +2,7 @@ from collections import namedtuple
 from functools import lru_cache
 import logging
 import time
-from typing import Dict, List
+from typing import Dict, List, Union
 
 import iteround
 from rich.segment import Segment
@@ -10,7 +10,7 @@ from rich.style import Style
 from textual import on
 from textual.binding import Binding
 from textual.color import Color
-from textual.events import Click, MouseMove, Resize, MouseEvent
+from textual.events import Click, MouseEvent, MouseMove, Resize
 from textual.message import Message
 from textual.reactive import reactive
 from textual.strip import Strip
@@ -21,6 +21,7 @@ from flameshow.const import (
     SELECTED_PARENTS_BG_COLOR_BLEND_TO,
     VIEW_INFO_COLOR,
 )
+from flameshow.models import Frame
 
 
 logger = logging.getLogger(__name__)
@@ -379,9 +380,10 @@ class FlameGraph(Widget, can_focus=True):
     @on(Click)
     def handle_click_frame(self, event: Click):
         frame = self.get_frame_under_mouse(event)
-        self.focused_stack_id = frame._id
+        if frame:
+            self.focused_stack_id = frame._id
 
-    def get_frame_under_mouse(self, event: MouseEvent):
+    def get_frame_under_mouse(self, event: MouseEvent) -> Union[None, Frame]:
         line_no = event.y
         x = event.x
 
