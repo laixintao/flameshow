@@ -10,7 +10,7 @@ from rich.style import Style
 from textual import on
 from textual.binding import Binding
 from textual.color import Color
-from textual.events import Click, MouseEvent, MouseMove, Resize
+from textual.events import Click, MouseEvent, MouseMove
 from textual.message import Message
 from textual.reactive import reactive
 from textual.strip import Strip

@@ -156,4 +156,4 @@ def test_flamegraph_render_line():
 
     line_strings = [seg.text for seg in strip._segments]
 
-    assert line_strings == ['▏', 's1 ', '▏', 's2']
+    assert line_strings == ["▏", "s1 ", "▏", "s2"]
