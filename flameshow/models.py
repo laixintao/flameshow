@@ -89,24 +89,26 @@ class SampleType:
 
 @dataclass
 class Profile:
-    filename: str = ""
+    # required
+    filename: str
+    root_stack: Frame
+    highest_lines: int
+    # total samples is one top most sample, it's a list that contains all
+    # its parents all the way up
+    total_sample: int
+    sample_types: List[SampleType]
+    id_store: Dict[int, Frame]
 
-    created_at: datetime.datetime | None = None
-    id_store: Dict[int, Frame] = field(default_factory=dict)
-
-    sample_types: List[SampleType] = field(default_factory=list)
+    # optional
     default_sample_type_index: int = -1
-
     period_type: SampleType | None = None
     period: int = 0
+    created_at: datetime.datetime | None = None
 
-    root_stack: Frame | None = None
-    highest_lines: int = 0
-    total_sample: int = 0
+    # init by post_init
+    lines: List = field(init=False)
 
-    lines: List = field(default_factory=list)
-
-    def init_lines(self):
+    def __post_init__(self):
         """
         init_lines must be called before render
         """
@@ -118,17 +120,16 @@ class Profile:
         lines = [
             [root],
         ]
-        current = [root.children]
+        current = root.children
         line_no = 1
 
         while len(current) > 0:
             line = []
             next_line = []
 
-            for children_group in current:
-                for child in children_group:
-                    line.append(child)
-                    next_line.append(child.children)
+            for child in current:
+                line.append(child)
+                next_line.extend(child.children)
 
             lines.append(line)
             line_no += 1
@@ -137,4 +138,3 @@ class Profile:
         t2 = time.time()
         logger.info("create lines done, took %.2f seconds", t2 - t1)
         self.lines = lines
-        return lines

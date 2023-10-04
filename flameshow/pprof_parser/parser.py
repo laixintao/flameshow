@@ -9,7 +9,7 @@ import datetime
 import gzip
 import logging
 import os
-from typing import List
+from typing import Dict, List
 
 from flameshow.models import Frame, Profile, SampleType
 from flameshow.utils import sizeof
@@ -164,7 +164,7 @@ class ProfileParser:
         self.locations = []
         self.highest = 0
 
-        self.id_store = {self.root._id: self.root}
+        self.id_store: Dict[int, Frame] = {self.root._id: self.root}
 
     def idgenerator(self):
         i = self.next_id
@@ -185,23 +185,10 @@ class ProfileParser:
         pbdata = unmarshal(binary_data)
         self.parse_internal_data(pbdata)
 
-        pprof_profile = Profile()
-        pprof_profile.filename = self.filename
-        pprof_profile.sample_types = self.parse_sample_types(
-            pbdata.sample_type
-        )
-        pprof_profile.created_at = self.parse_created_at(pbdata.time_nanos)
-        pprof_profile.period = pbdata.period
-        pprof_profile.period_type = self.to_smaple_type(pbdata.period_type)
+        sample_types = self.parse_sample_types(pbdata.sample_type)
 
-        if pbdata.default_sample_type:
-            pprof_profile.default_sample_type_index = (
-                pbdata.default_sample_type
-            )
-
-        # WIP
         root = self.root
-        root.values = [0] * len(pprof_profile.sample_types)
+        root.values = [0] * len(sample_types)
         for pbsample in pbdata.sample:
             child_frame = self.parse_sample(pbsample)
             if not child_frame:
@@ -209,11 +196,23 @@ class ProfileParser:
             root.values = list(map(sum, zip(root.values, child_frame.values)))
             root.pile_up(child_frame)
 
-        pprof_profile.root_stack = root
-        pprof_profile.id_store = self.id_store
-        pprof_profile.total_sample = len(pbdata.sample)
-        pprof_profile.highest_lines = self.highest
-        pprof_profile.init_lines()
+        pprof_profile = Profile(
+            filename=self.filename,
+            root_stack=root,
+            highest_lines=self.highest,
+            total_sample=len(pbdata.sample),
+            sample_types=sample_types,
+            id_store=self.id_store,
+        )
+
+        if pbdata.default_sample_type:
+            pprof_profile.default_sample_type_index = (
+                pbdata.default_sample_type
+            )
+
+        pprof_profile.created_at = self.parse_created_at(pbdata.time_nanos)
+        pprof_profile.period = pbdata.period
+        pprof_profile.period_type = self.to_smaple_type(pbdata.period_type)
 
         return pprof_profile
 
