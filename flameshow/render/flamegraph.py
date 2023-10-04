@@ -110,7 +110,7 @@ class FlameGraph(Widget, can_focus=True):
         me = current_focused_stack
         while me:
             frame_maps[me._id] = [
-                FrameMap(0, width, 0) for _ in range(st_count)
+                FrameMap(0, width) for _ in range(st_count)
             ]
             me = me.parent
 
