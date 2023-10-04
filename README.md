@@ -1,6 +1,6 @@
 # Flameshow
 
-<a href="https://badge.fury.io/py/flameshow"><img src="https://badge.fury.io/py/flameshow.svg" alt="PyPI version"></a>
+[![PyPI](https://img.shields.io/pypi/v/flameshow.svg)](https://pypi.org/project/flameshow/)
 [![tests](https://github.com/laixintao/flameshow/actions/workflows/pytest.yaml/badge.svg?branch=main)](https://github.com/laixintao/flameshow/actions/workflows/pytest.yaml)
 [![codecov](https://codecov.io/gh/laixintao/flameshow/graph/badge.svg?token=XQCGN9GBL4)](https://codecov.io/gh/laixintao/flameshow)
 
