@@ -16,7 +16,11 @@ from textual.reactive import reactive
 from textual.strip import Strip
 from textual.widget import Widget
 
-from flameshow.const import VIEW_INFO_COLOR
+from flameshow.const import (
+    SELECTED_PARENTS_BG_COLOR_BLEND_FACTOR,
+    SELECTED_PARENTS_BG_COLOR_BLEND_TO,
+    VIEW_INFO_COLOR,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -213,7 +217,8 @@ class FlameGraph(Widget, can_focus=True):
             ]
             if y <= expand_before_line:
                 display_color = display_color.blend(
-                    Color.parse("#b20000"), 0.7
+                    Color.parse(SELECTED_PARENTS_BG_COLOR_BLEND_TO),
+                    SELECTED_PARENTS_BG_COLOR_BLEND_FACTOR,
                 )
 
             if frame is self.view_frame:
