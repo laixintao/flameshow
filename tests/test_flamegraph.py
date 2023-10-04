@@ -1,7 +1,4 @@
-import pytest
-
 from flameshow.pprof_parser.parser import Line, Profile, SampleType, PprofFrame
-from flameshow.render import FlameshowApp
 from flameshow.models import Frame
 from flameshow.render.flamegraph import FlameGraph, add_array, FrameMap
 
@@ -30,7 +27,6 @@ def test_flamegraph_generate_frame_maps_parents_with_only_child():
 
     # focus on 0 root
     frame_maps = flamegraph_widget.generate_frame_maps(20, 0)
-    print(frame_maps)
 
     assert frame_maps == {
         0: [FrameMap(offset=0, width=20)],
@@ -128,3 +124,36 @@ def test_flamegraph_generate_frame_maps_child_width_0():
         0: [FrameMap(offset=0, width=20)],
         2: [FrameMap(offset=0, width=00)],
     }
+
+
+def test_flamegraph_render_line():
+    root = Frame("root", 0, values=[10])
+    s1 = Frame("s1", 1, values=[4], parent=root)
+    s2 = Frame("s2", 2, values=[3], parent=root)
+
+    root.children = [s1, s2]
+
+    p = Profile(
+        filename="abc",
+        root_stack=root,
+        highest_lines=1,
+        total_sample=2,
+        sample_types=[SampleType("goroutine", "count")],
+        id_store={
+            0: root,
+            1: s1,
+            2: s2,
+        },
+    )
+    flamegraph_widget = FlameGraph(p, 0, -1, 0)
+    flamegraph_widget.frame_maps = flamegraph_widget.generate_frame_maps(
+        10, focused_stack_id=0
+    )
+
+    strip = flamegraph_widget.render_line(
+        1,
+    )
+
+    line_strings = [seg.text for seg in strip._segments]
+
+    assert line_strings == ['▏', 's1 ', '▏', 's2']
