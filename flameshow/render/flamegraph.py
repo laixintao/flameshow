@@ -109,9 +109,7 @@ class FlameGraph(Widget, can_focus=True):
         # set me to 100% and siblins to 0
         me = current_focused_stack
         while me:
-            frame_maps[me._id] = [
-                FrameMap(0, width) for _ in range(st_count)
-            ]
+            frame_maps[me._id] = [FrameMap(0, width) for _ in range(st_count)]
             me = me.parent
 
         logger.info("frame maps: %s", frame_maps)
