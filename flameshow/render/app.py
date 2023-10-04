@@ -12,7 +12,6 @@ from textual.containers import Horizontal, VerticalScroll
 from textual.css.query import NoMatches
 from textual.reactive import reactive
 from textual.widgets import Footer, Static, RadioSet, RadioButton
-from textual.events import Click
 
 from flameshow.render.header import FlameshowHeader
 from flameshow.utils import fgid
@@ -38,6 +37,12 @@ class FlameGraphScroll(VerticalScroll, inherit_bindings=False):
         Binding("pageup", "page_up", "Page Up", show=False),
         Binding("pagedown", "page_down", "Page Down", show=False),
     ]
+
+    def scroll_to_make_line_center(self, line_no):
+        height = self.size.height
+        start_line = max(0, line_no - round(height / 2))
+        self.scroll_to(y=start_line)
+        return start_line
 
 
 class FlameshowApp(App):
@@ -100,6 +105,8 @@ class FlameshowApp(App):
         else:
             self.sample_index = profile.default_sample_type_index
 
+        self.flamegraph_widget = None
+
     def on_mount(self):
         logger.info("mounted")
         self.title = "flameshow"
@@ -141,6 +148,7 @@ class FlameshowApp(App):
         )
         fg.styles.height = self.profile.highest_lines + 1
         fg.focus()
+        self.flamegraph_widget = fg
 
         yield FlameGraphScroll(
             fg,
@@ -187,10 +195,6 @@ class FlameshowApp(App):
             logger.debug("%s %s", indent * " ", c)
             self.__debug_dom(c, indent + 2)
 
-    @on(Click)
-    def handle_switch_to_mouse(self):
-        logger.debug("mouse click")
-
     @on(RadioSet.Changed)
     async def handle_radioset_changed(self, e):
         logger.info("event: %s", e)
@@ -201,16 +205,15 @@ class FlameshowApp(App):
     async def handle_view_frame_changed(self, e):
         logger.debug("app handle_view_frame_changed...")
         new_frame = e.frame
+        by_mouse = e.by_mouse
         self.view_frame = new_frame
 
-        with self.batch_update():
-            flamegraph = self.query_one("FlameGraph")
-            flamegraph.view_frame = new_frame
+        self.flamegraph_widget.view_frame = new_frame
 
-            region = flamegraph.get_scroll_region(new_frame)
-            if region:
-                container = self.query_one("#flamegraph-out-container")
-                container.scroll_to_region(region)
+        if not by_mouse:
+            frame_line_no = self.profile.frameid_to_lineno[new_frame._id]
+            container = self.query_one("#flamegraph-out-container")
+            container.scroll_to_make_line_center(line_no=frame_line_no)
 
     async def watch_sample_index(self, sample_index):
         logger.info("sample index changed to %d", sample_index)
@@ -225,9 +228,7 @@ class FlameshowApp(App):
             return
         header.center_text = center_text
 
-        # TODO cache it to self instead of query every time
-        flamegraph = self.query_one("FlameGraph")
-        flamegraph.sample_index = sample_index
+        self.flamegraph_widget.sample_index = sample_index
 
         self._update_span_detail(self.view_frame)
 
@@ -236,8 +237,7 @@ class FlameshowApp(App):
         focused_stack_id,
     ):
         logger.info(f"{focused_stack_id=} changed")
-        flamegraph_widget = self.query_one("FlameGraph")
-        flamegraph_widget.focused_stack_id = focused_stack_id
+        self.flamegraph_widget.focused_stack_id = focused_stack_id
 
     async def watch_view_frame(self, old, new_frame):
         logger.debug(

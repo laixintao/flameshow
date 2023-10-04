@@ -2,15 +2,15 @@ from collections import namedtuple
 from functools import lru_cache
 import logging
 import time
-from typing import Dict, List, Union
+from typing import Dict, List
 
 import iteround
 from rich.segment import Segment
 from rich.style import Style
+from textual import on
 from textual.binding import Binding
 from textual.color import Color
-from textual.events import Resize
-from textual.geometry import Region
+from textual.events import Click, MouseMove, Resize, MouseEvent
 from textual.message import Message
 from textual.reactive import reactive
 from textual.strip import Strip
@@ -45,9 +45,10 @@ class FlameGraph(Widget, can_focus=True):
     class ViewFrameChanged(Message):
         """View Frame changed"""
 
-        def __init__(self, frame) -> None:
+        def __init__(self, frame, by_mouse=False) -> None:
             super().__init__()
             self.frame = frame
+            self.by_mouse = by_mouse
 
         def __repr__(self) -> str:
             return f"ViewFrameChanged({self.frame=})"
@@ -71,16 +72,13 @@ class FlameGraph(Widget, can_focus=True):
         # pre-render
         self.frame_maps = None
 
-        # manually maintain the offset
-        self.current_crop = None
-
     def render_lines(self, crop):
         my_width = crop.size.width
         self.frame_maps = self.generate_frame_maps(
             my_width, self.focused_stack_id
         )
 
-        self.current_crop = crop
+        logger.info("render crop: %s", crop)
 
         return super().render_lines(crop)
 
@@ -284,17 +282,6 @@ class FlameGraph(Widget, can_focus=True):
             return
         self.post_message(self.ViewFrameChanged(new_view_info_frame))
 
-    def get_scroll_region(self, frame) -> Union[None, Region]:
-        crop = self.current_crop
-        frame_line_no = self.profile.frameid_to_lineno[frame._id]
-        start_y = max(0, frame_line_no - round(crop.height / 2))
-        if start_y == crop.y == 0:
-            return None
-        display_region = Region(crop.x, start_y, crop.width, crop.height)
-        logger.info("scroll to %s", display_region)
-        # self.scroll_to_region(display_region, top=True)
-        return display_region
-
     def _get_biggest_exist_child(self, stacks):
         biggest = max(stacks, key=lambda s: s.values[self.sample_index])
         return biggest
@@ -375,3 +362,37 @@ class FlameGraph(Widget, can_focus=True):
 
             me = my_parent
             my_parent = my_parent.parent
+
+    def on_mouse_move(self, event: MouseMove) -> None:
+        hover_frame = self.get_frame_under_mouse(event)
+        if hover_frame:
+            logger.info("mouse hover on %s", hover_frame)
+            self.post_message(
+                self.ViewFrameChanged(hover_frame, by_mouse=True)
+            )
+
+    @on(Click)
+    def handle_click_frame(self, event: Click):
+        frame = self.get_frame_under_mouse(event)
+        self.focused_stack_id = frame._id
+
+    def get_frame_under_mouse(self, event: MouseEvent):
+        line_no = event.y
+        x = event.x
+
+        if line_no >= len(self.profile.lines):
+            return
+
+        line = self.profile.lines[line_no]
+
+        for frame in line:
+            frame_maps = self.frame_maps.get(frame._id)
+            if not frame_maps:
+                # this frame not exist in current render
+                continue
+            frame_map = frame_maps[self.sample_index]
+            offset = frame_map.offset
+            width = frame_map.width
+
+            if offset + width > x:  # find it!
+                return frame
