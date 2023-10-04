@@ -108,6 +108,8 @@ class Profile:
     # init by post_init
     lines: List = field(init=False)
 
+    frameid_to_lineno: Dict[int, int] = field(init=False)
+
     def __post_init__(self):
         """
         init_lines must be called before render
@@ -120,6 +122,7 @@ class Profile:
         lines = [
             [root],
         ]
+        frameid_to_lineno = {0: 0}
         current = root.children
         line_no = 1
 
@@ -129,6 +132,7 @@ class Profile:
 
             for child in current:
                 line.append(child)
+                frameid_to_lineno[child._id] = line_no
                 next_line.extend(child.children)
 
             lines.append(line)
@@ -138,3 +142,4 @@ class Profile:
         t2 = time.time()
         logger.info("create lines done, took %.2f seconds", t2 - t1)
         self.lines = lines
+        self.frameid_to_lineno = frameid_to_lineno

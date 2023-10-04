@@ -25,9 +25,13 @@ logger = logging.getLogger(__name__)
 
 class FlameGraphScroll(VerticalScroll, inherit_bindings=False):
     BINDINGS: ClassVar[list[BindingType]] = [
-        Binding("b", "scroll_up", "Scroll Up", show=True, key_display="B"),
+        Binding("b", "page_up", "Scroll Page Up", show=True, key_display="B"),
         Binding(
-            "f,space", "scroll_down", "Scroll Down", show=True, key_display="F"
+            "f,space",
+            "page_down",
+            "Scroll Page Down",
+            show=True,
+            key_display="F",
         ),
         Binding("home", "scroll_home", "Scroll Home", show=False),
         Binding("end", "scroll_end", "Scroll End", show=False),
@@ -199,8 +203,14 @@ class FlameshowApp(App):
         new_frame = e.frame
         self.view_frame = new_frame
 
-        flamegraph = self.query_one("FlameGraph")
-        flamegraph.view_frame = new_frame
+        with self.batch_update():
+            flamegraph = self.query_one("FlameGraph")
+            flamegraph.view_frame = new_frame
+
+            region = flamegraph.get_scroll_region(new_frame)
+            if region:
+                container = self.query_one("#flamegraph-out-container")
+                container.scroll_to_region(region)
 
     async def watch_sample_index(self, sample_index):
         logger.info("sample index changed to %d", sample_index)

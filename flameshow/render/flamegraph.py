@@ -2,7 +2,7 @@ from collections import namedtuple
 from functools import lru_cache
 import logging
 import time
-from typing import Dict, List
+from typing import Dict, List, Union
 
 import iteround
 from rich.segment import Segment
@@ -10,6 +10,7 @@ from rich.style import Style
 from textual.binding import Binding
 from textual.color import Color
 from textual.events import Resize
+from textual.geometry import Region
 from textual.message import Message
 from textual.reactive import reactive
 from textual.strip import Strip
@@ -70,15 +71,17 @@ class FlameGraph(Widget, can_focus=True):
         # pre-render
         self.frame_maps = None
 
+        # manually maintain the offset
+        self.current_crop = None
+
     def render_lines(self, crop):
-        logger.info("render_lines!! crop: %s", crop)
         my_width = crop.size.width
-        t1 = time.time()
         self.frame_maps = self.generate_frame_maps(
             my_width, self.focused_stack_id
         )
-        t2 = time.time()
-        logger.info("Generates frame maps, took %.4f seconds", t2 - t1)
+
+        self.current_crop = crop
+
         return super().render_lines(crop)
 
     @lru_cache
@@ -88,6 +91,7 @@ class FlameGraph(Widget, can_focus=True):
 
         only re-computes with width, focused_stack changing
         """
+        t1 = time.time()
         logger.info(
             "lru cache miss, Generates frame map, for width=%d,"
             " focused_stack_id=%s",
@@ -163,7 +167,8 @@ class FlameGraph(Widget, can_focus=True):
                 _generate_for_children(child)
 
         _generate_for_children(current_focused_stack)
-
+        t2 = time.time()
+        logger.info("Generates frame maps done, took %.4f seconds", t2 - t1)
         return frame_maps
 
     def render_line(self, y: int) -> Strip:
@@ -278,6 +283,17 @@ class FlameGraph(Widget, can_focus=True):
             logger.warn("Got no children displayed!")
             return
         self.post_message(self.ViewFrameChanged(new_view_info_frame))
+
+    def get_scroll_region(self, frame) -> Union[None, Region]:
+        crop = self.current_crop
+        frame_line_no = self.profile.frameid_to_lineno[frame._id]
+        start_y = max(0, frame_line_no - round(crop.height / 2))
+        if start_y == crop.y == 0:
+            return None
+        display_region = Region(crop.x, start_y, crop.width, crop.height)
+        logger.info("scroll to %s", display_region)
+        # self.scroll_to_region(display_region, top=True)
+        return display_region
 
     def _get_biggest_exist_child(self, stacks):
         biggest = max(stacks, key=lambda s: s.values[self.sample_index])
