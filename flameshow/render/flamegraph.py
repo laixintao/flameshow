@@ -72,8 +72,6 @@ class FlameGraph(Widget, can_focus=True):
         # pre-render
         self.frame_maps = None
 
-        self.visible_start_y = 0
-
     def render_lines(self, crop):
         my_width = crop.size.width
         self.frame_maps = self.generate_frame_maps(
@@ -369,7 +367,9 @@ class FlameGraph(Widget, can_focus=True):
         hover_frame = self.get_frame_under_mouse(event)
         if hover_frame:
             logger.info("mouse hover on %s", hover_frame)
-            self.post_message(self.ViewFrameChanged(hover_frame, by_mouse=True))
+            self.post_message(
+                self.ViewFrameChanged(hover_frame, by_mouse=True)
+            )
 
     @on(Click)
     def handle_click_frame(self, event: Click):
@@ -377,7 +377,7 @@ class FlameGraph(Widget, can_focus=True):
         self.focused_stack_id = frame._id
 
     def get_frame_under_mouse(self, event: MouseEvent):
-        line_no = event.y + self.visible_start_y
+        line_no = event.y
         x = event.x
 
         if line_no >= len(self.profile.lines):
