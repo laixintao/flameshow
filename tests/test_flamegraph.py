@@ -449,6 +449,7 @@ def test_flamegraph_action_move_right_on_root():
 
     flamegraph_widget.post_message.assert_not_called()
 
+
 def test_flamegraph_action_move_left_sibling_just_here():
     id_store = {}
     root = create_frame(
