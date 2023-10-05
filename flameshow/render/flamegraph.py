@@ -170,9 +170,6 @@ class FlameGraph(Widget, can_focus=True):
         for frame in line:
             frame_maps = self.frame_maps.get(frame._id)
             if not frame_maps:
-                logger.debug(
-                    "frame %s not found in frame_map, not render this.", frame
-                )
                 continue
             frame_map = frame_maps[self.sample_index]
             my_width = frame_map.width
@@ -236,10 +233,6 @@ class FlameGraph(Widget, can_focus=True):
         strip = Strip(segments)
         return strip
 
-    @property
-    def sample_unit(self):
-        return self.profile.sample_types[self.sample_index].sample_unit
-
     def action_zoom_in(self):
         logger.info("Zoom in!")
         self.focused_stack_id = self.view_frame._id
@@ -259,9 +252,6 @@ class FlameGraph(Widget, can_focus=True):
 
         # go to the biggest value
         new_view_info_frame = self._get_biggest_exist_child(children)
-        if not new_view_info_frame:
-            logger.warn("Got no children displayed!")
-            return
         self.post_message(self.ViewFrameChanged(new_view_info_frame))
 
     def _get_biggest_exist_child(self, stacks):
