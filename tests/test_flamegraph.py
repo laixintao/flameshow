@@ -1,6 +1,8 @@
-from flameshow.pprof_parser.parser import Line, Profile, SampleType, PprofFrame
+from unittest.mock import MagicMock
+
 from flameshow.models import Frame
-from flameshow.render.flamegraph import FlameGraph, add_array, FrameMap
+from flameshow.pprof_parser.parser import Line, PprofFrame, Profile, SampleType
+from flameshow.render.flamegraph import FlameGraph, FrameMap, add_array
 
 
 def test_flamegraph_generate_frame_maps_parents_with_only_child():
@@ -157,3 +159,174 @@ def test_flamegraph_render_line():
     line_strings = [seg.text for seg in strip._segments]
 
     assert line_strings == ["▏", "s1 ", "▏", "s2"]
+
+
+def test_flamegraph_action_zoom_in_zoom_out():
+    root = Frame("root", 123, values=[5])
+    s1 = Frame("s1", 42, values=[1])
+
+    p = Profile(
+        filename="abc",
+        root_stack=root,
+        highest_lines=1,
+        total_sample=2,
+        sample_types=[SampleType("goroutine", "count")],
+        id_store={},
+    )
+    flamegraph_widget = FlameGraph(p, 0, -1, 0)
+    flamegraph_widget.focused_stack_id = 333
+
+    flamegraph_widget.action_zoom_out()
+
+    assert flamegraph_widget.focused_stack_id == 123
+
+    flamegraph_widget.view_frame = s1
+    flamegraph_widget.action_zoom_in()
+    assert flamegraph_widget.focused_stack_id == 42
+
+
+def create_frame(data, id_store=None):
+    root = Frame(
+        name="node-{}".format(data["id"]),
+        _id=data["id"],
+        values=data["values"],
+    )
+    root.children = []
+    for child in data["children"]:
+        cf = create_frame(child, id_store)
+        root.children.append(cf)
+        cf.parent = root
+
+    if id_store is not None:
+        id_store[root._id] = root
+    return root
+
+
+def test_flamegraph_action_move_down():
+    root = create_frame(
+        {
+            "id": 0,
+            "values": [10],
+            "children": [
+                {"id": 1, "values": [3], "children": []},
+                {"id": 2, "values": [4], "children": []},
+            ],
+        }
+    )
+
+    p = Profile(
+        filename="abc",
+        root_stack=root,
+        highest_lines=10,
+        total_sample=10,
+        sample_types=[SampleType("goroutine", "count")],
+        id_store={},
+    )
+    flamegraph_widget = FlameGraph(p, 0, -1, view_frame=root)
+    flamegraph_widget.post_message = MagicMock()
+    flamegraph_widget.action_move_down()
+
+    flamegraph_widget.post_message.assert_called_once()
+    args = flamegraph_widget.post_message.call_args[0]
+    message = args[0]
+    assert message.by_mouse == False
+    assert message.frame._id == 2
+
+
+def test_flamegraph_action_move_down_no_more_children():
+    root = create_frame(
+        {
+            "id": 0,
+            "values": [10],
+            "children": [],
+        }
+    )
+
+    p = Profile(
+        filename="abc",
+        root_stack=root,
+        highest_lines=10,
+        total_sample=10,
+        sample_types=[SampleType("goroutine", "count")],
+        id_store={},
+    )
+    flamegraph_widget = FlameGraph(p, 0, -1, view_frame=root)
+    flamegraph_widget.post_message = MagicMock()
+    flamegraph_widget.action_move_down()
+
+    flamegraph_widget.post_message.assert_not_called()
+
+
+def test_flamegraph_action_move_down_children_is_zero():
+    root = create_frame(
+        {
+            "id": 0,
+            "values": [10],
+            "children": [
+                {"id": 1, "values": [0], "children": []},
+            ],
+        }
+    )
+
+    p = Profile(
+        filename="abc",
+        root_stack=root,
+        highest_lines=10,
+        total_sample=10,
+        sample_types=[SampleType("goroutine", "count")],
+        id_store={},
+    )
+    flamegraph_widget = FlameGraph(p, 0, -1, view_frame=root)
+    flamegraph_widget.post_message = MagicMock()
+    flamegraph_widget.action_move_down()
+
+    flamegraph_widget.post_message.assert_called_once()
+    args = flamegraph_widget.post_message.call_args[0]
+    message = args[0]
+    assert message.by_mouse == False
+    assert message.frame._id == 1
+
+
+def test_flamegraph_action_move_up():
+    id_store = {}
+    root = create_frame(
+        {
+            "id": 0,
+            "values": [10],
+            "children": [
+                {
+                    "id": 1,
+                    "values": [2],
+                    "children": [
+                        {"id": 3, "values": [1], "children": []},
+                    ],
+                },
+                {"id": 2, "values": [3], "children": []},
+            ],
+        },
+        id_store,
+    )
+
+    p = Profile(
+        filename="abc",
+        root_stack=root,
+        highest_lines=10,
+        total_sample=10,
+        sample_types=[SampleType("goroutine", "count")],
+        id_store=id_store,
+    )
+    flamegraph_widget = FlameGraph(p, 0, -1, view_frame=id_store[3])
+    flamegraph_widget.post_message = MagicMock()
+    flamegraph_widget.action_move_up()
+
+    flamegraph_widget.post_message.assert_called_once()
+    args = flamegraph_widget.post_message.call_args[0]
+    message = args[0]
+    assert message.by_mouse == False
+    assert message.frame._id == 1
+
+    # move up but no more parents
+    flamegraph_widget.post_message = MagicMock()
+    flamegraph_widget.view_frame = root
+    flamegraph_widget.action_move_up()
+    flamegraph_widget.post_message.assert_not_called()
