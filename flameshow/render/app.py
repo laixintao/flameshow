@@ -1,10 +1,7 @@
 from datetime import datetime
 import logging
-import time
 from typing import ClassVar
 
-from rich.style import Style
-from rich.text import Text
 from textual import on
 from textual.app import App, ComposeResult
 from textual.binding import Binding, BindingType
