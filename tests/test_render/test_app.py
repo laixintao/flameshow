@@ -29,15 +29,14 @@ def test_flamegraph_container_scroll():
 
 
 def test_app_set_title_after_mount():
-    r = Frame("root", 0 )
+    r = Frame("root", 0)
     p = Profile(
         filename="abc",
         root_stack=r,
         highest_lines=1,
         total_sample=2,
         sample_types=[SampleType("goroutine", "count")],
-        id_store={
-        },
+        id_store={},
     )
     app = FlameshowApp(p)
     app.on_mount()

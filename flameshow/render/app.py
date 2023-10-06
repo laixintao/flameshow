@@ -1,10 +1,7 @@
 from datetime import datetime
 import logging
-import time
 from typing import ClassVar
 
-from rich.style import Style
-from rich.text import Text
 from textual import on
 from textual.app import App, ComposeResult
 from textual.binding import Binding, BindingType
@@ -156,7 +153,6 @@ class FlameshowApp(App):
             id="flamegraph-out-container",
         )
 
-        yield Static(id="loading-status")
         yield self._profile_info(self.profile.created_at)
         yield Footer()
 
@@ -167,20 +163,6 @@ class FlameshowApp(App):
             f" {chosen_sample_type.sample_unit})"
         )
         return center_header
-
-    def set_status_loading(self):
-        widget = self.query_one("#loading-status")
-        widget.update(Text("● loading...", Style(color="green")))
-        self.loading_start_time = time.time()
-
-    def set_status_loading_done(self):
-        widget = self.query_one("#loading-status")
-        widget.update("")
-        self.loading_end_time = time.time()
-        logger.info(
-            "rerender done, took %.3f seconds.",
-            self.loading_end_time - self.loading_start_time,
-        )
 
     def _profile_info(self, created_at: datetime):
         if not created_at:
