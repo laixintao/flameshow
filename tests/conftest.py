@@ -1,5 +1,6 @@
 import pytest
 import pathlib
+from flameshow.pprof_parser import parse_profile
 
 
 pytest_plugins = ("pytest_asyncio",)
@@ -25,3 +26,12 @@ def profile10s():
         "rb",
     ) as f:
         return f.read()
+
+
+@pytest.fixture(scope="session")
+def profile10s_profile():
+    with open(
+        pathlib.Path(__file__).parent / "pprof_data/profile-10seconds.out",
+        "rb",
+    ) as f:
+        return parse_profile(f.read(), "pprof_data/profile-10seconds.out")

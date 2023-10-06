@@ -1,10 +1,11 @@
 # Flameshow
 
 [![PyPI](https://img.shields.io/pypi/v/flameshow.svg)](https://pypi.org/project/flameshow/)
-[![tests](https://github.com/laixintao/flameshow/actions/workflows/pytest.yaml/badge.svg?branch=main)](https://github.com/laixintao/flameshow/actions/workflows/pytest.yaml)
 [![codecov](https://codecov.io/gh/laixintao/flameshow/graph/badge.svg?token=XQCGN9GBL4)](https://codecov.io/gh/laixintao/flameshow)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/flameshow?logo=python&logoColor=white)
+[![tests](https://github.com/laixintao/flameshow/actions/workflows/pytest.yaml/badge.svg?branch=main)](https://github.com/laixintao/flameshow/actions/workflows/pytest.yaml)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/flameshow)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/flameshow)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 Flameshow is a terminal Flamegraph viewer.
 
