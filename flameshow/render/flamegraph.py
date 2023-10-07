@@ -368,5 +368,5 @@ class FlameGraph(Widget, can_focus=True):
             offset = frame_map.offset
             width = frame_map.width
 
-            if offset < x < offset + width:  # find it!
+            if offset <= x < offset + width:  # find it!
                 return frame

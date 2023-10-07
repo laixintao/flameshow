@@ -7,4 +7,4 @@ class UsageError(FlameshowException):
 
 
 class RenderException(FlameshowException):
-    """Got error when render, this usually means code bug of Flameshow, you can open an issue"""
+    """Got error when render, this usually means code bug of Flameshow, you can open an issue"""  # noqa: E501

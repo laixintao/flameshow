@@ -633,7 +633,7 @@ def test_flamegraph_render_on_mouse_move():
         id_store=id_store,
     )
     flamegraph_widget = FlameGraph(p, 0, -1, view_frame=id_store[3])
-    flamegraph_widget.frame_maps = flamegraph_widget.generate_frame_maps(20, 0)
+    flamegraph_widget.frame_maps = flamegraph_widget.generate_frame_maps(10, 0)
     flamegraph_widget.post_message = MagicMock()
 
     flamegraph_widget.on_mouse_move(
@@ -670,3 +670,24 @@ def test_flamegraph_render_on_mouse_move():
         )
     )
     args = flamegraph_widget.post_message.assert_not_called()
+
+    # just to move the the exact offset, should still work
+    # should be hove on next span instead of last
+    flamegraph_widget.post_message = MagicMock()
+    flamegraph_widget.on_mouse_move(
+        MouseMove(
+            x=3,
+            y=1,
+            delta_x=0,
+            delta_y=0,
+            button=False,
+            shift=False,
+            meta=False,
+            ctrl=False,
+        )
+    )
+    flamegraph_widget.post_message.assert_called_once()
+    args = flamegraph_widget.post_message.call_args[0]
+    message = args[0]
+    assert message.by_mouse == True
+    assert message.frame._id == 1

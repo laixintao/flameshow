@@ -19,4 +19,6 @@ _perf_startup:
 
 run-test:
 	rm -rf htmlcov && pytest --cov-report html --cov=flameshow -vv --disable-warnings
+	flake8 .
+	black .
 	open htmlcov/index.html
