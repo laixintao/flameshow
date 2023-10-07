@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock
 
 import pytest
-from textual.events import MouseMove
+from textual.events import Click, MouseMove
 
 from flameshow.exceptions import RenderException
 from flameshow.models import Frame
@@ -636,24 +636,27 @@ def test_flamegraph_render_on_mouse_move():
     flamegraph_widget.frame_maps = flamegraph_widget.generate_frame_maps(10, 0)
     flamegraph_widget.post_message = MagicMock()
 
-    flamegraph_widget.on_mouse_move(
-        MouseMove(
-            x=2,
-            y=1,
-            delta_x=0,
-            delta_y=0,
-            button=False,
-            shift=False,
-            meta=False,
-            ctrl=False,
-        )
+    mouse_event = MouseMove(
+        x=2,
+        y=1,
+        delta_x=0,
+        delta_y=0,
+        button=False,
+        shift=False,
+        meta=False,
+        ctrl=False,
     )
+    flamegraph_widget.on_mouse_move(mouse_event)
 
     flamegraph_widget.post_message.assert_called_once()
     args = flamegraph_widget.post_message.call_args[0]
     message = args[0]
     assert message.by_mouse == True
     assert message.frame._id == 2
+
+    assert flamegraph_widget.focused_stack_id == 0
+    flamegraph_widget.handle_click_frame(mouse_event)
+    assert flamegraph_widget.focused_stack_id == 2
 
     # move to lines that empty
     flamegraph_widget.post_message = MagicMock()
@@ -750,3 +753,67 @@ def test_flamegraph_render_line_with_some_width_is_0():
     line_strings = [seg.text for seg in strip._segments]
 
     assert line_strings == ["▏", "no", "▏", "n"]
+
+
+def test_flamegraph_render_line_with_focused_frame():
+    id_store = {}
+    root = create_frame(
+        {
+            "id": 0,
+            "values": [10],
+            "children": [
+                {"id": 1, "values": [3], "children": []},
+                {"id": 4, "values": [1], "children": []},
+                {
+                    "id": 2,
+                    "values": [6],
+                    "children": [
+                        {"id": 3, "values": [1], "children": []},
+                    ],
+                },
+            ],
+        },
+        id_store,
+    )
+
+    p = Profile(
+        filename="abc",
+        root_stack=root,
+        highest_lines=1,
+        total_sample=2,
+        sample_types=[SampleType("samples", "count")],
+        id_store=id_store,
+    )
+    flamegraph_widget = FlameGraph(p, 2, -1, 0)
+    flamegraph_widget.frame_maps = flamegraph_widget.generate_frame_maps(
+        10, focused_stack_id=2
+    )
+
+    strip = flamegraph_widget.render_line(
+        1,
+    )
+
+    line_strings = [seg.text for seg in strip._segments]
+
+    assert line_strings == ["▏", "node-2   "]
+
+    flamegraph_widget.post_message = MagicMock()
+
+    flamegraph_widget.on_mouse_move(
+        MouseMove(
+            x=0,
+            y=1,
+            delta_x=0,
+            delta_y=0,
+            button=False,
+            shift=False,
+            meta=False,
+            ctrl=False,
+        )
+    )
+
+    flamegraph_widget.post_message.assert_called_once()
+    args = flamegraph_widget.post_message.call_args[0]
+    message = args[0]
+    assert message.by_mouse == True
+    assert message.frame._id == 2
