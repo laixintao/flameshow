@@ -13,6 +13,9 @@ def test_linaer_color_platte():
 
     assert isinstance(color2, Color)
 
+    for key in range(999):
+        platte.get_color(key)
+
 
 def test_flamegraph_random_color_platte():
     platte = flamegraph_random_color_platte

@@ -1,6 +1,9 @@
+import os
+from unittest.mock import MagicMock, patch
+
 from click.testing import CliRunner
-from flameshow.main import main, ensure_tty
-from unittest.mock import patch, MagicMock
+
+from flameshow.main import ensure_tty, main
 
 
 def test_print_version():
