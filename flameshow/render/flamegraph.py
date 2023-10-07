@@ -21,6 +21,7 @@ from flameshow.const import (
     SELECTED_PARENTS_BG_COLOR_BLEND_TO,
     VIEW_INFO_COLOR,
 )
+from flameshow.exceptions import RenderException
 from flameshow.models import Frame
 
 
@@ -163,7 +164,7 @@ class FlameGraph(Widget, can_focus=True):
         line = self.profile.lines[y]
 
         if not self.frame_maps:
-            raise Exception("frame_maps is not init yet!")
+            raise RenderException("frame_maps is not init yet!")
 
         segments = []
         cursor = 0
@@ -367,5 +368,5 @@ class FlameGraph(Widget, can_focus=True):
             offset = frame_map.offset
             width = frame_map.width
 
-            if offset + width > x:  # find it!
+            if offset <= x < offset + width:  # find it!
                 return frame
