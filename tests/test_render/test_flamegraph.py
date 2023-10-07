@@ -1,5 +1,9 @@
 from unittest.mock import MagicMock
 
+import pytest
+from textual.events import MouseMove
+
+from flameshow.exceptions import RenderException
 from flameshow.models import Frame
 from flameshow.pprof_parser.parser import Line, PprofFrame, Profile, SampleType
 from flameshow.render.flamegraph import FlameGraph, FrameMap, add_array
@@ -161,6 +165,33 @@ def test_flamegraph_render_line():
     assert line_strings == ["▏", "s1 ", "▏", "s2"]
 
 
+def test_flamegraph_render_line_without_init():
+    root = Frame("root", 0, values=[10])
+    s1 = Frame("s1", 1, values=[4], parent=root)
+    s2 = Frame("s2", 2, values=[3], parent=root)
+
+    root.children = [s1, s2]
+
+    p = Profile(
+        filename="abc",
+        root_stack=root,
+        highest_lines=1,
+        total_sample=2,
+        sample_types=[SampleType("goroutine", "count")],
+        id_store={
+            0: root,
+            1: s1,
+            2: s2,
+        },
+    )
+    flamegraph_widget = FlameGraph(p, 0, -1, 0)
+
+    with pytest.raises(RenderException):
+        flamegraph_widget.render_line(
+            1,
+        )
+
+
 def test_flamegraph_action_zoom_in_zoom_out():
     root = Frame("root", 123, values=[5])
     s1 = Frame("s1", 42, values=[1])
@@ -231,6 +262,8 @@ def test_flamegraph_action_move_down():
     message = args[0]
     assert message.by_mouse == False
     assert message.frame._id == 2
+
+    assert str(message) == "ViewFrameChanged(self.frame=<Frame #2 node-2>)"
 
 
 def test_flamegraph_action_move_down_no_more_children():
@@ -566,3 +599,74 @@ def test_flamegraph_action_move_left_on_root():
     flamegraph_widget.action_move_left()
 
     flamegraph_widget.post_message.assert_not_called()
+
+
+def test_flamegraph_render_on_mouse_move():
+    id_store = {}
+    # 10
+    # 3, 2
+    #  , 1
+    root = create_frame(
+        {
+            "id": 0,
+            "values": [10],
+            "children": [
+                {"id": 2, "values": [3], "children": []},
+                {
+                    "id": 1,
+                    "values": [2],
+                    "children": [
+                        {"id": 3, "values": [1], "children": []},
+                    ],
+                },
+            ],
+        },
+        id_store,
+    )
+
+    p = Profile(
+        filename="abc",
+        root_stack=root,
+        highest_lines=10,
+        total_sample=10,
+        sample_types=[SampleType("goroutine", "count")],
+        id_store=id_store,
+    )
+    flamegraph_widget = FlameGraph(p, 0, -1, view_frame=id_store[3])
+    flamegraph_widget.frame_maps = flamegraph_widget.generate_frame_maps(20, 0)
+    flamegraph_widget.post_message = MagicMock()
+
+    flamegraph_widget.on_mouse_move(
+        MouseMove(
+            x=2,
+            y=1,
+            delta_x=0,
+            delta_y=0,
+            button=False,
+            shift=False,
+            meta=False,
+            ctrl=False,
+        )
+    )
+
+    flamegraph_widget.post_message.assert_called_once()
+    args = flamegraph_widget.post_message.call_args[0]
+    message = args[0]
+    assert message.by_mouse == True
+    assert message.frame._id == 2
+
+    # move to lines that empty
+    flamegraph_widget.post_message = MagicMock()
+    flamegraph_widget.on_mouse_move(
+        MouseMove(
+            x=1,
+            y=2,
+            delta_x=0,
+            delta_y=0,
+            button=False,
+            shift=False,
+            meta=False,
+            ctrl=False,
+        )
+    )
+    args = flamegraph_widget.post_message.assert_not_called()
