@@ -672,7 +672,7 @@ def test_flamegraph_render_on_mouse_move():
     args = flamegraph_widget.post_message.assert_not_called()
 
     # just to move the the exact offset, should still work
-    # should be hove on next span instead of last
+    # should be hover on next span instead of last
     flamegraph_widget.post_message = MagicMock()
     flamegraph_widget.on_mouse_move(
         MouseMove(
