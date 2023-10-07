@@ -691,3 +691,62 @@ def test_flamegraph_render_on_mouse_move():
     message = args[0]
     assert message.by_mouse == True
     assert message.frame._id == 1
+
+    # move down, not hover on any lines
+    flamegraph_widget.post_message = MagicMock()
+    flamegraph_widget.on_mouse_move(
+        MouseMove(
+            x=0,
+            y=3,
+            delta_x=0,
+            delta_y=0,
+            button=False,
+            shift=False,
+            meta=False,
+            ctrl=False,
+        )
+    )
+    args = flamegraph_widget.post_message.assert_not_called()
+
+
+def test_flamegraph_render_line_with_some_width_is_0():
+    id_store = {}
+    root = create_frame(
+        {
+            "id": 0,
+            "values": [10],
+            "children": [
+                {"id": 2, "values": [3], "children": []},
+                {
+                    "id": 1,
+                    "values": [2],
+                    "children": [
+                        {"id": 3, "values": [1], "children": []},
+                    ],
+                },
+                {"id": 4, "values": [0.1], "children": []},
+            ],
+        },
+        id_store,
+    )
+
+    p = Profile(
+        filename="abc",
+        root_stack=root,
+        highest_lines=1,
+        total_sample=2,
+        sample_types=[SampleType("samples", "count")],
+        id_store=id_store,
+    )
+    flamegraph_widget = FlameGraph(p, 0, -1, 0)
+    flamegraph_widget.frame_maps = flamegraph_widget.generate_frame_maps(
+        10, focused_stack_id=0
+    )
+
+    strip = flamegraph_widget.render_line(
+        1,
+    )
+
+    line_strings = [seg.text for seg in strip._segments]
+
+    assert line_strings == ["▏", "no", "▏", "n"]

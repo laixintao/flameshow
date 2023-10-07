@@ -164,6 +164,8 @@ class FlameGraph(Widget, can_focus=True):
         line = self.profile.lines[y]
 
         if not self.frame_maps:
+            # never should happen
+            # pragma: no cover
             raise RenderException("frame_maps is not init yet!")
 
         segments = []
@@ -171,7 +173,8 @@ class FlameGraph(Widget, can_focus=True):
         for frame in line:
             frame_maps = self.frame_maps.get(frame._id)
             if not frame_maps:
-                continue
+                # never should happen
+                continue  # pragma: no cover
             frame_map = frame_maps[self.sample_index]
             my_width = frame_map.width
             if not my_width:
@@ -185,7 +188,10 @@ class FlameGraph(Widget, can_focus=True):
                 segments.append(Segment(" " * pre_pad))
                 cursor += pre_pad
             elif pre_pad < 0:
-                raise Exception("Prepad is negative! {}".format(pre_pad))
+                # never should happen
+                raise Exception(
+                    "Prepad is negative! {}".format(pre_pad)
+                )  # pragma: no cover
 
             if len(text) < my_width:
                 text += " " * (my_width - len(text))
