@@ -80,7 +80,7 @@ class FrameStatThis(Widget):
         if sample_unit == "bytes":
             display_value = sizeof(value)
 
-        return display_value
+        return str(display_value)
 
     @property
     def sample_unit(self):
@@ -187,7 +187,9 @@ class FrameDetail(Widget):
             frame_this_widget = self.query_one("FrameStatThis")
         except NoMatches:
             return
+
         frame_this_widget.frame = self.frame
+        frame_this_widget.sample_index = self.sample_index
 
     @property
     def sample_unit(self):
