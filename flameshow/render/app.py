@@ -49,10 +49,12 @@ class FlameshowApp(App):
     BINDINGS = [
         Binding("d", "toggle_dark", "Toggle dark mode", show=False),
         Binding(
-            "tab",
+            "tab,n",
             "switch_sample_type",
             "Switch Sample Type",
             priority=True,
+            show=True,
+            key_display="tab",
         ),
         Binding("ctrl+c,q", "quit", "Quit", show=True, key_display="Q"),
         Binding("o", "debug"),
@@ -116,7 +118,14 @@ class FlameshowApp(App):
         else:
             self.sample_index = profile.default_sample_type_index
 
-        self.flamegraph_widget = None
+        fg = FlameGraph(
+            self.profile,
+            self.focused_stack_id,
+            self.sample_index,
+            self.root_stack,
+        )
+        fg.styles.height = self.profile.highest_lines + 1
+        self.flamegraph_widget = fg
 
         tabs = [
             f"{s.sample_type}, {s.sample_unit}" for s in profile.sample_types
@@ -145,18 +154,8 @@ class FlameshowApp(App):
             id="span-detail-container",
         )
 
-        fg = FlameGraph(
-            self.profile,
-            self.focused_stack_id,
-            self.sample_index,
-            self.root_stack,
-        )
-        fg.styles.height = self.profile.highest_lines + 1
-        fg.focus()
-        self.flamegraph_widget = fg
-
         yield FlameGraphScroll(
-            fg,
+            self.flamegraph_widget,
             id="flamegraph-out-container",
         )
 
