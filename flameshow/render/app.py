@@ -1,6 +1,6 @@
 from datetime import datetime
 import logging
-from typing import ClassVar, List
+from typing import ClassVar
 
 from textual import on
 from textual.app import App, ComposeResult
@@ -11,7 +11,6 @@ from textual.reactive import reactive
 from textual.widgets import Footer, Static, Tabs, Tab
 
 from flameshow import __version__
-from flameshow.models import SampleType
 from flameshow.render.header import FlameshowHeader
 from flameshow.render.tabs import SampleTabs
 
