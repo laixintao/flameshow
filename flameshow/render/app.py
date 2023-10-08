@@ -210,28 +210,20 @@ class FlameshowApp(App):
         self.flamegraph_widget.sample_index = sample_index
         self.frame_detail.sample_index = sample_index
 
-    async def watch_focused_stack_id(
-        self,
-        focused_stack_id,
-    ):
-        logger.info(f"{focused_stack_id=} changed")
-        self.flamegraph_widget.focused_stack_id = focused_stack_id
-
     async def watch_view_frame(self, old, new_frame):
         logger.debug(
             "view info stack changed: old: %s, new: %s",
             old,
             new_frame,
         )
-        self._update_span_detail(new_frame)
+        self.frame_detail.frame = new_frame
 
-    def _update_span_detail(self, frame):
-        # set the span detail info
-        span_detail = self.query_one("#span-detail")
-        span_detail.border_title = frame.render_title()
-        span_detail.update(
-            frame.render_detail(self.sample_index, self.sample_unit)
-        )
+    async def watch_focused_stack_id(
+        self,
+        focused_stack_id,
+    ):
+        logger.info(f"{focused_stack_id=} changed")
+        self.flamegraph_widget.focused_stack_id = focused_stack_id
 
     def action_switch_sample_type(self):
         self.tabs_widget.action_next_tab()
