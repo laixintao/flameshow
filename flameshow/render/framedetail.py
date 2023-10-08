@@ -46,9 +46,11 @@ class FrameStatThis(Widget):
     def compose(self):
         yield Static("Total", id="stat-this-total-label")
         yield Static("Self", id="stat-this-self-label")
-        yield Static(self.frame_value_humanize, id="stat-this-total-value")
+        yield Static(
+            self.frame_total_value_humanize, id="stat-this-total-value"
+        )
         yield Static("0", id="stat-this-self-value")
-        yield Static("1.0%", id="stat-this-total-percent")
+        yield Static(self.frame_total_percent, id="stat-this-total-percent")
         yield Static("0", id="stat-this-self-percent")
 
     def watch_frame(self, _: Frame):
@@ -63,17 +65,40 @@ class FrameStatThis(Widget):
         if self.sample_index is None:
             return
         logger.info(f"rerender --> {self.frame=} {self.sample_index=}")
+
         try:
             total_value_widget = self.query_one("#stat-this-total-value")
         except NoMatches:
             return
-        total_value_widget.update(self.frame_value_humanize)
+        total_value_widget.update(self.frame_total_value_humanize)
+
+        try:
+            total_percent_widget = self.query_one("#stat-this-total-percent")
+        except NoMatches:
+            return
+        total_percent_widget.update(self.frame_total_percent)
 
     @property
-    def frame_value_humanize(self):
+    def frame_total_value_humanize(self):
         value = self.frame.values[self.sample_index]
         value_display = self.humanize(self.sample_unit, value)
         return value_display
+
+    @property
+    def frame_total_percent(self):
+        frame = self.frame
+        sample_index = self.sample_index
+
+        if not frame.root.values[sample_index]:
+            p_root = 0
+        else:
+            p_root = (
+                frame.values[sample_index]
+                / frame.root.values[sample_index]
+                * 100
+            )
+
+        return f"{p_root:.2f}%"
 
     def humanize(self, sample_unit, value):
         display_value = value
