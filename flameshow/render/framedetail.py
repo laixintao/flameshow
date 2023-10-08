@@ -1,10 +1,13 @@
 import logging
+
 from textual.containers import Vertical
 from textual.css.query import NoMatches
-
 from textual.reactive import reactive
 from textual.widget import Widget
 from textual.widgets import Static
+
+from flameshow.models import Frame
+from flameshow.utils import sizeof
 
 logger = logging.getLogger(__name__)
 
@@ -43,10 +46,41 @@ class FrameStatThis(Widget):
     def compose(self):
         yield Static("Total", id="stat-this-total-label")
         yield Static("Self", id="stat-this-self-label")
-        yield Static("998.1MiB", id="stat-this-total-value")
+        yield Static(self.frame_value_humanize, id="stat-this-total-value")
         yield Static("0", id="stat-this-self-value")
         yield Static("1.0%", id="stat-this-total-percent")
         yield Static("0", id="stat-this-self-percent")
+
+    def watch_frame(self, _: Frame):
+        self._rerender()
+
+    def watch_sample_index(self, _: int):
+        self._rerender()
+
+    def _rerender(self):
+        if self.frame is None:
+            return
+        if self.sample_index is None:
+            return
+        logger.info(f"rerender --> {self.frame=} {self.sample_index=}")
+        try:
+            total_value_widget = self.query_one("#stat-this-total-value")
+        except NoMatches:
+            return
+        total_value_widget.update(self.frame_value_humanize)
+
+    @property
+    def frame_value_humanize(self):
+        value = self.frame.values[self.sample_index]
+        value_display = self.humanize(self.sample_unit, value)
+        return value_display
+
+    def humanize(self, sample_unit, value):
+        display_value = value
+        if sample_unit == "bytes":
+            display_value = sizeof(value)
+
+        return display_value
 
     @property
     def sample_unit(self):
@@ -148,6 +182,12 @@ class FrameDetail(Widget):
         span_detail.update(
             self.frame.render_detail(self.sample_index, self.sample_unit)
         )
+
+        try:
+            frame_this_widget = self.query_one("FrameStatThis")
+        except NoMatches:
+            return
+        frame_this_widget.frame = self.frame
 
     @property
     def sample_unit(self):
