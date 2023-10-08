@@ -7,9 +7,8 @@ from textual.app import App, ComposeResult
 from textual.binding import Binding, BindingType
 from textual.containers import Horizontal, VerticalScroll
 from textual.css.query import NoMatches
-from textual.events import Focus
 from textual.reactive import reactive
-from textual.widgets import Footer, RadioButton, RadioSet, Static
+from textual.widgets import Footer, Static
 
 from flameshow import __version__
 from flameshow.models import SampleType
@@ -50,7 +49,7 @@ class FlameshowApp(App):
     BINDINGS = [
         Binding("d", "toggle_dark", "Toggle dark mode", show=False),
         Binding(
-            "s",
+            "tab",
             "switch_sample_type",
             "Switch Sample Type",
             priority=True,
@@ -61,6 +60,7 @@ class FlameshowApp(App):
 
     DEFAULT_CSS = """
     #span-detail-container {
+        height: 4;
     }
 
     #span-detail {
@@ -118,6 +118,11 @@ class FlameshowApp(App):
 
         self.flamegraph_widget = None
 
+        tabs = [
+            f"{s.sample_type}, {s.sample_unit}" for s in profile.sample_types
+        ]
+        self.tabs_widget = SampleTabs(*tabs)
+
     def on_mount(self):
         logger.info("mounted")
         self.title = "flameshow"
@@ -131,25 +136,14 @@ class FlameshowApp(App):
         center_text = self._center_header_text(self.sample_index)
         yield FlameshowHeader(center_text)
 
-        yield self._get_tabs(self.sample_index, self.profile.sample_types)
-
-        options = [
-            RadioButton(f"{s.sample_type}, {s.sample_unit}")
-            for s in self.profile.sample_types
-        ]
-        options[self.sample_index].value = True
-        radioset = RadioSet(*options, id="sample-type-radio")
-        radioset.blur()
+        yield self.tabs_widget
 
         detail_row = Horizontal(
             Static(
                 id="span-detail",
             ),
-            radioset,
             id="span-detail-container",
         )
-        # set min height, 2 lines of detail + 2 lines border
-        detail_row.styles.height = max(4, len(options) + 2)
 
         fg = FlameGraph(
             self.profile,
@@ -171,10 +165,6 @@ class FlameshowApp(App):
         yield self._profile_info(self.profile.created_at)
         yield Footer()
 
-    def _get_tabs(self, chosen_index: int, sample_types: List[SampleType]):
-        tabs = [f"{s.sample_type}, {s.sample_unit}" for s in sample_types]
-        return SampleTabs(*tabs)
-
     def _center_header_text(self, sample_index):
         chosen_sample_type = self.profile.sample_types[sample_index]
         center_header = (
@@ -191,12 +181,6 @@ class FlameshowApp(App):
             "Dumped at %Y %b %d(%A) %H:%M:%S %Z"
         )
         return Static(datetime_str, id="profile-detail-info")
-
-    @on(RadioSet.Changed)
-    async def handle_radioset_changed(self, e):
-        logger.info("event: %s", e)
-        self.sample_index = e.index
-        self.query_one("RadioSet").blur()
 
     @on(FlameGraph.ViewFrameChanged)
     async def handle_view_frame_changed(self, e):
@@ -253,12 +237,7 @@ class FlameshowApp(App):
         )
 
     def action_switch_sample_type(self):
-        logger.info("Focus on radio type")
-        sample_radio = self.query_one("#sample-type-radio")
-        if sample_radio.has_focus:
-            sample_radio.blur()
-        else:
-            sample_radio.focus()
+        self.tabs_widget.action_next_tab()
 
     @property
     def sample_unit(self):
