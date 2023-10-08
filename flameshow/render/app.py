@@ -136,8 +136,6 @@ class FlameshowApp(App):
         # set min height, 2 lines of detail + 2 lines border
         detail_row.styles.height = max(4, len(options) + 2)
 
-        yield detail_row
-
         fg = FlameGraph(
             self.profile,
             self.focused_stack_id,
@@ -152,6 +150,8 @@ class FlameshowApp(App):
             fg,
             id="flamegraph-out-container",
         )
+
+        yield detail_row
 
         yield self._profile_info(self.profile.created_at)
         yield Footer()
