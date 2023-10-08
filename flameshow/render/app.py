@@ -35,8 +35,6 @@ class FlameGraphScroll(VerticalScroll, inherit_bindings=False):
     ]
 
     def scroll_to_make_line_center(self, line_no):
-        print(self.size)
-        print(self.size.height)
         height = self.size.height
         start_line = max(0, line_no - round(height / 2))
         self.scroll_to(y=start_line)
