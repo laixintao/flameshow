@@ -69,7 +69,6 @@ class FlameshowApp(App):
         height: 1fr;
         padding: 0 1;
         border: round $secondary;
-        border-subtitle-align: left;
         content-align-vertical: middle;
     }
 
@@ -231,7 +230,7 @@ class FlameshowApp(App):
     def _update_span_detail(self, frame):
         # set the span detail info
         span_detail = self.query_one("#span-detail")
-        span_detail.border_subtitle = frame.render_title()
+        span_detail.border_title = frame.render_title()
         span_detail.update(
             frame.render_detail(self.sample_index, self.sample_unit)
         )
