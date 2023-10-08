@@ -85,7 +85,7 @@ class FlameshowApp(App):
     }
 
     Tabs {
-        margin-bottom: 1;
+        margin-bottom: 0;
     }
 
     """
