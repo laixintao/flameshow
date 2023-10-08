@@ -73,6 +73,11 @@ class FlameshowApp(App):
         height: 1fr;
     }
 
+    #profile-detail-info {
+        text-align: right;
+        color: grey;
+    }
+
     """
 
     focused_stack_id = reactive(0)
@@ -171,7 +176,7 @@ class FlameshowApp(App):
         datetime_str = created_at.astimezone().strftime(
             "Dumped at %Y %b %d(%A) %H:%M:%S %Z"
         )
-        return Static(datetime_str)
+        return Static(datetime_str, id="profile-detail-info")
 
     @on(RadioSet.Changed)
     async def handle_radioset_changed(self, e):
