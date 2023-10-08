@@ -8,7 +8,7 @@ from textual.binding import Binding, BindingType
 from textual.containers import Horizontal, VerticalScroll
 from textual.css.query import NoMatches
 from textual.reactive import reactive
-from textual.widgets import Footer, Static
+from textual.widgets import Footer, Static, Tabs, Tab
 
 from flameshow import __version__
 from flameshow.models import SampleType
@@ -128,9 +128,11 @@ class FlameshowApp(App):
         self.flamegraph_widget = fg
 
         tabs = [
-            f"{s.sample_type}, {s.sample_unit}" for s in profile.sample_types
+            Tab(f"{s.sample_type}, {s.sample_unit}", id=f"sample-{index}")
+            for index, s in enumerate(profile.sample_types)
         ]
-        self.tabs_widget = SampleTabs(*tabs)
+        active_tab = tabs[self.sample_index].id
+        self.tabs_widget = SampleTabs(*tabs, active=active_tab)
 
     def on_mount(self):
         logger.info("mounted")
@@ -244,3 +246,9 @@ class FlameshowApp(App):
 
     def action_debug(self):
         logger.info("currently focused on: %s", self.focused)
+
+    @on(Tabs.TabActivated)
+    def handle_sample_type_changed(self, event: Tabs.TabActivated):
+        logger.info("Tab changed: %s", event)
+        chosen_index = event.tab.id.split("-")[1]
+        self.sample_index = int(chosen_index)
