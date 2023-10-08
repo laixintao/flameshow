@@ -5,12 +5,13 @@ from typing import ClassVar
 from textual import on
 from textual.app import App, ComposeResult
 from textual.binding import Binding, BindingType
-from textual.containers import Horizontal, VerticalScroll
+from textual.containers import VerticalScroll
 from textual.css.query import NoMatches
 from textual.reactive import reactive
 from textual.widgets import Footer, Static, Tabs, Tab
 
 from flameshow import __version__
+from flameshow.render.framedetail import FrameDetail
 from flameshow.render.header import FlameshowHeader
 from flameshow.render.tabs import SampleTabs
 
@@ -85,7 +86,6 @@ class FlameshowApp(App):
     Tabs {
         margin-bottom: 0;
     }
-
     """
 
     focused_stack_id = reactive(0)
@@ -132,6 +132,12 @@ class FlameshowApp(App):
         active_tab = tabs[self.sample_index].id
         self.tabs_widget = SampleTabs(*tabs, active=active_tab)
 
+        self.frame_detail = FrameDetail(
+            profile=profile,
+            frame=self.root_stack,
+            sample_index=self.sample_index,
+        )
+
     def on_mount(self):
         logger.info("mounted")
         self.title = "flameshow"
@@ -147,19 +153,12 @@ class FlameshowApp(App):
 
         yield self.tabs_widget
 
-        detail_row = Horizontal(
-            Static(
-                id="span-detail",
-            ),
-            id="span-detail-container",
-        )
-
         yield FlameGraphScroll(
             self.flamegraph_widget,
             id="flamegraph-out-container",
         )
 
-        yield detail_row
+        yield self.frame_detail
 
         yield self._profile_info(self.profile.created_at)
         yield Footer()
@@ -209,8 +208,7 @@ class FlameshowApp(App):
         header.center_text = center_text
 
         self.flamegraph_widget.sample_index = sample_index
-
-        self._update_span_detail(self.view_frame)
+        self.frame_detail.sample_index = sample_index
 
     async def watch_focused_stack_id(
         self,
