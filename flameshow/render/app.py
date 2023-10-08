@@ -1,24 +1,29 @@
 from datetime import datetime
 import logging
-from typing import ClassVar
+from typing import ClassVar, List
 
 from textual import on
 from textual.app import App, ComposeResult
 from textual.binding import Binding, BindingType
 from textual.containers import Horizontal, VerticalScroll
 from textual.css.query import NoMatches
+from textual.events import Focus
 from textual.reactive import reactive
 from textual.widgets import Footer, RadioButton, RadioSet, Static
 
 from flameshow import __version__
+from flameshow.models import SampleType
 from flameshow.render.header import FlameshowHeader
+from flameshow.render.tabs import SampleTabs
 
 from .flamegraph import FlameGraph
 
 logger = logging.getLogger(__name__)
 
 
-class FlameGraphScroll(VerticalScroll, inherit_bindings=False):
+class FlameGraphScroll(
+    VerticalScroll, inherit_bindings=False, can_focus=False
+):
     BINDINGS: ClassVar[list[BindingType]] = [
         Binding("b", "page_up", "Scroll Page Up", show=True, key_display="B"),
         Binding(
@@ -51,6 +56,7 @@ class FlameshowApp(App):
             priority=True,
         ),
         Binding("ctrl+c,q", "quit", "Quit", show=True, key_display="Q"),
+        Binding("o", "debug"),
     ]
 
     DEFAULT_CSS = """
@@ -74,6 +80,10 @@ class FlameshowApp(App):
     #profile-detail-info {
         text-align: right;
         color: grey;
+    }
+
+    Tabs {
+        margin-bottom: 1;
     }
 
     """
@@ -121,6 +131,8 @@ class FlameshowApp(App):
         center_text = self._center_header_text(self.sample_index)
         yield FlameshowHeader(center_text)
 
+        yield self._get_tabs(self.sample_index, self.profile.sample_types)
+
         options = [
             RadioButton(f"{s.sample_type}, {s.sample_unit}")
             for s in self.profile.sample_types
@@ -158,6 +170,10 @@ class FlameshowApp(App):
 
         yield self._profile_info(self.profile.created_at)
         yield Footer()
+
+    def _get_tabs(self, chosen_index: int, sample_types: List[SampleType]):
+        tabs = [f"{s.sample_type}, {s.sample_unit}" for s in sample_types]
+        return SampleTabs(*tabs)
 
     def _center_header_text(self, sample_index):
         chosen_sample_type = self.profile.sample_types[sample_index]
@@ -247,3 +263,6 @@ class FlameshowApp(App):
     @property
     def sample_unit(self):
         return self.profile.sample_types[self.sample_index].sample_unit
+
+    def action_debug(self):
+        logger.info("currently focused on: %s", self.focused)
