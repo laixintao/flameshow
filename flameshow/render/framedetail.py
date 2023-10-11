@@ -209,10 +209,11 @@ class FrameDetail(Widget):
         max-width: 25;
     }
     """
-    frame = reactive(None)
-    sample_index = reactive(None)
+    frame = reactive(None, init=False)
+    sample_index = reactive(None, init=False)
 
     def __init__(self, frame, profile, sample_index, *args, **kwargs):
+        self.composed = False
         super().__init__(*args, **kwargs)
         self.frame = frame
         self.sample_index = sample_index
@@ -230,8 +231,11 @@ class FrameDetail(Widget):
         )
         span_detail.border_title = self.frame.render_title()
         yield span_detail
+        self.composed = True
 
     def _rerender(self):
+        if not self.composed:
+            return
         try:
             span_detail = self.query_one("#span-detail")
         except NoMatches:
