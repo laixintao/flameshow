@@ -32,7 +32,10 @@ class FrameStatThis(Widget):
     }
 
     #stat-this-total-label {
-        background: $primary;
+        background: $primary-background;
+    }
+    #stat-this-self-label {
+        background: $secondary-background;
     }
     """
 
@@ -164,8 +167,11 @@ class FrameStatAll(Widget):
         grid-gutter: 0 1;
     }
 
-    #stat-this-total-label {
-        background: $primary;
+    #stat-all-total-label {
+        background: $primary-background;
+    }
+    #stat-all-self-label {
+        background: $secondary-background;
     }
     """
 
