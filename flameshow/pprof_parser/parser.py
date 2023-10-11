@@ -156,6 +156,8 @@ class ProfileParser:
         self.next_id = 0
 
         self.root = PprofFrame("root", _id=self.idgenerator())
+        # need to set PprofFrame.root for every frame
+        self.root.root = self.root
 
         # store the pprof's string table
         self._t = []
