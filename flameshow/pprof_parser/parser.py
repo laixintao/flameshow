@@ -183,6 +183,23 @@ class ProfileParser:
         self.mappings = self.parse_mapping(pbdata.mapping)
         self.locations = self.parse_location(pbdata.location)
 
+    def get_name_aggr(self, start_frame: Frame) -> Dict[str, List[Frame]]:
+        result = {}
+        frame_list = [start_frame]
+        while frame_list:
+            next_list = []
+            for frame in frame_list:
+                key = result[frame.name]
+                lst = result.setdefault(key, [])
+                lst.append(frame)
+
+                if frame.children:
+                    next_list.extend(next_list)
+
+            frame_list = next_list
+
+        return result
+
     def parse(self, binary_data):
         pbdata = unmarshal(binary_data)
         self.parse_internal_data(pbdata)
@@ -205,6 +222,7 @@ class ProfileParser:
             total_sample=len(pbdata.sample),
             sample_types=sample_types,
             id_store=self.id_store,
+            name_aggr=self.get_name_aggr(root),
         )
 
         # default is 0, by the doc, default should be the last one

@@ -97,7 +97,10 @@ class Profile:
     # its parents all the way up
     total_sample: int
     sample_types: List[SampleType]
+    # int id mapping to Frame
     id_store: Dict[int, Frame]
+    # Frame grouped by same name
+    name_aggr: Dict[str, List[Frame]]
 
     # optional
     default_sample_type_index: int = -1
@@ -109,6 +112,7 @@ class Profile:
     lines: List = field(init=False)
 
     frameid_to_lineno: Dict[int, int] = field(init=False)
+
 
     def __post_init__(self):
         """
