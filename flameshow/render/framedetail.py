@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 class FrameStatThis(Widget):
-    frame = reactive(None)
-    sample_index = reactive(None)
+    frame = reactive(None, init=False)
+    sample_index = reactive(None, init=False)
 
     # width = 998.1MiB|998.1MiB
     DEFAULT_CSS = """
@@ -37,11 +37,13 @@ class FrameStatThis(Widget):
     """
 
     def __init__(self, frame, profile, sample_index, *args, **kwargs):
+        self.composed = False
         super().__init__(*args, **kwargs)
-        self.frame = frame
-        self.sample_index = sample_index
+
         self.profile = profile
         self.border_title = "This Instance"
+        self.frame = frame
+        self.sample_index = sample_index
 
     def compose(self):
         yield Static("Total", id="stat-this-total-label")
@@ -49,9 +51,10 @@ class FrameStatThis(Widget):
         yield Static(
             self.frame_total_value_humanize, id="stat-this-total-value"
         )
-        yield Static("0", id="stat-this-self-value")
+        yield Static(self.frame_self_value_humanize, id="stat-this-self-value")
         yield Static(self.frame_total_percent, id="stat-this-total-percent")
-        yield Static("0", id="stat-this-self-percent")
+        yield Static(self.frame_self_percent, id="stat-this-self-percent")
+        self.composed = True
 
     def watch_frame(self, _: Frame):
         self._rerender()
@@ -60,29 +63,59 @@ class FrameStatThis(Widget):
         self._rerender()
 
     def _rerender(self):
-        if self.frame is None:
-            return
-        if self.sample_index is None:
+        if not self.composed:
             return
         logger.info(f"rerender --> {self.frame=} {self.sample_index=}")
 
-        try:
-            total_value_widget = self.query_one("#stat-this-total-value")
-        except NoMatches:
-            return
+        total_value_widget = self.query_one("#stat-this-total-value")
         total_value_widget.update(self.frame_total_value_humanize)
 
-        try:
-            total_percent_widget = self.query_one("#stat-this-total-percent")
-        except NoMatches:
-            return
+        total_percent_widget = self.query_one("#stat-this-total-percent")
         total_percent_widget.update(self.frame_total_percent)
 
+        self_value_widget = self.query_one("#stat-this-self-value")
+        self_value_widget.update(self.frame_self_value_humanize)
+
+        self_percent_widget = self.query_one("#stat-this-self-percent")
+        self_percent_widget.update(self.frame_self_percent)
+
+    # TODO value should be rendered as different color based on total value
     @property
     def frame_total_value_humanize(self):
         value = self.frame.values[self.sample_index]
         value_display = self.humanize(self.sample_unit, value)
         return value_display
+
+    @property
+    def frame_self_value(self):
+        value = self.frame.values[self.sample_index]
+        self_value = value
+        child_value = 0
+        if self.frame.children:
+            for child in self.frame.children:
+                child_value += child.values[self.sample_index]
+
+        self_value -= child_value
+        return self_value
+
+    @property
+    def frame_self_value_humanize(self):
+        value_display = self.humanize(self.sample_unit, self.frame_self_value)
+        return value_display
+
+    @property
+    def frame_self_percent(self):
+        frame = self.frame
+        sample_index = self.sample_index
+
+        if not frame.root.values[sample_index]:
+            p_root = 0
+        else:
+            p_root = (
+                self.frame_self_value / frame.root.values[sample_index] * 100
+            )
+
+        return f"{p_root:.2f}%"
 
     @property
     def frame_total_percent(self):
@@ -100,16 +133,16 @@ class FrameStatThis(Widget):
 
         return f"{p_root:.2f}%"
 
+    @property
+    def sample_unit(self):
+        return self.profile.sample_types[self.sample_index].sample_unit
+
     def humanize(self, sample_unit, value):
         display_value = value
         if sample_unit == "bytes":
             display_value = sizeof(value)
 
         return str(display_value)
-
-    @property
-    def sample_unit(self):
-        return self.profile.sample_types[self.sample_index].sample_unit
 
 
 class FrameStatAll(Widget):
