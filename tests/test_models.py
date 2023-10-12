@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 
 from flameshow.models import Profile, SampleType
@@ -50,6 +50,7 @@ def test_profile_creataion():
             2: s2,
             3: s3,
         },
+        name_aggr={}
     )
     assert p.lines == [[root], [s1], [s2, s3]]
 

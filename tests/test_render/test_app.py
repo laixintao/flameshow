@@ -37,6 +37,7 @@ def test_app_set_title_after_mount():
         total_sample=2,
         sample_types=[SampleType("goroutine", "count")],
         id_store={},
+        name_aggr={},
     )
     app = FlameshowApp(p)
     app.on_mount()

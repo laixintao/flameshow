@@ -1,12 +1,14 @@
 from unittest.mock import MagicMock
 
 import pytest
-from textual.events import Click, MouseMove
+from textual.events import MouseMove
 
 from flameshow.exceptions import RenderException
 from flameshow.models import Frame
 from flameshow.pprof_parser.parser import Line, PprofFrame, Profile, SampleType
 from flameshow.render.flamegraph import FlameGraph, FrameMap, add_array
+
+from ..utils import create_frame
 
 
 def test_flamegraph_generate_frame_maps_parents_with_only_child():
@@ -18,6 +20,7 @@ def test_flamegraph_generate_frame_maps_parents_with_only_child():
     s1.children = [s2]
 
     p = Profile(
+        name_aggr={},
         filename="abc",
         root_stack=root,
         highest_lines=1,
@@ -65,6 +68,7 @@ def test_flamegraph_generate_frame_maps():
     s1.children = [s2, s3]
 
     p = Profile(
+        name_aggr={},
         filename="abc",
         root_stack=root,
         highest_lines=1,
@@ -109,6 +113,7 @@ def test_flamegraph_generate_frame_maps_child_width_0():
     s1.children = [s2]
 
     p = Profile(
+        name_aggr={},
         filename="abc",
         root_stack=root,
         highest_lines=1,
@@ -150,6 +155,7 @@ def test_flamegraph_render_line():
             1: s1,
             2: s2,
         },
+        name_aggr={},
     )
     flamegraph_widget = FlameGraph(p, 0, -1, 0)
     flamegraph_widget.frame_maps = flamegraph_widget.generate_frame_maps(
@@ -173,6 +179,7 @@ def test_flamegraph_render_line_without_init():
     root.children = [s1, s2]
 
     p = Profile(
+        name_aggr={},
         filename="abc",
         root_stack=root,
         highest_lines=1,
@@ -203,7 +210,7 @@ def test_flamegraph_action_zoom_in_zoom_out():
         total_sample=2,
         sample_types=[SampleType("goroutine", "count")],
         id_store={},
-        name_aggr={}
+        name_aggr={},
     )
     flamegraph_widget = FlameGraph(p, 0, -1, 0)
     flamegraph_widget.focused_stack_id = 333
@@ -217,9 +224,7 @@ def test_flamegraph_action_zoom_in_zoom_out():
     assert flamegraph_widget.focused_stack_id == 42
 
 
-
-
-def test_flamegraph_action_move_down(create_frame):
+def test_flamegraph_action_move_down():
     root = create_frame(
         {
             "id": 0,
@@ -238,7 +243,7 @@ def test_flamegraph_action_move_down(create_frame):
         total_sample=10,
         sample_types=[SampleType("goroutine", "count")],
         id_store={},
-        name_aggr={}
+        name_aggr={},
     )
     flamegraph_widget = FlameGraph(p, 0, -1, view_frame=root)
     flamegraph_widget.post_message = MagicMock()
@@ -269,6 +274,7 @@ def test_flamegraph_action_move_down_no_more_children():
         total_sample=10,
         sample_types=[SampleType("goroutine", "count")],
         id_store={},
+        name_aggr={},
     )
     flamegraph_widget = FlameGraph(p, 0, -1, view_frame=root)
     flamegraph_widget.post_message = MagicMock()
@@ -289,6 +295,7 @@ def test_flamegraph_action_move_down_children_is_zero():
     )
 
     p = Profile(
+        name_aggr={},
         filename="abc",
         root_stack=root,
         highest_lines=10,
@@ -328,6 +335,7 @@ def test_flamegraph_action_move_up():
     )
 
     p = Profile(
+        name_aggr={},
         filename="abc",
         root_stack=root,
         highest_lines=10,
@@ -371,6 +379,7 @@ def test_flamegraph_action_move_right_sibling_just_here():
     )
 
     p = Profile(
+        name_aggr={},
         filename="abc",
         root_stack=root,
         highest_lines=10,
@@ -417,6 +426,7 @@ def test_flamegraph_action_move_right_sibling_goes_to_parent():
     )
 
     p = Profile(
+        name_aggr={},
         filename="abc",
         root_stack=root,
         highest_lines=10,
@@ -456,6 +466,7 @@ def test_flamegraph_action_move_right_on_root():
     )
 
     p = Profile(
+        name_aggr={},
         filename="abc",
         root_stack=root,
         highest_lines=10,
@@ -489,6 +500,7 @@ def test_flamegraph_action_move_left_sibling_just_here():
     )
 
     p = Profile(
+        name_aggr={},
         filename="abc",
         root_stack=root,
         highest_lines=10,
@@ -535,6 +547,7 @@ def test_flamegraph_action_move_left_sibling_goes_to_parent():
     )
 
     p = Profile(
+        name_aggr={},
         filename="abc",
         root_stack=root,
         highest_lines=10,
@@ -574,6 +587,7 @@ def test_flamegraph_action_move_left_on_root():
     )
 
     p = Profile(
+        name_aggr={},
         filename="abc",
         root_stack=root,
         highest_lines=10,
@@ -612,6 +626,7 @@ def test_flamegraph_render_on_mouse_move():
     )
 
     p = Profile(
+        name_aggr={},
         filename="abc",
         root_stack=root,
         highest_lines=10,
@@ -721,6 +736,7 @@ def test_flamegraph_render_line_with_some_width_is_0():
     )
 
     p = Profile(
+        name_aggr={},
         filename="abc",
         root_stack=root,
         highest_lines=1,
@@ -764,6 +780,7 @@ def test_flamegraph_render_line_with_focused_frame():
     )
 
     p = Profile(
+        name_aggr={},
         filename="abc",
         root_stack=root,
         highest_lines=1,
