@@ -203,6 +203,7 @@ def test_flamegraph_action_zoom_in_zoom_out():
         total_sample=2,
         sample_types=[SampleType("goroutine", "count")],
         id_store={},
+        name_aggr={}
     )
     flamegraph_widget = FlameGraph(p, 0, -1, 0)
     flamegraph_widget.focused_stack_id = 333
@@ -216,24 +217,9 @@ def test_flamegraph_action_zoom_in_zoom_out():
     assert flamegraph_widget.focused_stack_id == 42
 
 
-def create_frame(data, id_store=None):
-    root = Frame(
-        name="node-{}".format(data["id"]),
-        _id=data["id"],
-        values=data["values"],
-    )
-    root.children = []
-    for child in data["children"]:
-        cf = create_frame(child, id_store)
-        root.children.append(cf)
-        cf.parent = root
-
-    if id_store is not None:
-        id_store[root._id] = root
-    return root
 
 
-def test_flamegraph_action_move_down():
+def test_flamegraph_action_move_down(create_frame):
     root = create_frame(
         {
             "id": 0,
@@ -252,6 +238,7 @@ def test_flamegraph_action_move_down():
         total_sample=10,
         sample_types=[SampleType("goroutine", "count")],
         id_store={},
+        name_aggr={}
     )
     flamegraph_widget = FlameGraph(p, 0, -1, view_frame=root)
     flamegraph_widget.post_message = MagicMock()

@@ -1,6 +1,7 @@
 import pytest
 import pathlib
 from flameshow.pprof_parser import parse_profile
+from flameshow.models import Frame
 
 
 pytest_plugins = ("pytest_asyncio",)

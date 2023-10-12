@@ -186,15 +186,23 @@ class ProfileParser:
     def get_name_aggr(self, start_frame: Frame) -> Dict[str, List[Frame]]:
         result = {}
         frame_list = [start_frame]
+        # for deduplicating recurssion fream
+        existing_frame = set()
         while frame_list:
             next_list = []
+            currnet_frame_set = set()
             for frame in frame_list:
-                key = result[frame.name]
-                lst = result.setdefault(key, [])
-                lst.append(frame)
+                key = frame.name
+                if key not in existing_frame:
+                    lst = result.setdefault(key, [])
+                    lst.append(frame)
+
+                    currnet_frame_set.add(frame.name)
 
                 if frame.children:
-                    next_list.extend(next_list)
+                    next_list.extend(frame.children)
+
+            existing_frame = existing_frame | currnet_frame_set
 
             frame_list = next_list
 
