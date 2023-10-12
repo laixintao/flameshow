@@ -176,6 +176,7 @@ class FrameStatAll(Widget):
     """
 
     def __init__(self, frame, profile, sample_index, *args, **kwargs):
+        self.composed = False
         super().__init__(*args, **kwargs)
         self.frame = frame
         self.sample_index = sample_index
@@ -189,6 +190,7 @@ class FrameStatAll(Widget):
         yield Static("0", id="stat-all-self-value")
         yield Static("1.0%", id="stat-all-total-percent")
         yield Static("0", id="stat-all-self-percent")
+        self.composed = True
 
     @property
     def sample_unit(self):
@@ -254,10 +256,10 @@ class FrameDetail(Widget):
         try:
             frame_this_widget = self.query_one("FrameStatThis")
         except NoMatches:
-            return
-
-        frame_this_widget.frame = self.frame
-        frame_this_widget.sample_index = self.sample_index
+            logger.warning("Can not find FrameStatThis when _rerender detail")
+        else:
+            frame_this_widget.frame = self.frame
+            frame_this_widget.sample_index = self.sample_index
 
     @property
     def sample_unit(self):
