@@ -20,6 +20,7 @@ from flameshow.const import (
     SELECTED_PARENTS_BG_COLOR_BLEND_FACTOR,
     SELECTED_PARENTS_BG_COLOR_BLEND_TO,
     VIEW_INFO_COLOR,
+    VIEW_INFO_OTHER_COLOR,
 )
 from flameshow.exceptions import RenderException
 from flameshow.models import Frame
@@ -213,6 +214,8 @@ class FlameGraph(Widget, can_focus=True):
             if frame is self.view_frame:
                 display_color = Color.parse(VIEW_INFO_COLOR)
                 bold = True
+            elif frame.name == self.view_frame.name:
+                display_color = Color.parse(VIEW_INFO_OTHER_COLOR)
 
             if my_width > 0:
                 # | is always default color
