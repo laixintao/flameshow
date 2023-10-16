@@ -1,12 +1,14 @@
 from unittest.mock import MagicMock
 
 import pytest
-from textual.events import Click, MouseMove
+from textual.events import MouseMove
 
 from flameshow.exceptions import RenderException
 from flameshow.models import Frame
 from flameshow.pprof_parser.parser import Line, PprofFrame, Profile, SampleType
 from flameshow.render.flamegraph import FlameGraph, FrameMap, add_array
+
+from ..utils import create_frame
 
 
 def test_flamegraph_generate_frame_maps_parents_with_only_child():
@@ -214,23 +216,6 @@ def test_flamegraph_action_zoom_in_zoom_out():
     flamegraph_widget.view_frame = s1
     flamegraph_widget.action_zoom_in()
     assert flamegraph_widget.focused_stack_id == 42
-
-
-def create_frame(data, id_store=None):
-    root = Frame(
-        name="node-{}".format(data["id"]),
-        _id=data["id"],
-        values=data["values"],
-    )
-    root.children = []
-    for child in data["children"]:
-        cf = create_frame(child, id_store)
-        root.children.append(cf)
-        cf.parent = root
-
-    if id_store is not None:
-        id_store[root._id] = root
-    return root
 
 
 def test_flamegraph_action_move_down():

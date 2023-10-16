@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 import datetime
 import logging
 import time
-from typing import Dict, List
+from typing import Dict, List, Set
 from typing_extensions import Self
 
 from .runtime import r
@@ -97,6 +97,7 @@ class Profile:
     # its parents all the way up
     total_sample: int
     sample_types: List[SampleType]
+    # int id mapping to Frame
     id_store: Dict[int, Frame]
 
     # optional
@@ -109,6 +110,9 @@ class Profile:
     lines: List = field(init=False)
 
     frameid_to_lineno: Dict[int, int] = field(init=False)
+
+    # Frame grouped by same name
+    name_aggr: Dict[str, List[Frame]] = field(init=False)
 
     def __post_init__(self):
         """
@@ -143,3 +147,23 @@ class Profile:
         logger.info("create lines done, took %.2f seconds", t2 - t1)
         self.lines = lines
         self.frameid_to_lineno = frameid_to_lineno
+
+        self.name_aggr = self.get_name_aggr(self.root_stack)
+
+    def get_name_aggr(
+        self, start_frame: Frame, names: Set[str] | None = None
+    ) -> Dict[str, List[Frame]]:
+        name = start_frame.name
+
+        result = {}
+        if names is None:
+            names = set()
+        if name not in names:
+            result[name] = [start_frame]
+
+        for child in start_frame.children:
+            name_aggr = self.get_name_aggr(child, names | set([name]))
+            for key, value in name_aggr.items():
+                result.setdefault(key, []).extend(value)
+
+        return result
