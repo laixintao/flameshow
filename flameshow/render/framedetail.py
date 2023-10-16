@@ -200,7 +200,7 @@ class FrameStatAll(Widget):
             self.frame_all_self_value_humanize, id="stat-all-self-value"
         )
         yield Static(self.frame_all_total_percent, id="stat-all-total-percent")
-        yield Static("0", id="stat-all-self-percent")
+        yield Static(self.frame_all_self_percent, id="stat-all-self-percent")
         self.composed = True
 
     def watch_frame(self, _: Frame):
@@ -223,8 +223,8 @@ class FrameStatAll(Widget):
         self_value_widget = self.query_one("#stat-all-self-value")
         self_value_widget.update(self.frame_all_self_value_humanize)
 
-        # self_percent_widget = self.query_one("#stat-all-self-percent")
-        # self_percent_widget.update(self.frame_self_percent)
+        self_percent_widget = self.query_one("#stat-all-self-percent")
+        self_percent_widget.update(self.frame_all_self_percent)
 
     @property
     def frame_all_self_value(self):
@@ -258,6 +258,22 @@ class FrameStatAll(Widget):
     def frame_all_total_value_humanize(self):
         value_display = humanize(self.sample_unit, self.frame_all_total_value)
         return value_display
+
+    @property
+    def frame_all_self_percent(self):
+        frame = self.frame
+        sample_index = self.sample_index
+
+        if not frame.root.values[sample_index]:
+            p_root = 0
+        else:
+            p_root = (
+                self.frame_all_self_value
+                / frame.root.values[sample_index]
+                * 100
+            )
+
+        return f"{p_root:.2f}%"
 
     @property
     def frame_all_total_percent(self):
