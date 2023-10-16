@@ -50,7 +50,6 @@ def test_profile_creataion():
             2: s2,
             3: s3,
         },
-        name_aggr={}
     )
     assert p.lines == [[root], [s1], [s2, s3]]
 

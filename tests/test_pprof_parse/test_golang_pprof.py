@@ -1,6 +1,6 @@
 import datetime
 import json
-from flameshow.models import Frame
+from flameshow.models import Frame, Profile, SampleType
 
 from flameshow.pprof_parser.parser import ProfileParser
 from flameshow.pprof_parser.parser import (
@@ -159,8 +159,15 @@ def test_parser_get_name_aggr():
             ],
         }
     )
-    parser = ProfileParser("goroutine.out")
-    name_aggr = parser.get_name_aggr(root)
+    p = Profile(
+        filename="abc",
+        root_stack=root,
+        highest_lines=1,
+        total_sample=2,
+        sample_types=[SampleType("goroutine", "count")],
+        id_store={},
+    )
+    name_aggr = p.name_aggr
     assert name_aggr["node-0"] == [Frame("", 0)]
     assert name_aggr["node-1"] == [Frame("", 1)]
     assert name_aggr["node-2"] == [Frame("", 2)]
@@ -202,8 +209,59 @@ def test_parser_get_name_aggr_with_nested():
             ],
         }
     )
-    parser = ProfileParser("goroutine.out")
-    name_aggr = parser.get_name_aggr(root)
+
+    p = Profile(
+        filename="abc",
+        root_stack=root,
+        highest_lines=1,
+        total_sample=2,
+        sample_types=[SampleType("goroutine", "count")],
+        id_store={},
+    )
+
+    name_aggr = p.name_aggr
     assert name_aggr["node-0"] == [Frame("", 0)]
     assert name_aggr["foo"] == [Frame("", 1), Frame("", 2)]
     assert name_aggr["bar"] == [Frame("", 21)]
+
+
+def test_parser_get_name_aggr_with_previous_occrance():
+    root = create_frame(
+        {
+            "id": 0,
+            "values": [10],
+            "children": [
+                {
+                    "id": 1,
+                    "name": "foo",
+                    "values": [3],
+                    "children": [],
+                },
+                {
+                    "id": 2,
+                    "values": [4],
+                    "children": [
+                        {
+                            "id": 3,
+                            "name": "foo",
+                            "values": [2],
+                            "children": [],
+                        },
+                    ],
+                    "name": "bar",
+                },
+            ],
+        }
+    )
+
+    p = Profile(
+        filename="abc",
+        root_stack=root,
+        highest_lines=1,
+        total_sample=2,
+        sample_types=[SampleType("goroutine", "count")],
+        id_store={},
+    )
+
+    name_aggr = p.name_aggr
+    assert name_aggr["foo"] == [Frame("", 1), Frame("", 3)]
