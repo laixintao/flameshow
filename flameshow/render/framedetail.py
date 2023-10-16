@@ -196,7 +196,9 @@ class FrameStatAll(Widget):
         yield Static(
             self.frame_all_total_value_humanize, id="stat-all-total-value"
         )
-        yield Static("0", id="stat-all-self-value")
+        yield Static(
+            self.frame_all_self_value_humanize, id="stat-all-self-value"
+        )
         yield Static(self.frame_all_total_percent, id="stat-all-total-percent")
         yield Static("0", id="stat-all-self-percent")
         self.composed = True
@@ -218,11 +220,31 @@ class FrameStatAll(Widget):
         total_percent_widget = self.query_one("#stat-all-total-percent")
         total_percent_widget.update(self.frame_all_total_percent)
 
-        # self_value_widget = self.query_one("#stat-all-self-value")
-        # self_value_widget.update(self.frame_self_value_humanize)
+        self_value_widget = self.query_one("#stat-all-self-value")
+        self_value_widget.update(self.frame_all_self_value_humanize)
 
         # self_percent_widget = self.query_one("#stat-all-self-percent")
         # self_percent_widget.update(self.frame_self_percent)
+
+    @property
+    def frame_all_self_value(self):
+        frames_same_name = self.name_to_frame[self.frame.name]
+        total_value = 0
+        i = self.sample_index
+        for instance in frames_same_name:
+            if not instance.children:
+                continue
+            child_total = sum(child.values[i] for child in instance.children)
+            self_value = instance.values[i]
+
+            total_value += self_value - child_total
+
+        return total_value
+
+    @property
+    def frame_all_self_value_humanize(self):
+        value_display = humanize(self.sample_unit, self.frame_all_self_value)
+        return value_display
 
     @property
     def frame_all_total_value(self):
