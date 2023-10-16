@@ -113,7 +113,6 @@ class Profile:
 
     frameid_to_lineno: Dict[int, int] = field(init=False)
 
-
     def __post_init__(self):
         """
         init_lines must be called before render
