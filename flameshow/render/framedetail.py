@@ -197,7 +197,7 @@ class FrameStatAll(Widget):
             self.frame_all_total_value_humanize, id="stat-all-total-value"
         )
         yield Static("0", id="stat-all-self-value")
-        yield Static("1.0%", id="stat-all-total-percent")
+        yield Static(self.frame_all_total_percent, id="stat-all-total-percent")
         yield Static("0", id="stat-all-self-percent")
         self.composed = True
 
@@ -215,8 +215,8 @@ class FrameStatAll(Widget):
         total_value_widget = self.query_one("#stat-all-total-value")
         total_value_widget.update(self.frame_all_total_value_humanize)
 
-        # total_percent_widget = self.query_one("#stat-all-total-percent")
-        # total_percent_widget.update(self.frame_total_percent)
+        total_percent_widget = self.query_one("#stat-all-total-percent")
+        total_percent_widget.update(self.frame_all_total_percent)
 
         # self_value_widget = self.query_one("#stat-all-self-value")
         # self_value_widget.update(self.frame_self_value_humanize)
@@ -225,19 +225,33 @@ class FrameStatAll(Widget):
         # self_percent_widget.update(self.frame_self_percent)
 
     @property
-    def frame_all_total_value_humanize(self):
+    def frame_all_total_value(self):
         frames_same_name = self.name_to_frame[self.frame.name]
-        logger.info("frames: %s", frames_same_name)
-        logger.info("frame vaues: %s", frames_same_name[0].values)
-        logger.info(
-            "frame value: %s",
-            [f.values[self.sample_index] for f in frames_same_name],
-        )
         total_value = sum(
             f.values[self.sample_index] for f in frames_same_name
         )
-        value_display = humanize(self.sample_unit, total_value)
+        return total_value
+
+    @property
+    def frame_all_total_value_humanize(self):
+        value_display = humanize(self.sample_unit, self.frame_all_total_value)
         return value_display
+
+    @property
+    def frame_all_total_percent(self):
+        frame = self.frame
+        sample_index = self.sample_index
+
+        if not frame.root.values[sample_index]:
+            p_root = 0
+        else:
+            p_root = (
+                self.frame_all_total_value
+                / frame.root.values[sample_index]
+                * 100
+            )
+
+        return f"{p_root:.2f}%"
 
     @property
     def sample_unit(self):
