@@ -235,7 +235,9 @@ class FrameStatAll(Widget):
             self_value = instance.values[i]
 
             if instance.children:
-                child_total = sum(child.values[i] for child in instance.children)
+                child_total = sum(
+                    child.values[i] for child in instance.children
+                )
                 self_value -= child_total
 
             total_value += self_value
