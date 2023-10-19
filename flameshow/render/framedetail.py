@@ -232,12 +232,13 @@ class FrameStatAll(Widget):
         total_value = 0
         i = self.sample_index
         for instance in frames_same_name:
-            if not instance.children:
-                continue
-            child_total = sum(child.values[i] for child in instance.children)
             self_value = instance.values[i]
 
-            total_value += self_value - child_total
+            if instance.children:
+                child_total = sum(child.values[i] for child in instance.children)
+                self_value -= child_total
+
+            total_value += self_value
 
         return total_value
 
