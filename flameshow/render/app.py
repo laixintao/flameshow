@@ -61,18 +61,6 @@ class FlameshowApp(App):
     ]
 
     DEFAULT_CSS = """
-    #span-detail-container {
-        height: 4;
-    }
-
-    #span-detail {
-        width: 1fr;
-        height: 1fr;
-        padding: 0 1;
-        border: round $secondary;
-        content-align-vertical: middle;
-    }
-
     #sample-type-radio {
         width: 20%;
         height: 1fr;

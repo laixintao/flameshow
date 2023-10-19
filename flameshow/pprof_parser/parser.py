@@ -9,8 +9,10 @@ from dataclasses import dataclass, field
 import datetime
 import gzip
 import logging
-import os
 from typing import Dict, List
+from rich.style import Style
+
+from rich.text import Text
 
 from flameshow.models import Frame, Profile, SampleType
 from flameshow.utils import sizeof
@@ -84,49 +86,47 @@ class PprofFrame(Frame):
 
         return display_value
 
+    def render_one_frame_detail(self, frame, sample_index, sample_unit):
+        if frame._id == 0:  # root
+            total = sum([c.values[sample_index] for c in frame.children])
+            value = frame.humanize(sample_unit, total)
+            if frame.children:
+                binary_name = f"Binary: {frame.children[0].mapping.filename}"
+            else:
+                binary_name = "root"
+            detail = f"{binary_name} [b red]{value}[/b red]\n"
+            return [detail]
+
+        value = frame.humanize(sample_unit, frame.values[sample_index])
+        line1 = f"{frame.line.function.name}: [b red]{value}[/b red]\n"
+
+        line2 = (
+            f"  [grey37]{frame.line.function.filename}, [b]line"
+            f" {frame.line.line_no}[/b][/grey37]\n"
+        )
+        return [line1, line2]
+
     def render_detail(self, sample_index: int, sample_unit: str):
         """
-        render 2 lines of detail information
+        render stacked information
         """
-        if self._id == 0:  # root
-            total = sum([c.values[sample_index] for c in self.children])
-            line1 = f"Total: {self.humanize(sample_unit, total)}"
-            line2 = ""
-            if self.children:
-                line2 = f"Binary: {self.children[0].mapping.filename}"
-        else:
-            line1 = (
-                f"{self.line.function.filename}, [b]line"
-                f" {self.line.line_no}[/b]"
+        detail = []
+        frame = self
+        while frame:
+            lines = self.render_one_frame_detail(
+                frame, sample_index, sample_unit
             )
-            if not self.parent or not self.root:
-                logger.warning("self.parent or self.root is None!")
-                line2 = "<error>"
-            else:
-                if not self.parent.values[sample_index]:
-                    p_parent = 0
-                else:
-                    p_parent = (
-                        self.values[sample_index]
-                        / self.parent.values[sample_index]
-                        * 100
+            for line in lines:
+                detail.append(
+                    Text.assemble(
+                        (" ", Style(bgcolor=frame.display_color.rich_color)),
+                        " ",
+                        Text.from_markup(line),
                     )
-
-                if not self.root.values[sample_index]:
-                    p_root = 0
-                else:
-                    p_root = (
-                        self.values[sample_index]
-                        / self.root.values[sample_index]
-                        * 100
-                    )
-
-                value = self.humanize(sample_unit, self.values[sample_index])
-                line2 = (
-                    f"{self.line.function.name}: [b red]{value}[/b"
-                    f" red] ({p_parent:.1f}% of parent, {p_root:.1f}% of root)"
                 )
-        return line1 + os.linesep + line2
+            frame = frame.parent
+
+        return Text.assemble(*detail), len(detail)
 
     def render_title(self) -> str:
         return self.display_name

@@ -5,7 +5,7 @@ from textual.events import MouseMove
 
 from flameshow.exceptions import RenderException
 from flameshow.models import Frame
-from flameshow.pprof_parser.parser import Line, PprofFrame, Profile, SampleType
+from flameshow.pprof_parser.parser import Profile, SampleType
 from flameshow.render.flamegraph import FlameGraph, FrameMap, add_array
 
 from ..utils import create_frame
@@ -41,16 +41,6 @@ def test_flamegraph_generate_frame_maps_parents_with_only_child():
         1: [FrameMap(offset=0, width=16)],
         2: [FrameMap(offset=0, width=8)],
     }
-
-
-def test_render_detail_when_parent_zero():
-    root = PprofFrame("root", 0, values=[0])
-    s1 = PprofFrame("s1", 1, values=[0], parent=root, root=root)
-    s1.line = Line()
-    s1.line.function.name = "asdf"
-
-    detail = s1.render_detail(0, "bytes")
-    assert "(0.0% of parent, 0.0% of root)" in detail
 
 
 def test_add_array():

@@ -1,6 +1,6 @@
 import logging
 
-from textual.containers import Vertical
+from textual.containers import Vertical, VerticalScroll
 from textual.css.query import NoMatches
 from textual.reactive import reactive
 from textual.widget import Widget
@@ -306,10 +306,11 @@ class FrameDetail(Widget):
         height: 10;
     }
 
-    #span-detail {
+    #span-stack-container {
         width: 1fr;
         height: 1fr;
-        padding: 0 1;
+        padding-left: 1;
+        padding-right: 0;
         border: round $secondary;
         content-align-vertical: middle;
     }
@@ -335,12 +336,18 @@ class FrameDetail(Widget):
             FrameStatAll(self.frame, self.profile, self.sample_index),
             id="stat-container",
         )
+        content, *_ = self.frame.render_detail(
+            self.sample_index, self.sample_unit
+        )
         span_detail = Static(
-            self.frame.render_detail(self.sample_index, self.sample_unit),
+            content,
             id="span-detail",
         )
-        span_detail.border_title = self.frame.render_title()
-        yield span_detail
+        span_stack_container = VerticalScroll(
+            span_detail, id="span-stack-container"
+        )
+        span_stack_container.border_title = self.frame.render_title()
+        yield span_stack_container
         self.composed = True
 
     def _rerender(self):
@@ -348,12 +355,15 @@ class FrameDetail(Widget):
             return
         try:
             span_detail = self.query_one("#span-detail")
+            span_stack_container = self.query_one("#span-stack-container")
         except NoMatches:
             return
-        span_detail.border_title = self.frame.render_title()
-        span_detail.update(
-            self.frame.render_detail(self.sample_index, self.sample_unit)
+        span_stack_container.border_title = self.frame.render_title()
+        content, height = self.frame.render_detail(
+            self.sample_index, self.sample_unit
         )
+        span_detail.update(content)
+        span_detail.styles.height = height
 
         try:
             frame_this_widget = self.query_one("FrameStatThis")

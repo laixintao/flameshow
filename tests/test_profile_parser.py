@@ -25,4 +25,4 @@ def test_render_detail_when_parent_zero():
     s1.line.function.name = "asdf"
 
     detail = s1.render_detail(0, "bytes")
-    assert "(0.0% of parent, 0.0% of root)" in detail
+    assert "  asdf: 0.0B\n    , line 0" in detail[0]
