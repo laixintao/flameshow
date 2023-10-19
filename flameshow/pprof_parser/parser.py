@@ -91,10 +91,11 @@ class PprofFrame(Frame):
         if frame._id == 0:  # root
             total = sum([c.values[sample_index] for c in frame.children])
             value = frame.humanize(sample_unit, total)
-            detail = (
-                f"Binary: {frame.children[0].mapping.filename} [b"
-                f" red]{value}[/b red]\n"
-            )
+            if frame.children:
+                binary_name = f"Binary: {frame.children[0].mapping.filename}"
+            else:
+                binary_name = "root"
+            detail = f"{binary_name} [b red]{value}[/b red]\n"
             return [detail]
 
         value = frame.humanize(sample_unit, frame.values[sample_index])
