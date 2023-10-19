@@ -4,6 +4,7 @@ Parse golang's pprof format into flameshow.models which can be rendered.
 Ref:
 https://github.com/google/pprof/tree/main/proto
 """
+
 from dataclasses import dataclass, field
 import datetime
 import gzip
