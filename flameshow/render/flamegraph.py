@@ -65,7 +65,7 @@ class FlameGraph(Widget, can_focus=True):
         profile,
         focused_stack_id,
         sample_index,
-        view_frame,
+        view_frame: Frame,
         *args,
         **kwargs,
     ):

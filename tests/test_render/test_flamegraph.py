@@ -153,7 +153,7 @@ def test_flamegraph_render_line():
             2: s2,
         },
     )
-    flamegraph_widget = FlameGraph(p, 0, -1, 0)
+    flamegraph_widget = FlameGraph(p, 0, -1, root)
     flamegraph_widget.frame_maps = flamegraph_widget.generate_frame_maps(
         10, focused_stack_id=0
     )
@@ -726,7 +726,7 @@ def test_flamegraph_render_line_with_some_width_is_0():
         sample_types=[SampleType("samples", "count")],
         id_store=id_store,
     )
-    flamegraph_widget = FlameGraph(p, 0, -1, 0)
+    flamegraph_widget = FlameGraph(p, 0, -1, root)
     flamegraph_widget.frame_maps = flamegraph_widget.generate_frame_maps(
         10, focused_stack_id=0
     )
@@ -769,7 +769,7 @@ def test_flamegraph_render_line_with_focused_frame():
         sample_types=[SampleType("samples", "count")],
         id_store=id_store,
     )
-    flamegraph_widget = FlameGraph(p, 2, -1, 0)
+    flamegraph_widget = FlameGraph(p, 2, -1, root)
     flamegraph_widget.frame_maps = flamegraph_widget.generate_frame_maps(
         10, focused_stack_id=2
     )
