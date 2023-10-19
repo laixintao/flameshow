@@ -9,7 +9,6 @@ from dataclasses import dataclass, field
 import datetime
 import gzip
 import logging
-import os
 from typing import Dict, List
 from rich.style import Style
 
