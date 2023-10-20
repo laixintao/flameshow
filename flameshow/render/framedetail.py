@@ -3,10 +3,12 @@ import logging
 from textual.containers import Vertical, VerticalScroll
 from textual.css.query import NoMatches
 from textual.reactive import reactive
+from textual.screen import Screen
 from textual.widget import Widget
-from textual.widgets import Static
+from textual.widgets import Footer, Static
 
 from flameshow.models import Frame
+from flameshow.render.header import FlameshowHeader
 from flameshow.utils import sizeof
 
 logger = logging.getLogger(__name__)
@@ -392,3 +394,31 @@ class FrameDetail(Widget):
     def watch_sample_index(self, new_sample_index):
         logger.info("sample index changed to: %s", new_sample_index)
         self._rerender()
+
+
+class InformaionScreen(Screen):
+    def __init__(
+        self, frame, sample_index, sample_unit, *args, **kwargs
+    ) -> None:
+        super().__init__(*args, **kwargs)
+        self.frame = frame
+        self.sample_index = sample_index
+        self.sample_unit = sample_unit
+
+    def compose(self):
+        center_text = "Stack detail information"
+        yield FlameshowHeader(center_text)
+        content, height = self.frame.render_detail(
+            self.sample_index, self.sample_unit
+        )
+        span_detail = Static(
+            content,
+            id="span-detail",
+        )
+        span_detail.styles.height = height
+        span_stack_container = VerticalScroll(
+            span_detail, id="span-stack-container"
+        )
+        span_stack_container.border_title = self.frame.render_title()
+        yield span_stack_container
+        yield Footer()
