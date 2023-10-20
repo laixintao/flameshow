@@ -11,7 +11,7 @@ from textual.reactive import reactive
 from textual.widgets import Footer, Static, Tabs, Tab
 
 from flameshow import __version__
-from flameshow.render.framedetail import FrameDetail
+from flameshow.render.framedetail import FrameDetail, InformaionScreen
 from flameshow.render.header import FlameshowHeader
 from flameshow.render.tabs import SampleTabs
 
@@ -58,6 +58,7 @@ class FlameshowApp(App):
         ),
         Binding("ctrl+c,q", "quit", "Quit", show=True, key_display="Q"),
         Binding("o", "debug"),
+        Binding("i", "information_screen", "Toggle view stack", show=True),
     ]
 
     DEFAULT_CSS = """
@@ -125,6 +126,7 @@ class FlameshowApp(App):
             frame=self.root_stack,
             sample_index=self.sample_index,
         )
+        self.show_information_screen = False
 
     def on_mount(self):
         logger.info("mounted")
@@ -228,3 +230,14 @@ class FlameshowApp(App):
         logger.info("Tab changed: %s", event)
         chosen_index = event.tab.id.split("-")[1]
         self.sample_index = int(chosen_index)
+
+    def action_information_screen(self):
+        if self.show_information_screen:
+            self.pop_screen()
+        else:
+            self.push_screen(
+                InformaionScreen(
+                    self.view_frame, self.sample_index, self.sample_unit
+                )
+            )
+        self.show_information_screen = not self.show_information_screen
