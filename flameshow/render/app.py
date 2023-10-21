@@ -200,6 +200,10 @@ class FlameshowApp(App):
         self.flamegraph_widget.sample_index = sample_index
         self.frame_detail.sample_index = sample_index
 
+        if self.show_information_screen:
+            information_screen = self.query_one("InformaionScreen")
+            information_screen.sample_index = sample_index
+
     async def watch_view_frame(self, old, new_frame):
         logger.debug(
             "view info stack changed: old: %s, new: %s",
@@ -237,7 +241,10 @@ class FlameshowApp(App):
         else:
             self.push_screen(
                 InformaionScreen(
-                    self.view_frame, self.sample_index, self.sample_unit
+                    self.view_frame,
+                    self.sample_index,
+                    self.sample_unit,
+                    self.profile,
                 )
             )
         self.show_information_screen = not self.show_information_screen
