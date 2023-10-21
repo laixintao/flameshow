@@ -403,7 +403,7 @@ class InformaionScreen(Screen):
         Binding("escape", "exit_screen", "Close detail screen", show=True),
     ]
 
-    class InformaionScreenPoped(Message):
+    class InformaionScreenPopped(Message):
         pass
 
     def __init__(
@@ -433,4 +433,4 @@ class InformaionScreen(Screen):
         yield Footer()
 
     def action_exit_screen(self):
-        self.post_message(self.InformaionScreenPoped())
+        self.post_message(self.InformaionScreenPopped())
