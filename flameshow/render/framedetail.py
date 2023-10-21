@@ -340,9 +340,7 @@ class FrameDetail(Widget):
             FrameStatAll(self.frame, self.profile, self.sample_index),
             id="stat-container",
         )
-        content, *_ = self.frame.render_detail(
-            self.sample_index, self.sample_unit
-        )
+        content = self.frame.render_detail(self.sample_index, self.sample_unit)
         span_detail = Static(
             content,
             id="span-detail",
@@ -363,11 +361,8 @@ class FrameDetail(Widget):
         except NoMatches:
             return
         span_stack_container.border_title = self.frame.render_title()
-        content, height = self.frame.render_detail(
-            self.sample_index, self.sample_unit
-        )
+        content = self.frame.render_detail(self.sample_index, self.sample_unit)
         span_detail.update(content)
-        span_detail.styles.height = height
 
         try:
             frame_this_widget = self.query_one("FrameStatThis")
@@ -402,35 +397,54 @@ class InformaionScreen(Screen):
     BINDINGS = [
         Binding("escape", "exit_screen", "Close detail screen", show=True),
     ]
+    sample_index = reactive(None, init=False)
 
     class InformaionScreenPopped(Message):
         pass
 
     def __init__(
-        self, frame, sample_index, sample_unit, *args, **kwargs
+        self, frame, sample_index, sample_unit, profile, *args, **kwargs
     ) -> None:
+        self.composed = False
         super().__init__(*args, **kwargs)
         self.frame = frame
         self.sample_index = sample_index
-        self.sample_unit = sample_unit
+        self.profile = profile
 
     def compose(self):
         center_text = "Stack detail information"
         yield FlameshowHeader(center_text)
-        content, height = self.frame.render_detail(
-            self.sample_index, self.sample_unit
-        )
+        content = self.frame.render_detail(self.sample_index, self.sample_unit)
         span_detail = Static(
             content,
             id="span-detail",
         )
-        span_detail.styles.height = height
         span_stack_container = VerticalScroll(
             span_detail, id="span-stack-container"
         )
         span_stack_container.border_title = self.frame.render_title()
         yield span_stack_container
         yield Footer()
+        self.composed = True
 
     def action_exit_screen(self):
         self.post_message(self.InformaionScreenPopped())
+
+    def watch_sample_index(self, new_sample_index):
+        logger.info("sample index change: %s", new_sample_index)
+        self._rerender()
+
+    def _rerender(self):
+        if not self.composed:
+            return
+        content = self.frame.render_detail(self.sample_index, self.sample_unit)
+        try:
+            span_detail = self.query_one("#span-detail")
+        except NoMatches:
+            logger.warning("Didn't found #span-detail")
+            return
+        span_detail.update(content)
+
+    @property
+    def sample_unit(self):
+        return self.profile.sample_types[self.sample_index].sample_unit

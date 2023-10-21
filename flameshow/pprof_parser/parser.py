@@ -126,7 +126,7 @@ class PprofFrame(Frame):
                 )
             frame = frame.parent
 
-        return Text.assemble(*detail), len(detail)
+        return Text.assemble(*detail)
 
     def render_title(self) -> str:
         return self.display_name
