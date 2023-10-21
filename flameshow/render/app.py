@@ -241,3 +241,10 @@ class FlameshowApp(App):
                 )
             )
         self.show_information_screen = not self.show_information_screen
+
+    @on(InformaionScreen.InformaionScreenPoped)
+    def handle_inforamtion_screen_pop(self, event):
+        logger.info("Information screen poped, event=%s", event)
+        if self.show_information_screen:
+            self.pop_screen()
+        self.show_information_screen = False

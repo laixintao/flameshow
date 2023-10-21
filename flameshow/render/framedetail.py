@@ -1,7 +1,9 @@
 import logging
 
+from textual.binding import Binding
 from textual.containers import Vertical, VerticalScroll
 from textual.css.query import NoMatches
+from textual.message import Message
 from textual.reactive import reactive
 from textual.screen import Screen
 from textual.widget import Widget
@@ -397,6 +399,13 @@ class FrameDetail(Widget):
 
 
 class InformaionScreen(Screen):
+    BINDINGS = [
+        Binding("escape", "exit_screen", "Close detail screen", show=True),
+    ]
+
+    class InformaionScreenPoped(Message):
+        pass
+
     def __init__(
         self, frame, sample_index, sample_unit, *args, **kwargs
     ) -> None:
@@ -422,3 +431,6 @@ class InformaionScreen(Screen):
         span_stack_container.border_title = self.frame.render_title()
         yield span_stack_container
         yield Footer()
+
+    def action_exit_screen(self):
+        self.post_message(self.InformaionScreenPoped())
