@@ -10,8 +10,8 @@ import datetime
 import gzip
 import logging
 from typing import Dict, List
-from rich.style import Style
 
+from rich.style import Style
 from rich.text import Text
 
 from flameshow.models import Frame, Profile, SampleType
@@ -326,6 +326,15 @@ class ProfileParser:
 
     def to_smaple_type(self, st):
         return SampleType(self.s(st.type), self.s(st.unit))
+
+    @classmethod
+    def validate(cls, content: bytes) -> bool:
+        try:
+            unmarshal(content)
+        except:  # noqa E722
+            logger.info("Error when parse content as Pprof")
+            return False
+        return True
 
 
 def get_frame_tree(root_frame):

@@ -43,7 +43,6 @@ textual = "^0.37.1"
 click = "^8.1.7"
 protobuf = "^4.24"
 iteround = "^1.0.4"
-binaryornot = "^0.4.4"
 
 [tool.poetry.scripts]
 flameshow = 'flameshow.main:main'
