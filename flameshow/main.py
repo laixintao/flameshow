@@ -7,7 +7,7 @@ import sys
 import click
 
 from flameshow import __version__
-from flameshow.pprof_parser import parse_profile
+from flameshow.parsers import parse
 from flameshow.render import FlameshowApp
 
 
@@ -54,7 +54,7 @@ def run_app(verbose, log_to, profile_f, _debug_exit_after_rednder):
     t0 = time.time()
     profile_data = profile_f.read()
 
-    profile = parse_profile(profile_data, profile_f.name)
+    profile = parse(profile_data, profile_f.name)
 
     t01 = time.time()
     logger.info("Parse profile, took %.3fs", t01 - t0)
@@ -67,7 +67,7 @@ def run_app(verbose, log_to, profile_f, _debug_exit_after_rednder):
     app.run()
 
 
-def print_version(ctx, param, value):
+def print_version(ctx, _, value):
     if not value or ctx.resilient_parsing:
         return
     click.echo(__version__)
