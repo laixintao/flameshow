@@ -76,8 +76,27 @@ class PprofFrame(Frame):
     ) -> None:
         super().__init__(name, _id, children, parent, values, root)
 
+        parts = self.name.split("/")
+        if len(parts) > 1:
+            self.golang_package = "/".join(parts[:-1])
+        else:
+            self.golang_package = "buildin"
+
+        self.golang_module_function = parts[-1]
+
+        self.golang_module = self.golang_module_function.split(".")[0]
+
+        self.mapping_file = ""
         self.line = line
         self.mapping = mapping
+
+    @property
+    def color_key(self):
+        return self.golang_module
+
+    @property
+    def display_name(self):
+        return self.golang_module_function
 
     def humanize(self, sample_unit, value):
         display_value = value

@@ -27,19 +27,6 @@ class Frame:
         else:
             self.values = values
 
-        parts = self.name.split("/")
-        if len(parts) > 1:
-            self.golang_package = "/".join(parts[:-1])
-        else:
-            self.golang_package = "buildin"
-
-        golang_module_function = parts[-1]
-        golang_module = golang_module_function.split(".")[0]
-
-        self.display_name = golang_module_function
-        self.color_key = golang_module
-
-        self.mapping_file = ""
         self.root = root
 
     def pile_up(self, childstack: Self):
@@ -67,6 +54,13 @@ class Frame:
             return self._id == other._id
         return False
 
+    @property
+    def display_color(self):
+        return r.get_color(self.color_key)
+
+    def __repr__(self) -> str:
+        return f"<Frame #{self._id} {self.name}>"
+
     def render_detail(self, sample_index: int, sample_unit: str):
         raise NotImplementedError
 
@@ -74,11 +68,12 @@ class Frame:
         raise NotImplementedError
 
     @property
-    def display_color(self):
-        return r.get_color(self.color_key)
+    def color_key(self):
+        raise NotImplementedError
 
-    def __repr__(self) -> str:
-        return f"<Frame #{self._id} {self.name}>"
+    @property
+    def display_name(self):
+        raise NotImplementedError
 
 
 @dataclass
