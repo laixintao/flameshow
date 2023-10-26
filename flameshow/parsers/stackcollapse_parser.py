@@ -63,6 +63,8 @@ class StackCollapseParser:
             sample_types=[SampleType("samples", "count")],
             id_store=self.id_store,
         )
+        logger.info("profile.lines = %s", profile.lines)
+        logger.info("profile.id_store = %s", profile.id_store)
         return profile
 
     def parse_line(self, line) -> None:
@@ -78,6 +80,7 @@ class StackCollapseParser:
         count = int(matcher.group(2))
         frame_names = frame_str.split(";")
         logger.info("frame names:%s, count: %s", frame_names, count)
+
         pre = None
         head = None
         for name in frame_names:
@@ -89,14 +92,20 @@ class StackCollapseParser:
                 values=[count],
                 root=self.root,
             )
+            self.id_store[frame._id] = frame
             if pre:
                 pre.children = [frame]
+                frame.parent = pre
             if not head:
                 head = frame
             pre = frame
 
         if head:
             self.root.pile_up(head)
+            self.root.values[0] += head.values[0]
+
+        if len(frame_names) > self.highest:
+            self.highest = len(frame_names)
         logger.debug("over")
 
     @classmethod
