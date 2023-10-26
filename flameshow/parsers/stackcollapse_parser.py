@@ -73,9 +73,10 @@ class StackCollapseParser:
             return
         matcher = self.line_matcher.match(line)
         if not matcher:
-            raise ProfileParseException(
+            logger.warn(
                 "Can not parse {} with regex {}".format(line, self.line_regex)
             )
+            return
         frame_str = matcher.group(1)
         count = int(matcher.group(2))
         frame_names = frame_str.split(";")
@@ -125,11 +126,12 @@ class StackCollapseParser:
             logger.info("The file is empty, skip StackCollapseParser")
             return False
 
-        for line in to_validate_liens:
-            if not re.match(r".+\s\d+$", line):
+        for index, line in enumerate(to_validate_liens):
+            if not re.match(r"(.* )?\d+", line):
                 logger.info(
-                    "%s not match regex, not suitable for"
+                    "line %d not match regex, line:%s not suitable for"
                     " StackCollapseParser!",
+                    index + 1,
                     line,
                 )
                 return False
