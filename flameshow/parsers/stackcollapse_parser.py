@@ -9,14 +9,30 @@ logger = logging.getLogger(__name__)
 
 
 class StackCollapseFrame(Frame):
-    pass
+    @property
+    def color_key(self):
+        return self.name
+
+    def render_title(self) -> str:
+        return self.name
+
+    @property
+    def display_name(self):
+        return self.name
+
+    def render_one_frame_detail(
+        self, frame, sample_index: int, sample_unit: str
+    ):
+        return frame.name
 
 
 class StackCollapseParser:
     def __init__(self, filename) -> None:
         self.filename = filename
         self.next_id = 0
-        self.root = StackCollapseFrame("root", _id=self.idgenerator())
+        self.root = StackCollapseFrame(
+            "root", _id=self.idgenerator(), values=[0]
+        )
         self.root.root = self.root
 
         self.highest = 0
@@ -35,6 +51,9 @@ class StackCollapseParser:
         lines = text_data.split(os.linesep)
         for line in lines:
             self.parse_line(line)
+
+        logger.info("root: %s, %s", self.root, self.root.values)
+        logger.debug("root.children: %s", self.root.children)
 
         profile = Profile(
             filename=self.filename,
@@ -56,13 +75,15 @@ class StackCollapseParser:
                 "Can not parse {} with regex {}".format(line, self.line_regex)
             )
         frame_str = matcher.group(1)
-        count = matcher.group(2)
+        count = int(matcher.group(2))
         frame_names = frame_str.split(";")
+        logger.info("frame names:%s, count: %s", frame_names, count)
         pre = None
+        head = None
         for name in frame_names:
             frame = StackCollapseFrame(
                 name,
-                self.idgenerator,
+                self.idgenerator(),
                 children=[],
                 parent=pre,
                 values=[count],
@@ -70,7 +91,13 @@ class StackCollapseParser:
             )
             if pre:
                 pre.children = [frame]
+            if not head:
+                head = frame
             pre = frame
+
+        if head:
+            self.root.pile_up(head)
+        logger.debug("over")
 
     @classmethod
     def validate(cls, content: bytes) -> bool:

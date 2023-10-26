@@ -11,11 +11,7 @@ import gzip
 import logging
 from typing import Dict, List
 
-from rich.style import Style
-from rich.text import Text
-
 from flameshow.models import Frame, Profile, SampleType
-from flameshow.utils import sizeof
 
 from . import profile_pb2
 
@@ -98,13 +94,6 @@ class PprofFrame(Frame):
     def display_name(self):
         return self.golang_module_function
 
-    def humanize(self, sample_unit, value):
-        display_value = value
-        if sample_unit == "bytes":
-            display_value = sizeof(value)
-
-        return display_value
-
     def render_one_frame_detail(self, frame, sample_index, sample_unit):
         if frame._id == 0:  # root
             total = sum([c.values[sample_index] for c in frame.children])
@@ -124,28 +113,6 @@ class PprofFrame(Frame):
             f" {frame.line.line_no}[/b][/grey37]\n"
         )
         return [line1, line2]
-
-    def render_detail(self, sample_index: int, sample_unit: str):
-        """
-        render stacked information
-        """
-        detail = []
-        frame = self
-        while frame:
-            lines = self.render_one_frame_detail(
-                frame, sample_index, sample_unit
-            )
-            for line in lines:
-                detail.append(
-                    Text.assemble(
-                        (" ", Style(bgcolor=frame.display_color.rich_color)),
-                        " ",
-                        Text.from_markup(line),
-                    )
-                )
-            frame = frame.parent
-
-        return Text.assemble(*detail)
 
     def render_title(self) -> str:
         return self.display_name

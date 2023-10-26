@@ -5,6 +5,11 @@ import time
 from typing import Dict, List, Set
 from typing_extensions import Self
 
+from rich.style import Style
+from rich.text import Text
+
+from flameshow.utils import sizeof
+
 from .runtime import r
 
 
@@ -58,21 +63,55 @@ class Frame:
     def display_color(self):
         return r.get_color(self.color_key)
 
+    def humanize(self, sample_unit, value):
+        display_value = value
+        if sample_unit == "bytes":
+            display_value = sizeof(value)
+
+        return display_value
+
     def __repr__(self) -> str:
         return f"<Frame #{self._id} {self.name}>"
 
     def render_detail(self, sample_index: int, sample_unit: str):
+        """
+        render stacked information
+        """
+        detail = []
+        frame = self
+        while frame:
+            lines = self.render_one_frame_detail(
+                frame, sample_index, sample_unit
+            )
+            for line in lines:
+                detail.append(
+                    Text.assemble(
+                        (" ", Style(bgcolor=frame.display_color.rich_color)),
+                        " ",
+                        Text.from_markup(line),
+                    )
+                )
+            frame = frame.parent
+
+        return Text.assemble(*detail)
+
+    def render_one_frame_detail(
+        self, frame, sample_index: int, sample_unit: str
+    ):
         raise NotImplementedError
 
     def render_title(self) -> str:
+        """Full name which will be displayed in the frame detail panel"""
         raise NotImplementedError
 
     @property
     def color_key(self):
+        """Same key will get the same color"""
         raise NotImplementedError
 
     @property
     def display_name(self):
+        """The name display on the flamegraph"""
         raise NotImplementedError
 
 

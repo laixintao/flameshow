@@ -99,10 +99,10 @@ class FrameStatThis(Widget):
     def frame_this_total_value_humanize(self):
         logger.info("this instance: %s", self.frame)
 
-        value = self.frame.values[self.sample_index]
         logger.info(
-            "this instance value: %s, values=%s", value, self.frame.values
+            "this instance name: %s, values=%s", self.frame.display_name, self.frame.values
         )
+        value = self.frame.values[self.sample_index]
         value_display = humanize(self.sample_unit, value)
         return value_display
 
