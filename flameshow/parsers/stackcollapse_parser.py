@@ -23,7 +23,7 @@ class StackCollapseFrame(Frame):
     def render_one_frame_detail(
         self, frame, sample_index: int, sample_unit: str
     ):
-        return frame.name
+        return [f"{frame.name}\n"]
 
 
 class StackCollapseParser:
