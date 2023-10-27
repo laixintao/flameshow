@@ -2,23 +2,17 @@ import logging
 import os
 import re
 from typing import Dict
+
 from flameshow.models import Frame, Profile, SampleType
-from flameshow.exceptions import ProfileParseException
 
 logger = logging.getLogger(__name__)
 
 
 class StackCollapseFrame(Frame):
-    @property
-    def color_key(self):
-        return self.name
 
     def render_title(self) -> str:
         return self.name
 
-    @property
-    def display_name(self):
-        return self.name
 
     def render_one_frame_detail(
         self, frame, sample_index: int, sample_unit: str

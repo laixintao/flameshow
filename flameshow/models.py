@@ -107,12 +107,12 @@ class Frame:
     @property
     def color_key(self):
         """Same key will get the same color"""
-        raise NotImplementedError
+        return self.name
 
     @property
     def display_name(self):
         """The name display on the flamegraph"""
-        raise NotImplementedError
+        return self.name
 
 
 @dataclass
