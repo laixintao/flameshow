@@ -114,7 +114,8 @@ class PprofFrame(Frame):
         )
         return [line1, line2]
 
-    def render_title(self) -> str:
+    @property
+    def title(self) -> str:
         return self.display_name
 
 

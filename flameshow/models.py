@@ -100,9 +100,10 @@ class Frame:
     ):
         raise NotImplementedError
 
-    def render_title(self) -> str:
+    @property
+    def title(self) -> str:
         """Full name which will be displayed in the frame detail panel"""
-        raise NotImplementedError
+        return self.name
 
     @property
     def color_key(self):

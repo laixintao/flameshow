@@ -9,11 +9,6 @@ logger = logging.getLogger(__name__)
 
 
 class StackCollapseFrame(Frame):
-
-    def render_title(self) -> str:
-        return self.name
-
-
     def render_one_frame_detail(
         self, frame, sample_index: int, sample_unit: str
     ):
