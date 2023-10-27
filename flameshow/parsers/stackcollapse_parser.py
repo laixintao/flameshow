@@ -107,15 +107,15 @@ class StackCollapseParser:
 
         # only validate the first 100 lines
         lines = to_check.split(os.linesep)
-        to_validate_liens = [
+        to_validate_lines = [
             line.strip() for line in lines[:100] if line.strip()
         ]
 
-        if not to_validate_liens:
+        if not to_validate_lines:
             logger.info("The file is empty, skip StackCollapseParser")
             return False
 
-        for index, line in enumerate(to_validate_liens):
+        for index, line in enumerate(to_validate_lines):
             if not re.match(r"(.* )?\d+", line):
                 logger.info(
                     "line %d not match regex, line:%s not suitable for"

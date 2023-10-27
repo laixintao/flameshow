@@ -19,3 +19,13 @@ def create_frame(data, id_store=None):
     if id_store is not None:
         id_store[root._id] = root
     return root
+
+
+def frame2json(frame):
+    data = {
+        frame.name: {
+            "values": frame.values,
+            "children": [frame2json(c) for c in frame.children],
+        }
+    }
+    return data

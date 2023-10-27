@@ -1,7 +1,6 @@
 import pytest
 import pathlib
 from flameshow.pprof_parser import parse_profile
-from flameshow.models import Frame
 
 
 pytest_plugins = ("pytest_asyncio",)
@@ -36,3 +35,12 @@ def profile10s_profile():
         "rb",
     ) as f:
         return parse_profile(f.read(), "pprof_data/profile-10seconds.out")
+
+
+@pytest.fixture(scope="session")
+def simple_collapse_data():
+    with open(
+        pathlib.Path(__file__).parent / "stackcollapse_data/simple.txt",
+        "rb",
+    ) as f:
+        return f.read()
