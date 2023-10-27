@@ -40,7 +40,7 @@ jobs:
       - uses: codespell-project/actions-codespell@v2
         with:
           check_filenames: true
-          skip: "*.log,./tests/pprof_data/*,poetry.lock"
+          skip: "*.log,./tests/pprof_data/*,poetry.lock,./tests/stackcollapse_data"
 
       - uses: actions/setup-python@v4
         with:
