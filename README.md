@@ -47,12 +47,14 @@ After entering the TUI, the available actions are listed on Footer:
 
 ## Supported Formats
 
-At the moment, Flameshow supports only Golang's pprof dump. I'm actively working
-on adding more formats. Admittedly, I might not be familiar with every tool and
-its specifics. So, if you'd like Flameshow to integrate with a tool you love,
-feel free reach out and drop an issue.
+As far as I know, there is no standard specification for profiles. Different
+languages or tools might generate varying profile formats. I'm actively working
+on supporting more formats. Admittedly, I might not be familiar with every tool
+and its specific format. So, if you'd like Flameshow to integrate with a tool
+you love, please feel free to reach out and submit an issue.
 
 - Golang pprof
+- [Brendan Gregg's Flamegraph](https://www.brendangregg.com/flamegraphs.html)
 
 ## Development
 
