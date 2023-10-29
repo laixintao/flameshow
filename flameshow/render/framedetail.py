@@ -99,10 +99,12 @@ class FrameStatThis(Widget):
     def frame_this_total_value_humanize(self):
         logger.info("this instance: %s", self.frame)
 
-        value = self.frame.values[self.sample_index]
         logger.info(
-            "this instance value: %s, values=%s", value, self.frame.values
+            "this instance name: %s, values=%s",
+            self.frame.display_name,
+            self.frame.values,
         )
+        value = self.frame.values[self.sample_index]
         value_display = humanize(self.sample_unit, value)
         return value_display
 
@@ -348,7 +350,7 @@ class FrameDetail(Widget):
         span_stack_container = VerticalScroll(
             span_detail, id="span-stack-container"
         )
-        span_stack_container.border_title = self.frame.render_title()
+        span_stack_container.border_title = self.frame.title
         yield span_stack_container
         self.composed = True
 
@@ -360,7 +362,7 @@ class FrameDetail(Widget):
             span_stack_container = self.query_one("#span-stack-container")
         except NoMatches:
             return
-        span_stack_container.border_title = self.frame.render_title()
+        span_stack_container.border_title = self.frame.title
         content = self.frame.render_detail(self.sample_index, self.sample_unit)
         span_detail.update(content)
 
@@ -422,7 +424,7 @@ class InformaionScreen(Screen):
         span_stack_container = VerticalScroll(
             span_detail, id="span-stack-container"
         )
-        span_stack_container.border_title = self.frame.render_title()
+        span_stack_container.border_title = self.frame.title
         yield span_stack_container
         yield Footer()
         self.composed = True

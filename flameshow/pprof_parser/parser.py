@@ -10,12 +10,8 @@ import datetime
 import gzip
 import logging
 from typing import Dict, List
-from rich.style import Style
-
-from rich.text import Text
 
 from flameshow.models import Frame, Profile, SampleType
-from flameshow.utils import sizeof
 
 from . import profile_pb2
 
@@ -76,15 +72,27 @@ class PprofFrame(Frame):
     ) -> None:
         super().__init__(name, _id, children, parent, values, root)
 
+        parts = self.name.split("/")
+        if len(parts) > 1:
+            self.golang_package = "/".join(parts[:-1])
+        else:
+            self.golang_package = "buildin"
+
+        self.golang_module_function = parts[-1]
+
+        self.golang_module = self.golang_module_function.split(".")[0]
+
+        self.mapping_file = ""
         self.line = line
         self.mapping = mapping
 
-    def humanize(self, sample_unit, value):
-        display_value = value
-        if sample_unit == "bytes":
-            display_value = sizeof(value)
+    @property
+    def color_key(self):
+        return self.golang_module
 
-        return display_value
+    @property
+    def display_name(self):
+        return self.golang_module_function
 
     def render_one_frame_detail(self, frame, sample_index, sample_unit):
         if frame._id == 0:  # root
@@ -106,29 +114,8 @@ class PprofFrame(Frame):
         )
         return [line1, line2]
 
-    def render_detail(self, sample_index: int, sample_unit: str):
-        """
-        render stacked information
-        """
-        detail = []
-        frame = self
-        while frame:
-            lines = self.render_one_frame_detail(
-                frame, sample_index, sample_unit
-            )
-            for line in lines:
-                detail.append(
-                    Text.assemble(
-                        (" ", Style(bgcolor=frame.display_color.rich_color)),
-                        " ",
-                        Text.from_markup(line),
-                    )
-                )
-            frame = frame.parent
-
-        return Text.assemble(*detail)
-
-    def render_title(self) -> str:
+    @property
+    def title(self) -> str:
         return self.display_name
 
 
@@ -326,6 +313,15 @@ class ProfileParser:
 
     def to_smaple_type(self, st):
         return SampleType(self.s(st.type), self.s(st.unit))
+
+    @classmethod
+    def validate(cls, content: bytes) -> bool:
+        try:
+            unmarshal(content)
+        except:  # noqa E722
+            logger.info("Error when parse content as Pprof")
+            return False
+        return True
 
 
 def get_frame_tree(root_frame):

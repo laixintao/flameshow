@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 
 from flameshow.models import Profile, SampleType
-from flameshow.pprof_parser.parser import Frame, ProfileParser
+from flameshow.pprof_parser.parser import Frame, PprofFrame, ProfileParser
 
 
 def test_parse_max_depth_when_have_multiple_lines(profile10s):
@@ -79,7 +79,7 @@ def test_frame_get_color():
 def test_frame_get_color_full_model_path():
     with patch("flameshow.models.r") as mock_r:
         mock_r.get_color.return_value = "#1122ff"
-        f1 = Frame(
+        f1 = PprofFrame(
             "github.com/prometheus/common/expfmt.MetricFamilyToText.func1", 12
         )
         assert f1.display_color == "#1122ff"

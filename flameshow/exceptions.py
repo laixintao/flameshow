@@ -2,6 +2,10 @@ class FlameshowException(Exception):
     """FlameShow base Exception"""
 
 
+class ProfileParseException(FlameshowException):
+    """Can not parse the profile"""
+
+
 class UsageError(FlameshowException):
     """Usage Error"""
 
