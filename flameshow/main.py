@@ -102,4 +102,4 @@ def main(verbose, log_to, profile):
 
 
 if __name__ == "__main__":
-    main(True, 3, "lucky.log")
+    main()
