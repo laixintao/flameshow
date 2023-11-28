@@ -116,3 +116,37 @@ c 4
             "values": [14],
         }
     }
+
+
+def test_space_and_numbers_in_stackcollapse_symbols():
+    data = b"""
+a 1;b 2;c 3 10
+"""
+    profile = StackCollapseParser("a.txt").parse(data)
+    assert frame2json(profile.root_stack) == {
+        "root": {
+            "children": [
+                {
+                    "a 1": {
+                        "children": [
+                            {
+                                "b 2": {
+                                    "children": [
+                                        {
+                                            "c 3": {
+                                                "children": [],
+                                                "values": [10],
+                                            }
+                                        }
+                                    ],
+                                    "values": [10],
+                                }
+                            }
+                        ],
+                        "values": [10],
+                    }
+                }
+            ],
+            "values": [10],
+        },
+    }
