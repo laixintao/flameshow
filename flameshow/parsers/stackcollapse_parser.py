@@ -26,7 +26,7 @@ class StackCollapseParser:
 
         self.highest = 0
         self.id_store: Dict[int, Frame] = {self.root._id: self.root}
-        self.line_regex = r"(.*?) (\d+)"
+        self.line_regex = r"(.*?) (\d+)$"
         self.line_matcher = re.compile(self.line_regex)
 
     def idgenerator(self):
