@@ -10,24 +10,20 @@ def test_parse_simple_text_data(simple_collapse_data):
 
     assert frame2json(profile.root_stack) == {
         "root": {
-            "children": [
-                {
-                    "a": {
-                        "children": [
-                            {
-                                "b": {
-                                    "children": [
-                                        {"c": {"children": [], "values": [5]}},
-                                        {"d": {"children": [], "values": [4]}},
-                                    ],
-                                    "values": [14],
-                                }
-                            }
-                        ],
-                        "values": [14],
-                    }
+            "children": [{
+                "a": {
+                    "children": [{
+                        "b": {
+                            "children": [
+                                {"c": {"children": [], "values": [5]}},
+                                {"d": {"children": [], "values": [4]}},
+                            ],
+                            "values": [14],
+                        }
+                    }],
+                    "values": [14],
                 }
-            ],
+            }],
             "values": [14],
         },
     }
@@ -98,16 +94,14 @@ c 4
             "children": [
                 {
                     "a": {
-                        "children": [
-                            {
-                                "b": {
-                                    "children": [
-                                        {"c": {"children": [], "values": [10]}}
-                                    ],
-                                    "values": [10],
-                                }
+                        "children": [{
+                            "b": {
+                                "children": [
+                                    {"c": {"children": [], "values": [10]}}
+                                ],
+                                "values": [10],
                             }
-                        ],
+                        }],
                         "values": [10],
                     }
                 },
@@ -125,28 +119,24 @@ a 1;b 2;c 3 10
     profile = StackCollapseParser("a.txt").parse(data)
     assert frame2json(profile.root_stack) == {
         "root": {
-            "children": [
-                {
-                    "a 1": {
-                        "children": [
-                            {
-                                "b 2": {
-                                    "children": [
-                                        {
-                                            "c 3": {
-                                                "children": [],
-                                                "values": [10],
-                                            }
-                                        }
-                                    ],
-                                    "values": [10],
+            "children": [{
+                "a 1": {
+                    "children": [{
+                        "b 2": {
+                            "children": [
+                                {
+                                    "c 3": {
+                                        "children": [],
+                                        "values": [10],
+                                    }
                                 }
-                            }
-                        ],
-                        "values": [10],
-                    }
+                            ],
+                            "values": [10],
+                        }
+                    }],
+                    "values": [10],
                 }
-            ],
+            }],
             "values": [10],
         },
     }
