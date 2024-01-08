@@ -11,6 +11,8 @@ import gzip
 import logging
 from typing import Dict, List
 
+from rich.text import Text
+
 from flameshow.models import Frame, Profile, SampleType
 
 from . import profile_pb2
@@ -112,7 +114,7 @@ class PprofFrame(Frame):
             f"  [grey37]{frame.line.function.filename}, [b]line"
             f" {frame.line.line_no}[/b][/grey37]\n"
         )
-        return [line1, line2]
+        return [Text.from_markup(line1), Text.from_markup(line2)]
 
     @property
     def title(self) -> str:

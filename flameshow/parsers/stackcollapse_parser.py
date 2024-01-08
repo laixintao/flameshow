@@ -3,6 +3,8 @@ import os
 import re
 from typing import Dict
 
+from rich.text import Text
+
 from flameshow.models import Frame, Profile, SampleType
 
 logger = logging.getLogger(__name__)
@@ -12,7 +14,7 @@ class StackCollapseFrame(Frame):
     def render_one_frame_detail(
         self, frame, sample_index: int, sample_unit: str
     ):
-        return [f"{frame.name}\n"]
+        return [Text(f"{frame.name}\n")]
 
 
 class StackCollapseParser:
