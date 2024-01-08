@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "flameshow"
-version = "1.1.1"
+version = "1.1.2"
 homepage = "https://github.com/laixintao/flameshow"
 description = "A Terminal Flamegraph Viewer"
 authors = ["laixintao <laixintaoo@gmail.com>"]
