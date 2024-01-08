@@ -88,7 +88,7 @@ class Frame:
                     Text.assemble(
                         (" ", Style(bgcolor=frame.display_color.rich_color)),
                         " ",
-                        Text.from_markup(line),
+                        line,
                     )
                 )
             frame = frame.parent
