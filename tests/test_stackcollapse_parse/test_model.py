@@ -13,9 +13,7 @@ def test_frame_model_render():
 
 
 def test_frame_model_render_with_square():
-    f = StackCollapseFrame(
-        "[abc]", 1, parent=None, children=[], values=[13]
-    )
+    f = StackCollapseFrame("[abc]", 1, parent=None, children=[], values=[13])
     render_result = f.render_one_frame_detail(f, 0, "count")
     assert len(render_result) == 1
     item = render_result[0]
