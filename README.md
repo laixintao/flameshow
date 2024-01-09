@@ -27,6 +27,14 @@ Flameshow is written in pure Python, so you can install via `pip`:
 pip install flameshow
 ```
 
+But you can also run it through [nix](https://nixos.org/):
+
+```shell
+nix run github:laixintao/flameshow
+# Or if you want to install it imperatively:
+nix profile install github:laixintao/flameshow
+```
+
 ## Usage
 
 View golang's goroutine dump:
