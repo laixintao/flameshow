@@ -47,7 +47,7 @@ $ flameshow goroutine.out
 After entering the TUI, the available actions are listed on Footer:
 
 - <kbd>q</kbd> for quit
-- <kbd>j</kbd> <kbd>i</kbd> <kbd>j</kbd> <kbd>k</kbd> or <kbd>←</kbd>
+- <kbd>h</kbd> <kbd>j</kbd> <kbd>k</kbd> <kbd>l</kbd> or <kbd>←</kbd>
   <kbd>↓</kbd> <kbd>↑</kbd> <kbd>→</kbd> for moving around, and <kbd>Enter</kbd>
   for zoom in, then <kbd>Esc</kbd> for zoom out.
 - You can also use a mouse, hover on a span will show it details, and click will
