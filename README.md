@@ -40,7 +40,7 @@ nix profile install github:laixintao/flameshow
 View golang's goroutine dump:
 
 ```shell
-$ curl https://raw.githubusercontent.com/laixintao/flameshow/main/tests/pprof_data/goroutine.out -o goroutine.out
+$ curl http://localhost:9100/debug/pprof/goroutine -o goroutine.out
 $ flameshow goroutine.out
 ```
 
