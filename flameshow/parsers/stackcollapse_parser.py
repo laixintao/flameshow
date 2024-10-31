@@ -62,7 +62,7 @@ class StackCollapseParser:
         line = line.strip()
         if not line:
             return
-        if line.startswith('#'):  # comments
+        if line.startswith("#"):  # comments
             return
         matcher = self.line_matcher.match(line)
         if not matcher:
