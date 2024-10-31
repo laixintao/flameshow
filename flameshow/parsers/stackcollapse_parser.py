@@ -62,9 +62,11 @@ class StackCollapseParser:
         line = line.strip()
         if not line:
             return
+        if line.startswith('#'):  # comments
+            return
         matcher = self.line_matcher.match(line)
         if not matcher:
-            logger.warn(
+            logger.warning(
                 "Can not parse {} with regex {}".format(line, self.line_regex)
             )
             return
@@ -118,6 +120,8 @@ class StackCollapseParser:
             return False
 
         for index, line in enumerate(to_validate_lines):
+            if line.startswith("#"):  # comments
+                continue
             if not re.match(r"(.* )?\d+", line):
                 logger.info(
                     "line %d not match regex, line:%s not suitable for"

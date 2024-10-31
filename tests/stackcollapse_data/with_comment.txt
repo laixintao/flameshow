@@ -1,0 +1,12 @@
+# austin: 3.7.0
+# interval: 100
+# mode: wall
+# python: 3.12.7
+# duration: 828637
+# sampling: 3,35,6057
+# saturation: 39/5305
+# errors: 820/5305
+
+
+P245906;T0:245906 16905
+P245906;T0:245906;<frozen importlib._bootstrap>:<module>:1546 158
