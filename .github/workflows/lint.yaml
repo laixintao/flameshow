@@ -41,6 +41,7 @@ jobs:
         with:
           check_filenames: true
           skip: "*.log,./tests/pprof_data/*,poetry.lock,./tests/stackcollapse_data"
+          ignore_words_list: buildin
 
       - uses: actions/setup-python@v4
         with:

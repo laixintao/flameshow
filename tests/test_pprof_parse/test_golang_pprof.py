@@ -149,14 +149,16 @@ def test_protobuf_parse_gorouting_mapping(goroutine_pprof):
 
 
 def test_parser_get_name_aggr():
-    root = create_frame({
-        "id": 0,
-        "values": [10],
-        "children": [
-            {"id": 1, "values": [3], "children": []},
-            {"id": 2, "values": [4], "children": []},
-        ],
-    })
+    root = create_frame(
+        {
+            "id": 0,
+            "values": [10],
+            "children": [
+                {"id": 1, "values": [3], "children": []},
+                {"id": 2, "values": [4], "children": []},
+            ],
+        }
+    )
     p = Profile(
         filename="abc",
         root_stack=root,
@@ -172,39 +174,41 @@ def test_parser_get_name_aggr():
 
 
 def test_parser_get_name_aggr_with_nested():
-    root = create_frame({
-        "id": 0,
-        "values": [10],
-        "children": [
-            {
-                "id": 1,
-                "name": "foo",
-                "values": [3],
-                "children": [
-                    {
-                        "id": 10,
-                        "values": [3],
-                        "children": [
-                            {
-                                "id": 11,
-                                "values": [3],
-                                "children": [
-                                    {
-                                        "id": 21,
-                                        "values": [3],
-                                        "children": [],
-                                        "name": "bar",
-                                    },
-                                ],
-                                "name": "foo",
-                            },
-                        ],
-                    },
-                ],
-            },
-            {"id": 2, "values": [4], "children": [], "name": "foo"},
-        ],
-    })
+    root = create_frame(
+        {
+            "id": 0,
+            "values": [10],
+            "children": [
+                {
+                    "id": 1,
+                    "name": "foo",
+                    "values": [3],
+                    "children": [
+                        {
+                            "id": 10,
+                            "values": [3],
+                            "children": [
+                                {
+                                    "id": 11,
+                                    "values": [3],
+                                    "children": [
+                                        {
+                                            "id": 21,
+                                            "values": [3],
+                                            "children": [],
+                                            "name": "bar",
+                                        },
+                                    ],
+                                    "name": "foo",
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {"id": 2, "values": [4], "children": [], "name": "foo"},
+            ],
+        }
+    )
 
     p = Profile(
         filename="abc",
@@ -222,31 +226,33 @@ def test_parser_get_name_aggr_with_nested():
 
 
 def test_parser_get_name_aggr_with_previous_occrance():
-    root = create_frame({
-        "id": 0,
-        "values": [10],
-        "children": [
-            {
-                "id": 1,
-                "name": "foo",
-                "values": [3],
-                "children": [],
-            },
-            {
-                "id": 2,
-                "values": [4],
-                "children": [
-                    {
-                        "id": 3,
-                        "name": "foo",
-                        "values": [2],
-                        "children": [],
-                    },
-                ],
-                "name": "bar",
-            },
-        ],
-    })
+    root = create_frame(
+        {
+            "id": 0,
+            "values": [10],
+            "children": [
+                {
+                    "id": 1,
+                    "name": "foo",
+                    "values": [3],
+                    "children": [],
+                },
+                {
+                    "id": 2,
+                    "values": [4],
+                    "children": [
+                        {
+                            "id": 3,
+                            "name": "foo",
+                            "values": [2],
+                            "children": [],
+                        },
+                    ],
+                    "name": "bar",
+                },
+            ],
+        }
+    )
 
     p = Profile(
         filename="abc",

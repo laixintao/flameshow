@@ -209,14 +209,16 @@ def test_flamegraph_action_zoom_in_zoom_out():
 
 
 def test_flamegraph_action_move_down():
-    root = create_frame({
-        "id": 0,
-        "values": [10],
-        "children": [
-            {"id": 1, "values": [3], "children": []},
-            {"id": 2, "values": [4], "children": []},
-        ],
-    })
+    root = create_frame(
+        {
+            "id": 0,
+            "values": [10],
+            "children": [
+                {"id": 1, "values": [3], "children": []},
+                {"id": 2, "values": [4], "children": []},
+            ],
+        }
+    )
 
     p = Profile(
         filename="abc",
@@ -240,11 +242,13 @@ def test_flamegraph_action_move_down():
 
 
 def test_flamegraph_action_move_down_no_more_children():
-    root = create_frame({
-        "id": 0,
-        "values": [10],
-        "children": [],
-    })
+    root = create_frame(
+        {
+            "id": 0,
+            "values": [10],
+            "children": [],
+        }
+    )
 
     p = Profile(
         filename="abc",
@@ -262,13 +266,15 @@ def test_flamegraph_action_move_down_no_more_children():
 
 
 def test_flamegraph_action_move_down_children_is_zero():
-    root = create_frame({
-        "id": 0,
-        "values": [10],
-        "children": [
-            {"id": 1, "values": [0], "children": []},
-        ],
-    })
+    root = create_frame(
+        {
+            "id": 0,
+            "values": [10],
+            "children": [
+                {"id": 1, "values": [0], "children": []},
+            ],
+        }
+    )
 
     p = Profile(
         filename="abc",

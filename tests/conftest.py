@@ -44,3 +44,12 @@ def simple_collapse_data():
         "rb",
     ) as f:
         return f.read()
+
+
+@pytest.fixture(scope="session")
+def collapse_data_with_comment():
+    with open(
+        pathlib.Path(__file__).parent / "stackcollapse_data/with_comment.txt",
+        "rb",
+    ) as f:
+        return f.read()
