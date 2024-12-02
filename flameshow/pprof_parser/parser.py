@@ -105,7 +105,7 @@ class PprofFrame(Frame):
             else:
                 binary_name = "root"
             detail = f"{binary_name} [b red]{value}[/b red]\n"
-            return [detail]
+            return [Text.from_markup(detail)]
 
         value = frame.humanize(sample_unit, frame.values[sample_index])
         line1 = f"{frame.line.function.name}: [b red]{value}[/b red]\n"
