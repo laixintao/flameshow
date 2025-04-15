@@ -35,6 +35,12 @@ nix run github:laixintao/flameshow
 nix profile install github:laixintao/flameshow
 ```
 
+If you are a [x-cmd](https://x-cmd.com) user, you can run the following command to install:
+
+```shel
+x install flameshow
+```
+
 ## Usage
 
 View golang's goroutine dump:
