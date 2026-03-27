@@ -229,23 +229,21 @@ pyflakes = ">=3.1.0,<3.2.0"
 [[package]]
 name = "flamegraph-textual"
 version = "0.1.0"
-description = "Terminal flamegraph renderer built on Textual"
+description = "Terminal flamegraph renderer built for Textual"
 optional = false
-python-versions = "^3.10"
-groups = ["main", "dev"]
-files = []
-develop = true
+python-versions = "<4.0,>=3.10"
+groups = ["main"]
+files = [
+    {file = "flamegraph_textual-0.1.0-py3-none-any.whl", hash = "sha256:febfefb6c56e06ec3b907ec52a1f9bc884c6140643a95fa75657026e55ff9b79"},
+    {file = "flamegraph_textual-0.1.0.tar.gz", hash = "sha256:c996c614a7433e8ed4f52ce8efd7377bd31c70650acb3a0bc61810e24cbc6c98"},
+]
 
 [package.dependencies]
-iteround = "^1.0.4"
-protobuf = "^4.25"
-rich = "^13.6.0"
-textual = "^0.37.1"
-typing-extensions = "^4.7.1"
-
-[package.source]
-type = "directory"
-url = "flamegraph_textual"
+iteround = ">=1.0.4,<2.0.0"
+protobuf = ">=4.25,<5.0"
+rich = ">=13.6.0,<14.0.0"
+textual = ">=0.37.1,<0.38.0"
+typing-extensions = ">=4.7.1,<5.0.0"
 
 [[package]]
 name = "importlib-metadata"
@@ -253,7 +251,7 @@ version = "9.0.0"
 description = "Read metadata from Python packages"
 optional = false
 python-versions = ">=3.10"
-groups = ["main", "dev"]
+groups = ["main"]
 files = [
     {file = "importlib_metadata-9.0.0-py3-none-any.whl", hash = "sha256:2d21d1cc5a017bd0559e36150c21c830ab1dc304dedd1b7ea85d20f45ef3edd7"},
     {file = "importlib_metadata-9.0.0.tar.gz", hash = "sha256:a4f57ab599e6a2e3016d7595cfd72eb4661a5106e787a95bcc90c7105b831efc"},
@@ -345,7 +343,7 @@ version = "1.0.4"
 description = "Rounds iterables (arrays, lists, sets, etc) while maintaining the sum of the initial array."
 optional = false
 python-versions = "*"
-groups = ["main", "dev"]
+groups = ["main"]
 files = [
     {file = "iteround-1.0.4-py3-none-any.whl", hash = "sha256:17947dd5479177e6fb186b0a3d5d594b55eedea14dc722c6da7e84bbed45f5b2"},
 ]
@@ -376,7 +374,7 @@ version = "2.1.0"
 description = "Links recognition library with FULL unicode support."
 optional = false
 python-versions = ">=3.10"
-groups = ["main", "dev"]
+groups = ["main"]
 files = [
     {file = "linkify_it_py-2.1.0-py3-none-any.whl", hash = "sha256:0d252c1594ecba2ecedc444053db5d3a9b7ec1b0dd929c8f1d74dce89f86c05e"},
     {file = "linkify_it_py-2.1.0.tar.gz", hash = "sha256:43360231720999c10e9328dc3691160e27a718e280673d444c38d7d3aaa3b98b"},
@@ -397,7 +395,7 @@ version = "4.0.0"
 description = "Python port of markdown-it. Markdown parsing, done right!"
 optional = false
 python-versions = ">=3.10"
-groups = ["main", "dev"]
+groups = ["main"]
 files = [
     {file = "markdown_it_py-4.0.0-py3-none-any.whl", hash = "sha256:87327c59b172c5011896038353a81343b6754500a08cd7a4973bb48c6d578147"},
     {file = "markdown_it_py-4.0.0.tar.gz", hash = "sha256:cb0a2b4aa34f932c007117b194e945bd74e0ec24133ceb5bac59009cda1cb9f3"},
@@ -453,7 +451,7 @@ version = "0.5.0"
 description = "Collection of plugins for markdown-it-py"
 optional = false
 python-versions = ">=3.10"
-groups = ["main", "dev"]
+groups = ["main"]
 files = [
     {file = "mdit_py_plugins-0.5.0-py3-none-any.whl", hash = "sha256:07a08422fc1936a5d26d146759e9155ea466e842f5ab2f7d2266dd084c8dab1f"},
     {file = "mdit_py_plugins-0.5.0.tar.gz", hash = "sha256:f4918cb50119f50446560513a8e311d574ff6aaed72606ddae6d35716fe809c6"},
@@ -473,7 +471,7 @@ version = "0.1.2"
 description = "Markdown URL utilities"
 optional = false
 python-versions = ">=3.7"
-groups = ["main", "dev"]
+groups = ["main"]
 files = [
     {file = "mdurl-0.1.2-py3-none-any.whl", hash = "sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8"},
     {file = "mdurl-0.1.2.tar.gz", hash = "sha256:bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba"},
@@ -560,7 +558,7 @@ version = "4.25.9"
 description = ""
 optional = false
 python-versions = ">=3.8"
-groups = ["main", "dev"]
+groups = ["main"]
 files = [
     {file = "protobuf-4.25.9-cp310-abi3-win32.whl", hash = "sha256:bde396f568b0b46fc8fbfe9f02facf25b6755b2578a3b8ac61e74b9d69499e03"},
     {file = "protobuf-4.25.9-cp310-abi3-win_amd64.whl", hash = "sha256:3683c05154252206f7cb2d371626514b3708199d9bcf683b503dabf3a2e38e06"},
@@ -710,7 +708,7 @@ version = "13.9.4"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 optional = false
 python-versions = ">=3.8.0"
-groups = ["main", "dev"]
+groups = ["main"]
 files = [
     {file = "rich-13.9.4-py3-none-any.whl", hash = "sha256:6049d5e6ec054bf2779ab3358186963bac2ea89175919d699e378b99738c2a90"},
     {file = "rich-13.9.4.tar.gz", hash = "sha256:439594978a49a09530cff7ebc4b5c7103ef57baf48d5ea3184f21d9a2befa098"},
@@ -750,7 +748,7 @@ version = "0.37.1"
 description = "Modern Text User Interface framework"
 optional = false
 python-versions = ">=3.7,<4.0"
-groups = ["main", "dev"]
+groups = ["main"]
 files = [
     {file = "textual-0.37.1-py3-none-any.whl", hash = "sha256:bbedebd9bf245523dc07d1a883ce4178133cfe1d3c3e030a2224359128f177b7"},
     {file = "textual-0.37.1.tar.gz", hash = "sha256:0498894da7f4af5cac62d99e412e9d813e784f7a87834dd29aa656d31d068760"},
@@ -866,7 +864,7 @@ version = "2.0.0"
 description = "Micro subset of unicode data files for linkify-it-py projects."
 optional = false
 python-versions = ">=3.10"
-groups = ["main", "dev"]
+groups = ["main"]
 files = [
     {file = "uc_micro_py-2.0.0-py3-none-any.whl", hash = "sha256:3603a3859af53e5a39bc7677713c78ea6589ff188d70f4fee165db88e22b242c"},
     {file = "uc_micro_py-2.0.0.tar.gz", hash = "sha256:c53691e495c8db60e16ffc4861a35469b0ba0821fe409a8a7a0a71864d33a811"},
@@ -893,7 +891,7 @@ version = "3.23.0"
 description = "Backport of pathlib-compatible object wrapper for zip files"
 optional = false
 python-versions = ">=3.9"
-groups = ["main", "dev"]
+groups = ["main"]
 files = [
     {file = "zipp-3.23.0-py3-none-any.whl", hash = "sha256:071652d6115ed432f5ce1d34c336c0adfd6a884660d1e9712a256d3d3bd4b14e"},
     {file = "zipp-3.23.0.tar.gz", hash = "sha256:a07157588a12518c9d4034df3fbbee09c814741a33ff63c05fa29d26a2404166"},
@@ -910,4 +908,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "90ad5dc344f395f1a9061b6dd0c92987ec6f9605cfc769823215f50b5b13c8d3"
+content-hash = "e27f193f287421bc0afba69ed6b48df61d77179782684f0416a4ef502e38e7c5"
