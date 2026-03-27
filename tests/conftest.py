@@ -10,7 +10,6 @@ sys.path.insert(
 
 from flameshow.pprof_parser import parse_profile
 
-
 pytest_plugins = ("pytest_asyncio",)
 
 

@@ -1,3 +1,9 @@
+from flamegraph_textual.exceptions import (
+    ProfileParseException,
+    RenderException,
+)
+
+
 class FlameshowException(Exception):
     """FlameShow base Exception"""
 
@@ -5,8 +11,6 @@ class FlameshowException(Exception):
 class UsageError(FlameshowException):
     """Usage Error"""
 
-
-from flamegraph_textual.exceptions import ProfileParseException, RenderException
 
 __all__ = [
     "FlameshowException",
