@@ -1,6 +1,6 @@
 from textual.geometry import Size
-from flameshow.models import Frame, Profile, SampleType
-from flameshow.render.app import FlameGraphScroll, FlameshowApp
+from flamegraph_textual.models import Frame, Profile, SampleType
+from flamegraph_textual.render.app import FlameGraphScroll, FlameshowApp
 from unittest.mock import MagicMock, patch, PropertyMock
 
 
@@ -11,7 +11,7 @@ def test_flamegraph_container_scroll():
         size.height = height
 
         with patch(
-            "flameshow.render.app.FlameGraphScroll.size",
+            "flamegraph_textual.render.app.FlameGraphScroll.size",
             new_callable=PropertyMock,
         ) as mock_size:
             mock_size.return_value = Size(0, height)

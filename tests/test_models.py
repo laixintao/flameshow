@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 
-from flameshow.models import Profile, SampleType
+from flamegraph_textual.models import Profile, SampleType
 from flameshow.pprof_parser.parser import Frame, PprofFrame, ProfileParser
 
 
@@ -69,7 +69,7 @@ def test_frame():
 
 
 def test_frame_get_color():
-    with patch("flameshow.models.r") as mock_r:
+    with patch("flamegraph_textual.models.r") as mock_r:
         mock_r.get_color.return_value = "#1122ff"
         f1 = Frame("foo", 12)
         assert f1.display_color == "#1122ff"
@@ -77,7 +77,7 @@ def test_frame_get_color():
 
 
 def test_frame_get_color_full_model_path():
-    with patch("flameshow.models.r") as mock_r:
+    with patch("flamegraph_textual.models.r") as mock_r:
         mock_r.get_color.return_value = "#1122ff"
         f1 = PprofFrame(
             "github.com/prometheus/common/expfmt.MetricFamilyToText.func1", 12

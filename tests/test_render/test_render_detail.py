@@ -1,5 +1,5 @@
-from flameshow.models import Profile
-from flameshow.render.framedetail import FrameStatAll
+from flamegraph_textual.models import Profile
+from flamegraph_textual.render.framedetail import FrameStatAll
 from ..utils import create_frame
 
 

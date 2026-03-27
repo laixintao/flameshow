@@ -1,6 +1,6 @@
 import datetime
 import json
-from flameshow.models import Frame, Profile, SampleType
+from flamegraph_textual.models import Frame, Profile, SampleType
 
 from flameshow.pprof_parser.parser import ProfileParser
 from flameshow.pprof_parser.parser import (

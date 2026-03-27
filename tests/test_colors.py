@@ -1,4 +1,7 @@
-from flameshow.colors import LinaerColorPlatte, flamegraph_random_color_platte
+from flamegraph_textual.colors import (
+    LinaerColorPlatte,
+    flamegraph_random_color_platte,
+)
 from textual.color import Color
 
 

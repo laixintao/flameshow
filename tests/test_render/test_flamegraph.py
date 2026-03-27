@@ -3,10 +3,10 @@ from unittest.mock import MagicMock
 import pytest
 from textual.events import MouseMove
 
-from flameshow.exceptions import RenderException
-from flameshow.models import Frame
+from flamegraph_textual.exceptions import RenderException
+from flamegraph_textual.models import Frame
 from flameshow.pprof_parser.parser import Profile, SampleType
-from flameshow.render.flamegraph import FlameGraph, FrameMap, add_array
+from flamegraph_textual.render.flamegraph import FlameGraph, FrameMap, add_array
 
 from ..utils import create_frame
 

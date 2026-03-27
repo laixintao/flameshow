@@ -1,4 +1,4 @@
-from flameshow.models import Frame
+from flamegraph_textual.models import Frame
 
 
 def create_frame(data, id_store=None):

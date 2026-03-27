@@ -1,5 +1,5 @@
 from rich.text import Text, Span
-from flameshow.render.header import (
+from flamegraph_textual.render.header import (
     HeaderIcon,
     HeaderTitle,
     HeaderOpenedFilename,

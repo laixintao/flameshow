@@ -1,4 +1,4 @@
-from flameshow.render.app import FlameshowApp
+from flamegraph_textual.render.app import FlameshowApp
 
 
 async def test_app_startup(profile10s_profile):

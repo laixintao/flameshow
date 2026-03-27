@@ -1,4 +1,4 @@
-from flameshow.utils import sizeof
+from flamegraph_textual.utils import sizeof
 
 
 def test_sizeof():

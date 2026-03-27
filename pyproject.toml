@@ -43,6 +43,7 @@ textual = "^0.37.1"
 click = "^8.1.7"
 protobuf = "^4.25"
 iteround = "^1.0.4"
+flamegraph-textual = "^0.1.0"
 
 [tool.poetry.scripts]
 flameshow = 'flameshow.main:main'
@@ -53,6 +54,7 @@ pytest-asyncio = "^0.21.1"
 ipdb = "^0.13.13"
 flake8 = "^6.1.0"
 pytest-cov = "^2.12.1"
+flamegraph-textual = {path = "flamegraph_textual", develop = true}
 
 [build-system]
 requires = ["poetry-core"]
