@@ -1,5 +1,13 @@
-import pytest
 import pathlib
+import sys
+
+import pytest
+
+sys.path.insert(
+    0,
+    str(pathlib.Path(__file__).resolve().parents[1] / "flamegraph_textual"),
+)
+
 from flameshow.pprof_parser import parse_profile
 
 
