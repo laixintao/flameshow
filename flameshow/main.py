@@ -5,10 +5,10 @@ import time
 import sys
 
 import click
+from flamegraph_textual.parsers import parse
+from flamegraph_textual.render import FlameshowApp
 
 from flameshow import __version__
-from flameshow.parsers import parse
-from flameshow.render import FlameshowApp
 
 logger = logging.getLogger(__name__)
 
