@@ -24,9 +24,6 @@ classifiers = [
     "Operating System :: Microsoft :: Windows :: Windows 11",
     "Operating System :: MacOS",
     "Operating System :: POSIX :: Linux",
-    # "Programming Language :: Python :: 3.7",
-    # "Programming Language :: Python :: 3.8",
-    # "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -43,6 +40,7 @@ textual = "^0.37.1"
 click = "^8.1.7"
 protobuf = "^4.25"
 iteround = "^1.0.4"
+flamegraph-textual = "^0.1.0"
 
 [tool.poetry.scripts]
 flameshow = 'flameshow.main:main'

@@ -10,7 +10,6 @@ from flameshow import __version__
 from flameshow.parsers import parse
 from flameshow.render import FlameshowApp
 
-
 logger = logging.getLogger(__name__)
 
 

@@ -1,3 +1,3 @@
-from .parser import parse_profile
+from flamegraph_textual.pprof_parser.parser import ProfileParser, parse_profile
 
-__all__ = ["parse_profile"]
+__all__ = ["ProfileParser", "parse_profile"]

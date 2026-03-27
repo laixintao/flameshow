@@ -1,5 +1,3 @@
-from textual.widgets import Tabs
+from flamegraph_textual.render.tabs import SampleTabs
 
-
-class SampleTabs(Tabs, can_focus=False):
-    pass
+__all__ = ["SampleTabs"]
