@@ -53,29 +53,14 @@ After entering the TUI, the available actions are listed on Footer:
 - You can also use a mouse, hover on a span will show it details, and click will
   zoom it.
 
-## Library usage
+## Flamegraph TUI
+
+This project is built on [flamegraph-textual](https://github.com/laixintao/flamegraph-textual).
 
 The flamegraph renderer is available as a separate package:
 
 ```shell
 pip install flamegraph-textual
-```
-
-You can embed the flamegraph widget in your own Textual projects:
-
-```python
-from textual.app import App, ComposeResult
-
-from flamegraph_textual import FlameGraphView
-
-
-class Demo(App):
-    def compose(self) -> ComposeResult:
-        profile_text = open("profile.out", "rb").read()
-        yield FlameGraphView(profile_text, filename="profile.out")
-
-
-Demo().run()
 ```
 
 ## Supported Formats
