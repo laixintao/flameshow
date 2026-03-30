@@ -12,7 +12,6 @@ packages = [{include = "flameshow"}]
 include = [
     { path = "docs", format = "sdist" },
     { path = "tests", format = "sdist" },
-    { path = "proto", format = "sdist" },
 ]
 
 classifiers = [
@@ -70,12 +69,6 @@ extend-exclude = '''
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-
-[tool.coverage.run]
-omit = [
-    "flameshow/pprof_parser/profile_pb2.py",
-    "flameshow/exceptions.py",
-]
 
 [tool.coverage.report]
 exclude_lines = [
