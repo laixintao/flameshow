@@ -74,6 +74,8 @@ you love, please feel free to reach out and submit an issue.
 - Golang pprof
 - [Brendan Gregg's Flamegraph](https://www.brendangregg.com/flamegraphs.html)
 - Python [Austin](https://github.com/P403n1x87/austin)
+- [Speedscope](https://www.speedscope.app/) (evented and sampled profiles)
+- Google Trace Event format
 
 ## Development
 
